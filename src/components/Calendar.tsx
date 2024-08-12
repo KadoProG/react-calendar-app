@@ -10,6 +10,7 @@ const Calendar: React.FC = () => {
   const [startHour, setStartHour] = useState<number | null>(null);
   const [endHour, setEndHour] = useState<number | null>(null);
   const [currentDay, setCurrentDay] = useState<number | null>(null);
+  const calendarRef = React.useRef<HTMLDivElement>(null);
 
   /**
    * ドラッグ開始時の処理（マウスがセルをクリックしたときの処理）
@@ -24,6 +25,7 @@ const Calendar: React.FC = () => {
   const handleMouseMove = React.useCallback(
     (day: number, hour: number) => {
       if (dragging && day === currentDay) {
+        console.log(hour);
         setEndHour(hour);
       }
     },
@@ -51,6 +53,8 @@ const Calendar: React.FC = () => {
     }
   }, [dragging, startHour, endHour, currentDay, events]);
 
+  const handleTouchEnd = React.useCallback(handleMouseUp, [handleMouseUp]);
+
   const handleKeyDown = React.useCallback((event: KeyboardEvent) => {
     if (event.key === 'Escape') {
       // Reset dragging state if ESC is pressed
@@ -71,7 +75,12 @@ const Calendar: React.FC = () => {
   }, [handleKeyDown]);
 
   return (
-    <div className={styles.calendar} onMouseUp={handleMouseUp}>
+    <div
+      className={styles.calendar}
+      onMouseUp={handleMouseUp}
+      onTouchEnd={handleTouchEnd}
+      ref={calendarRef}
+    >
       {[...Array(7)].map((_, dayIndex) => (
         <div key={dayIndex} className={styles.day_column}>
           <div className={styles.time_cell}>
@@ -83,14 +92,30 @@ const Calendar: React.FC = () => {
               className={`${styles.time_cell} ${
                 dragging &&
                 dayIndex === currentDay &&
-                hourIndex >= Math.min(startHour, endHour) &&
-                hourIndex <= Math.max(startHour, endHour)
+                hourIndex >= Math.min(startHour!, endHour!) &&
+                hourIndex <= Math.max(startHour!, endHour!)
                   ? styles.selected
                   : ''
               }`}
               onMouseDown={() => handleMouseDown(dayIndex, hourIndex)}
               onMouseMove={() => handleMouseMove(dayIndex, hourIndex)}
             >
+              {/* ドラッグ中の要素のハイライト */}
+              {dragging &&
+                dayIndex === currentDay &&
+                ((startHour! <= endHour! && hourIndex === startHour) ||
+                  (startHour! > endHour! && hourIndex === endHour)) && (
+                  <div
+                    className={`${styles.selected} ${startHour! > endHour! ? styles.reverse : ''}`}
+                    style={{
+                      height: `${(Math.abs(endHour! - startHour!) + 1) * 100}%`,
+                    }}
+                  >
+                    {Math.min(startHour!, endHour!)} ~ {Math.max(startHour!, endHour!)}
+                  </div>
+                )}
+
+              {/* １イベントごとの表示 */}
               {events
                 .filter((event) => event.day === dayIndex)
                 .filter((event) => hourIndex === event.startHour)
@@ -98,7 +123,9 @@ const Calendar: React.FC = () => {
                   <div
                     key={i}
                     className={styles.event}
-                    style={{ height: `${(event.endHour - hourIndex + 1) * 100}%` }}
+                    style={{
+                      height: `${(event.endHour - hourIndex + 1) * 100}%`,
+                    }}
                   >
                     {event.title} {event.startHour} ~ {event.endHour}
                   </div>

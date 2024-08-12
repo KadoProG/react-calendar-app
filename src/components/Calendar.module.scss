@@ -5,6 +5,11 @@
   gap: 1px; /* セル間のスペース */
   background-color: #ccc;
   width: 100svw;
+  user-select: none;
+  -webkit-user-drag: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -moz-user-drag: none;
 }
 
 /* 各日の列 */
@@ -18,9 +23,7 @@
 .time_cell {
   position: relative;
   cursor: pointer;
-  &:hover {
-    background-color: #f0f0f0;
-  }
+
   &::after {
     content: '';
     position: absolute;
@@ -28,6 +31,41 @@
     width: 100%;
     height: 1px;
     background-color: #e0e0e0;
+  }
+
+  &:hover {
+    background-color: #f0f0f0;
+  }
+  &.selected {
+    &:hover {
+      background: initial;
+    }
+  }
+
+  /* ドラッグで選択中のセルをハイライト */
+  & .selected {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(33, 150, 243, 0.3); /* ハイライトの色 */
+    border: 1px solid #2196f3; /* ハイライトの境界線 */
+    user-select: none;
+    -webkit-user-drag: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -moz-user-drag: none;
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background-color: #2196f3;
+      z-index: 1;
+    }
   }
 }
 
@@ -47,10 +85,5 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-/* ドラッグで選択中のセルをハイライト */
-.selected {
-  background-color: rgba(33, 150, 243, 0.3); /* ハイライトの色 */
-  border: 1px solid #2196f3; /* ハイライトの境界線 */
+  z-index: 1;
 }
