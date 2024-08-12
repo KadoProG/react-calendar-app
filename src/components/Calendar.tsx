@@ -81,6 +81,14 @@ const Calendar: React.FC = () => {
       onTouchEnd={handleTouchEnd}
       ref={calendarRef}
     >
+      <div className={styles.day_column}>
+        <div className={`${styles.time_cell} ${styles.time_label}`}></div>
+        {[...Array(24)].map((_, hourIndex) => (
+          <div key={hourIndex} className={`${styles.time_cell} ${styles.time_label}`}>
+            <p>{hourIndex}</p>
+          </div>
+        ))}
+      </div>
       {[...Array(7)].map((_, dayIndex) => (
         <div key={dayIndex} className={styles.day_column}>
           <div className={styles.time_cell}>
