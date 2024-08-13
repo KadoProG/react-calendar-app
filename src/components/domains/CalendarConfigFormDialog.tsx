@@ -71,15 +71,32 @@ export const CalendarConfigFormDialog: React.FC<CalendarConfigFormDialogProps> =
           <DeleteButton type="button" onClick={props.onDeleted} />
         </div>
         <div className={styles.dialog__body}>
-          <TextField control={control} name="title" type="string" required label="タイトル" />
-          <TextField
-            control={control}
-            name="start"
-            type="datetime-local"
-            required
-            label="開始日時"
-          />
-          <TextField control={control} name="end" type="datetime-local" required label="終了日時" />
+          {props.open && (
+            <>
+              <TextField
+                control={control}
+                name="title"
+                type="string"
+                required
+                label="タイトル"
+                autoFocus
+              />
+              <TextField
+                control={control}
+                name="start"
+                type="datetime-local"
+                required
+                label="開始日時"
+              />
+              <TextField
+                control={control}
+                name="end"
+                type="datetime-local"
+                required
+                label="終了日時"
+              />
+            </>
+          )}
         </div>
         <div className={styles.dialog__footer}>
           <Button type="button" onClick={props.onClose}>

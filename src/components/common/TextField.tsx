@@ -1,5 +1,6 @@
 import { FieldValues, UseControllerProps, useController } from 'react-hook-form';
 import styles from '@/components/common/TextField.module.scss';
+import React from 'react';
 
 export type TextFieldProps<T extends FieldValues> = UseControllerProps<T> & {
   label?: string;
@@ -13,6 +14,8 @@ export type TextFieldProps<T extends FieldValues> = UseControllerProps<T> & {
   style?: React.CSSProperties;
   /** inputのtype */
   type: React.HTMLInputTypeAttribute;
+  /** ロード時フォームフォーカス */
+  autoFocus?: boolean;
 };
 
 export const TextField = <T extends FieldValues>(props: TextFieldProps<T>) => {
@@ -39,6 +42,7 @@ export const TextField = <T extends FieldValues>(props: TextFieldProps<T>) => {
         placeholder={props.placeholder}
         disabled={props.disabled}
         type={props.type}
+        autoFocus={props.autoFocus}
         className={`${styles.Input} ${fieldState.error ? styles.InputError : ''}`}
       />
       {fieldState.error && <p className={styles.errorText}>{fieldState.error.message}</p>}
