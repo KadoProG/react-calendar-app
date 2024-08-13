@@ -104,125 +104,130 @@ const Calendar: React.FC = () => {
   }, [handleKeyDown]);
 
   return (
-    <div
-      className={styles.calendar}
-      onMouseUp={handleMouseUp}
-      onTouchEnd={handleTouchEnd}
-      ref={calendarRef}
-    >
+    <div>
+      <p>８月上旬の予定</p>
       <div
-        className={styles.day_column}
-        style={{
-          gridTemplateRows: `repeat(${24 * DIVISIONS_PER_HOUR + 1}, ${40 / DIVISIONS_PER_HOUR}px)`,
-        }}
+        className={styles.calendar}
+        onMouseUp={handleMouseUp}
+        onTouchEnd={handleTouchEnd}
+        ref={calendarRef}
       >
-        {/* <div className={`${styles.time_cell} ${styles.time_label}`}></div> */}
-        {[...Array(24 * DIVISIONS_PER_HOUR)].map((_, hourIndex) => (
-          <div key={hourIndex} className={`${styles.time_cell} ${styles.time_label}`}>
-            {
-              // 15分ごとに表示
-              hourIndex % DIVISIONS_PER_HOUR === 0 && (
-                <p>{generateTime(dayjs(), hourIndex).format('HH:mm')}</p>
-              )
-            }
-          </div>
-        ))}
-      </div>
-      {[...Array(7)].map((_, dayIndex) => {
-        const day = baseDate.add(dayIndex, 'day');
-        return (
-          <div
-            key={dayIndex}
-            className={styles.day_column}
-            style={{
-              gridTemplateRows: `repeat(${24 * DIVISIONS_PER_HOUR + 1}, ${
-                40 / DIVISIONS_PER_HOUR
-              }px)`,
-            }}
-          >
-            <div className={styles.time_cell}>
-              <p>{day.format('ddd')}</p>
-              <p>{day.format('D')}</p>
+        <div
+          className={styles.day_column}
+          style={{
+            gridTemplateRows: `repeat(${24 * DIVISIONS_PER_HOUR + 1}, ${
+              40 / DIVISIONS_PER_HOUR
+            }px)`,
+          }}
+        >
+          {/* <div className={`${styles.time_cell} ${styles.time_label}`}></div> */}
+          {[...Array(24 * DIVISIONS_PER_HOUR)].map((_, hourIndex) => (
+            <div key={hourIndex} className={`${styles.time_cell} ${styles.time_label}`}>
+              {
+                // 15分ごとに表示
+                hourIndex % DIVISIONS_PER_HOUR === 0 && (
+                  <p>{generateTime(dayjs(), hourIndex).format('HH:mm')}</p>
+                )
+              }
             </div>
+          ))}
+        </div>
+        {[...Array(7)].map((_, dayIndex) => {
+          const day = baseDate.add(dayIndex, 'day');
+          return (
+            <div
+              key={dayIndex}
+              className={styles.day_column}
+              style={{
+                gridTemplateRows: `repeat(${24 * DIVISIONS_PER_HOUR + 1}, ${
+                  40 / DIVISIONS_PER_HOUR
+                }px)`,
+              }}
+            >
+              <div className={styles.time_cell}>
+                <p>{day.format('ddd')}</p>
+                <p>{day.format('D')}</p>
+              </div>
 
-            {/* ユーザが触れる時刻の描写 */}
-            {[...Array(24 * DIVISIONS_PER_HOUR)].map((_, hourIndex) => {
-              const dayStart = generateTime(baseDate.add(dayIndex, 'day'), hourIndex);
+              {/* ユーザが触れる時刻の描写 */}
+              {[...Array(24 * DIVISIONS_PER_HOUR)].map((_, hourIndex) => {
+                const dayStart = generateTime(baseDate.add(dayIndex, 'day'), hourIndex);
 
-              const isSameDayContent =
-                dragging &&
-                dayStart.format('YYYY-MM-DD') === selectedStartDay?.format('YYYY-MM-DD');
+                const isSameDayContent =
+                  dragging &&
+                  dayStart.format('YYYY-MM-DD') === selectedStartDay?.format('YYYY-MM-DD');
 
-              const isSameContent =
-                selectedStartDay! <= selectedEndDay!
-                  ? isSameDayContent &&
-                    dayStart.format('YYYY-MM-DD HH:mm') ===
-                      selectedStartDay?.format('YYYY-MM-DD HH:mm')
-                  : isSameDayContent &&
-                    dayStart.format('YYYY-MM-DD HH:mm') ===
-                      selectedEndDay?.format('YYYY-MM-DD HH:mm');
-              return (
-                <div
-                  key={hourIndex}
-                  className={`${styles.time_cell} ${isSameDayContent ? styles.selected : ''} ${
-                    (hourIndex + 1) % DIVISIONS_PER_HOUR === 0 ? styles.drawLine : ''
-                  }`}
-                  onMouseDown={() => handleMouseDown(dayStart)}
-                  onMouseMove={() => handleMouseMove(dayStart)}
-                >
-                  {/* ドラッグ中の要素のハイライト */}
-                  {isSameContent && (
-                    <div
-                      className={styles.selected}
-                      style={{
-                        height: `${
-                          (Math.abs(calculateIndexDifference(selectedStartDay, selectedEndDay)) +
-                            1) *
-                          100
-                        }%`,
-                      }}
-                    >
-                      <p>
-                        {(selectedStartDay <= selectedEndDay
-                          ? selectedStartDay
-                          : selectedEndDay
-                        ).format('HH:mm')}
-                        ~
-                        {(selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay)!
-                          .add(60 / DIVISIONS_PER_HOUR, 'minute')
-                          .format('HH:mm')}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* １イベントごとの表示 */}
-                  {events
-                    .filter(
-                      (event) =>
-                        dayStart.format('YYYY-MM-DD HH:mm') ===
-                        event.start.format('YYYY-MM-DD HH:mm')
-                    )
-                    .map((event, i) => (
+                const isSameContent =
+                  selectedStartDay! <= selectedEndDay!
+                    ? isSameDayContent &&
+                      dayStart.format('YYYY-MM-DD HH:mm') ===
+                        selectedStartDay?.format('YYYY-MM-DD HH:mm')
+                    : isSameDayContent &&
+                      dayStart.format('YYYY-MM-DD HH:mm') ===
+                        selectedEndDay?.format('YYYY-MM-DD HH:mm');
+                return (
+                  <div
+                    key={hourIndex}
+                    className={`${styles.time_cell} ${isSameDayContent ? styles.selected : ''} ${
+                      (hourIndex + 1) % DIVISIONS_PER_HOUR === 0 ? styles.drawLine : ''
+                    }`}
+                    onMouseDown={() => handleMouseDown(dayStart)}
+                    onMouseMove={() => handleMouseMove(dayStart)}
+                  >
+                    {/* ドラッグ中の要素のハイライト */}
+                    {isSameContent && (
                       <div
-                        key={i}
-                        className={styles.event}
+                        className={styles.selected}
                         style={{
                           height: `${
-                            (calculateIndexDifference(event.start, event.end) + 1) * 100
+                            (Math.abs(calculateIndexDifference(selectedStartDay, selectedEndDay)) +
+                              1) *
+                            100
                           }%`,
                         }}
                       >
-                        <p>{event.start.format('HH:mm')}</p>
-                        <p>~{event.end.format('HH:mm')}</p>
-                        <p>{event.title}</p>
+                        <p>
+                          {(selectedStartDay <= selectedEndDay
+                            ? selectedStartDay
+                            : selectedEndDay
+                          ).format('HH:mm')}
+                          ~
+                          {(selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay)!
+                            .add(60 / DIVISIONS_PER_HOUR, 'minute')
+                            .format('HH:mm')}
+                        </p>
                       </div>
-                    ))}
-                </div>
-              );
-            })}
-          </div>
-        );
-      })}
+                    )}
+
+                    {/* １イベントごとの表示 */}
+                    {events
+                      .filter(
+                        (event) =>
+                          dayStart.format('YYYY-MM-DD HH:mm') ===
+                          event.start.format('YYYY-MM-DD HH:mm')
+                      )
+                      .map((event, i) => (
+                        <div
+                          key={i}
+                          className={styles.event}
+                          style={{
+                            height: `${
+                              (calculateIndexDifference(event.start, event.end) + 1) * 100
+                            }%`,
+                          }}
+                        >
+                          <p>{event.start.format('HH:mm')}</p>
+                          <p>~{event.end.format('HH:mm')}</p>
+                          <p>{event.title}</p>
+                        </div>
+                      ))}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
