@@ -39,11 +39,15 @@ const calculateIndexDifference = (startTime: dayjs.Dayjs, endTime: dayjs.Dayjs) 
   return indexDifference;
 };
 
+interface CalendarEvent {
+  start: dayjs.Dayjs;
+  end: dayjs.Dayjs;
+  title: string;
+}
+
 const Calendar: React.FC = () => {
   const [baseDate, setBaseDate] = useState<dayjs.Dayjs>(dayjs('2024-07-28'));
-  const [events, setEvents] = useState<{ start: dayjs.Dayjs; end: dayjs.Dayjs; title: string }[]>(
-    []
-  );
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [dragging, setDragging] = useState<boolean>(false);
   const [selectedStartDay, setSelectedStartDay] = useState<dayjs.Dayjs>(dayjs());
   const [selectedEndDay, setSelectedEndDay] = useState<dayjs.Dayjs>(dayjs());
@@ -98,13 +102,17 @@ const Calendar: React.FC = () => {
     }
   }, [dragging, selectedStartDay, selectedEndDay, events]);
 
-  const handleTouchEnd = React.useCallback(handleMouseUp, [handleMouseUp]);
-
   const handleKeyDown = React.useCallback((event: KeyboardEvent) => {
     if (event.key === 'Escape') {
       // Reset dragging state if ESC is pressed
       setDragging(false);
     }
+  }, []);
+
+  const handleEventClick = React.useCallback((e: React.MouseEvent, event: CalendarEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log(event);
   }, []);
 
   React.useEffect(() => {
@@ -152,12 +160,7 @@ const Calendar: React.FC = () => {
       </div>
 
       {/* ここからカレンダー本体 */}
-      <div
-        className={styles.calendar}
-        onMouseUp={handleMouseUp}
-        onTouchEnd={handleTouchEnd}
-        ref={calendarRef}
-      >
+      <div className={styles.calendar} onMouseUp={handleMouseUp} ref={calendarRef}>
         <div
           className={styles.day_column}
           style={{
@@ -251,6 +254,7 @@ const Calendar: React.FC = () => {
                             (calculateIndexDifference(event.start, event.end) + 1) * 100
                           }%`,
                         }}
+                        onMouseDown={(e) => handleEventClick(e, event)}
                       >
                         <p>{event.start.format('HH:mm')}</p>
                         <p>~{event.end.format('HH:mm')}</p>
