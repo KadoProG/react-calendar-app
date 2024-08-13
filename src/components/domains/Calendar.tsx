@@ -81,22 +81,21 @@ const Calendar: React.FC = () => {
     if (dragging) {
       setDragging(false);
       if (selectedStartDay && selectedEndDay) {
-        const title = prompt('Enter event title:');
-        if (title !== null) {
-          const resultStartDay =
-            selectedStartDay <= selectedEndDay ? selectedStartDay : selectedEndDay;
+        const resultStartDay =
+          selectedStartDay <= selectedEndDay ? selectedStartDay : selectedEndDay;
 
-          const resultEndDay = (
-            selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay
-          ).add(60 / DIVISIONS_PER_HOUR, 'minute');
-          const newEvent = {
-            id: uuidv4(),
-            start: resultStartDay,
-            end: resultEndDay,
-            title,
-          };
-          setEvents([...events, newEvent]);
-        }
+        const resultEndDay = (
+          selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay
+        ).add(60 / DIVISIONS_PER_HOUR, 'minute');
+        const newEvent = {
+          id: uuidv4(),
+          start: resultStartDay,
+          end: resultEndDay,
+          title: '',
+        };
+        setSelectedEvent(newEvent);
+        setIsOpen(true);
+        setEvents([...events, newEvent]);
       }
     }
   }, [dragging, selectedStartDay, selectedEndDay, events]);
