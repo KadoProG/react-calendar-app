@@ -1,5 +1,5 @@
 import dayjs from '@/libs/dayjs';
-import styles from '@/components/Calendar.module.scss';
+import styles from '@/components/domains/Calendar.module.scss';
 import React, { useState } from 'react';
 import { Button } from '@/components/common/button/Button';
 

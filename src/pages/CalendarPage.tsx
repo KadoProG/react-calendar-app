@@ -1,4 +1,4 @@
-import Calendar from '../components/Calendar';
+import Calendar from '@/components/domains/Calendar';
 
 export const CalendarPage: React.FC = () => {
   return (
