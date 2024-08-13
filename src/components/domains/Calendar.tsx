@@ -45,10 +45,10 @@ const Calendar: React.FC = () => {
   const { openDialog } = React.useContext(CalendarConfigFormDialogContext);
   const [baseDate, setBaseDate] = useState<dayjs.Dayjs>(dayjs('2024-07-28'));
   const [events, setEvents] = useState<CalendarEvent[]>([]);
+
   const [dragging, setDragging] = useState<boolean>(false);
   const [selectedStartDay, setSelectedStartDay] = useState<dayjs.Dayjs>(dayjs());
   const [selectedEndDay, setSelectedEndDay] = useState<dayjs.Dayjs>(dayjs());
-  const calendarRef = React.useRef<HTMLDivElement>(null);
 
   const handleBasePrev = React.useCallback(() => {
     setBaseDate(baseDate.add(-7, 'day'));
@@ -77,30 +77,27 @@ const Calendar: React.FC = () => {
   );
 
   const handleMouseUp = React.useCallback(async () => {
-    if (dragging) {
-      if (selectedStartDay && selectedEndDay) {
-        const resultStartDay =
-          selectedStartDay <= selectedEndDay ? selectedStartDay : selectedEndDay;
+    if (!dragging) return;
 
-        const resultEndDay = (
-          selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay
-        ).add(60 / DIVISIONS_PER_HOUR, 'minute');
-        const newEvent = {
-          id: uuidv4(),
-          start: resultStartDay,
-          end: resultEndDay,
-          title: '',
-        };
+    const resultStartDay = selectedStartDay <= selectedEndDay ? selectedStartDay : selectedEndDay;
+    const resultEndDay = (
+      selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay
+    ).add(60 / DIVISIONS_PER_HOUR, 'minute');
 
-        const result = await openDialog(newEvent);
+    const newEvent = {
+      id: uuidv4(),
+      start: resultStartDay,
+      end: resultEndDay,
+      title: '',
+    };
 
-        if (result.type === 'save') {
-          setEvents([...events, result.calendarEvent ?? newEvent]);
-        }
+    const result = await openDialog(newEvent);
 
-        setDragging(false);
-      }
+    if (result.type === 'save') {
+      setEvents([...events, result.calendarEvent ?? newEvent]);
     }
+
+    setDragging(false);
   }, [dragging, selectedStartDay, selectedEndDay, events, openDialog]);
 
   const handleKeyDown = React.useCallback((event: KeyboardEvent) => {
@@ -171,7 +168,7 @@ const Calendar: React.FC = () => {
       </div>
 
       {/* ここからカレンダー本体 */}
-      <div className={styles.calendar} onMouseUp={handleMouseUp} ref={calendarRef}>
+      <div className={styles.calendar} onMouseUp={handleMouseUp}>
         <div
           className={styles.day_column}
           style={{
