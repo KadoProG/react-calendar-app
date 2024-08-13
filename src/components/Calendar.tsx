@@ -4,12 +4,34 @@ import React, { useState } from 'react';
 
 /**
  * １時間を何分割するか
- *
- * - 4: 15分ごと
- * - 2: 30分ごと
  * - 1: 1時間ごと
+ * - 2: 30分ごと
+ * - 3: 20分ごと
+ * - 4: 15分ごと
  */
-const DIVISIONS_PER_HOUR = 2 as const;
+const DIVISIONS_PER_HOUR = 4 as const;
+
+const generateTime = (day: dayjs.Dayjs, index: number) => {
+  const minutesPerDivision = 60 / DIVISIONS_PER_HOUR;
+  const totalMinutes = index * minutesPerDivision;
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  return day.startOf('day').add(hours, 'hour').add(minutes, 'minute');
+};
+
+const calculateIndexDifference = (startTime: dayjs.Dayjs, endTime: dayjs.Dayjs) => {
+  // 2つの日時の差を分単位で取得
+  const differenceInMinutes = endTime.diff(startTime, 'minute');
+
+  // 1インデックスあたりの分数を計算
+  const minutesPerDivision = 60 / DIVISIONS_PER_HOUR;
+
+  // インデックスの差を計算
+  const indexDifference = Math.round(differenceInMinutes / minutesPerDivision);
+
+  return indexDifference;
+};
 
 const Calendar: React.FC = () => {
   const baseDate = dayjs('2024-08-01');
@@ -88,11 +110,21 @@ const Calendar: React.FC = () => {
       onTouchEnd={handleTouchEnd}
       ref={calendarRef}
     >
-      <div className={styles.day_column}>
-        <div className={`${styles.time_cell} ${styles.time_label}`}></div>
-        {[...Array(24)].map((_, hourIndex) => (
+      <div
+        className={styles.day_column}
+        style={{
+          gridTemplateRows: `repeat(${24 * DIVISIONS_PER_HOUR + 1}, ${40 / DIVISIONS_PER_HOUR}px)`,
+        }}
+      >
+        {/* <div className={`${styles.time_cell} ${styles.time_label}`}></div> */}
+        {[...Array(24 * DIVISIONS_PER_HOUR)].map((_, hourIndex) => (
           <div key={hourIndex} className={`${styles.time_cell} ${styles.time_label}`}>
-            <p>{hourIndex}</p>
+            {
+              // 15分ごとに表示
+              hourIndex % DIVISIONS_PER_HOUR === 0 && (
+                <p>{generateTime(dayjs(), hourIndex).format('HH:mm')}</p>
+              )
+            }
           </div>
         ))}
       </div>
@@ -109,32 +141,12 @@ const Calendar: React.FC = () => {
             }}
           >
             <div className={styles.time_cell}>
-              <p>{day.format('MM/DD(ddd)')}</p>
+              <p>{day.format('ddd')}</p>
+              <p>{day.format('D')}</p>
             </div>
+
+            {/* ユーザが触れる時刻の描写 */}
             {[...Array(24 * DIVISIONS_PER_HOUR)].map((_, hourIndex) => {
-              // indexが指定される
-              function generateTime(day: dayjs.Dayjs, index: number) {
-                const minutesPerDivision = 60 / DIVISIONS_PER_HOUR;
-                const totalMinutes = index * minutesPerDivision;
-                const hours = Math.floor(totalMinutes / 60);
-                const minutes = totalMinutes % 60;
-
-                return day.startOf('day').add(hours, 'hour').add(minutes, 'minute');
-              }
-
-              function calculateIndexDifference(startTime: dayjs.Dayjs, endTime: dayjs.Dayjs) {
-                // 2つの日時の差を分単位で取得
-                const differenceInMinutes = endTime.diff(startTime, 'minute');
-
-                // 1インデックスあたりの分数を計算
-                const minutesPerDivision = 60 / DIVISIONS_PER_HOUR;
-
-                // インデックスの差を計算
-                const indexDifference = Math.round(differenceInMinutes / minutesPerDivision);
-
-                return indexDifference;
-              }
-
               const dayStart = generateTime(baseDate.add(dayIndex, 'day'), hourIndex);
 
               const isSameDayContent =
@@ -152,7 +164,9 @@ const Calendar: React.FC = () => {
               return (
                 <div
                   key={hourIndex}
-                  className={`${styles.time_cell} ${isSameDayContent ? styles.selected : ''}`}
+                  className={`${styles.time_cell} ${isSameDayContent ? styles.selected : ''} ${
+                    (hourIndex + 1) % DIVISIONS_PER_HOUR === 0 ? styles.drawLine : ''
+                  }`}
                   onMouseDown={() => handleMouseDown(dayStart)}
                   onMouseMove={() => handleMouseMove(dayStart)}
                 >
@@ -198,9 +212,8 @@ const Calendar: React.FC = () => {
                           }%`,
                         }}
                       >
-                        <p>
-                          {event.start.format('HH:mm')}~{event.end.format('HH:mm')}
-                        </p>
+                        <p>{event.start.format('HH:mm')}</p>
+                        <p>~{event.end.format('HH:mm')}</p>
                         <p>{event.title}</p>
                       </div>
                     ))}
