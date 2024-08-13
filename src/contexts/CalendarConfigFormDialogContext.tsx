@@ -1,4 +1,5 @@
 import { CalendarConfigFormDialog } from '@/components/domains/CalendarConfigFormDialog';
+import { KeyDownContext } from '@/contexts/KeydownContext';
 import React from 'react';
 
 interface CalendarEventReturnValue {
@@ -20,6 +21,7 @@ export const CalendarConfigFormDialogContextProvider: React.FC<{ children: React
   props
 ) => {
   const [calendarEvent, setCalendarEvent] = React.useState<CalendarEvent | null>(null);
+  const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
 
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
 
@@ -41,17 +43,25 @@ export const CalendarConfigFormDialogContextProvider: React.FC<{ children: React
   const handleCancel = React.useCallback(() => {
     setIsOpen(false);
     resolveFunction.current?.({ type: 'cancel' });
-  }, []);
+    removeKeyDownEvent();
+  }, [removeKeyDownEvent]);
 
-  const handleSetCalendarEvent = React.useCallback((calendarEvent: CalendarEvent) => {
-    setIsOpen(false);
-    resolveFunction.current?.({ type: 'save', calendarEvent });
-  }, []);
+  const handleSetCalendarEvent = React.useCallback(
+    (calendarEvent: CalendarEvent) => {
+      setIsOpen(false);
+      resolveFunction.current?.({ type: 'save', calendarEvent });
+      removeKeyDownEvent();
+    },
+    [removeKeyDownEvent]
+  );
 
   const handleDelete = React.useCallback(() => {
     setIsOpen(false);
     resolveFunction.current?.({ type: 'delete' });
-  }, []);
+    removeKeyDownEvent();
+  }, [removeKeyDownEvent]);
+
+  addKeyDownEvent('Escape', () => handleCancel());
 
   return (
     <CalendarConfigFormDialogContext.Provider value={value}>

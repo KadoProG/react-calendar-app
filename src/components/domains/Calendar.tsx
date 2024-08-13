@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/common/button/Button';
 import { v4 as uuidv4 } from 'uuid';
 import { CalendarConfigFormDialogContext } from '@/contexts/CalendarConfigFormDialogContext';
+import { KeyDownContext } from '@/contexts/KeydownContext';
 
 /**
  * １時間を何分割するか
@@ -43,12 +44,16 @@ const calculateIndexDifference = (startTime: dayjs.Dayjs, endTime: dayjs.Dayjs) 
 
 const Calendar: React.FC = () => {
   const { openDialog } = React.useContext(CalendarConfigFormDialogContext);
+
   const [baseDate, setBaseDate] = useState<dayjs.Dayjs>(dayjs('2024-07-28'));
   const [events, setEvents] = useState<CalendarEvent[]>([]);
 
   const [dragging, setDragging] = useState<boolean>(false);
   const [selectedStartDay, setSelectedStartDay] = useState<dayjs.Dayjs>(dayjs());
   const [selectedEndDay, setSelectedEndDay] = useState<dayjs.Dayjs>(dayjs());
+
+  const { addKeyDownEvent } = React.useContext(KeyDownContext);
+  addKeyDownEvent('Escape', () => setDragging(false));
 
   const handleBasePrev = React.useCallback(() => {
     setBaseDate(baseDate.add(-7, 'day'));
@@ -100,12 +105,12 @@ const Calendar: React.FC = () => {
     setDragging(false);
   }, [dragging, selectedStartDay, selectedEndDay, events, openDialog]);
 
-  const handleKeyDown = React.useCallback((event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
-      // Reset dragging state if ESC is pressed
-      setDragging(false);
-    }
-  }, []);
+  // const handleKeyDown = React.useCallback((event: KeyboardEvent) => {
+  //   if (event.key === 'Escape') {
+  //     // Reset dragging state if ESC is pressed
+  //     setDragging(false);
+  //   }
+  // }, []);
 
   const handleEventClick = React.useCallback(
     async (e: React.MouseEvent, event: CalendarEvent) => {
@@ -123,15 +128,15 @@ const Calendar: React.FC = () => {
     [events, openDialog]
   );
 
-  React.useEffect(() => {
-    // Add event listener for keydown
-    window.addEventListener('keydown', handleKeyDown);
+  // React.useEffect(() => {
+  //   // Add event listener for keydown
+  //   window.addEventListener('keydown', handleKeyDown);
 
-    // Cleanup event listener on component unmount
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [handleKeyDown]);
+  //   // Cleanup event listener on component unmount
+  //   return () => {
+  //     window.removeEventListener('keydown', handleKeyDown);
+  //   };
+  // }, [handleKeyDown]);
 
   return (
     <div style={{ overflow: 'scroll', height: '100%' }}>
