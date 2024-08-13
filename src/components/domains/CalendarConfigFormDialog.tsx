@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 interface CalendarConfigFormDialogProps {
   open: boolean;
   onClose: () => void;
+  onDeleted: () => void;
   calendarEvent: CalendarEvent | null;
   setCalendarEvent?: (calendarEvent: CalendarEvent) => void;
 }
@@ -46,7 +47,6 @@ export const CalendarConfigFormDialog: React.FC<CalendarConfigFormDialogProps> =
             end: dayjs(data.end),
             title: data.title,
           });
-          props.onClose();
         }
       })();
     },
@@ -56,10 +56,10 @@ export const CalendarConfigFormDialog: React.FC<CalendarConfigFormDialogProps> =
   return (
     <div
       className={styles.dialog}
-      onClick={props.onClose}
       style={{
         display: props.open ? 'block' : 'none',
       }}
+      onClick={props.onClose}
     >
       <form
         className={styles.dialog__content}
@@ -68,7 +68,7 @@ export const CalendarConfigFormDialog: React.FC<CalendarConfigFormDialogProps> =
       >
         <div className={styles.dialog__header}>
           <h2>予定を追加</h2>
-          <DeleteButton onClick={() => props.onClose()} />
+          <DeleteButton type="button" onClick={props.onDeleted} />
         </div>
         <div className={styles.dialog__body}>
           <TextField control={control} name="title" type="string" required label="タイトル" />
@@ -82,7 +82,9 @@ export const CalendarConfigFormDialog: React.FC<CalendarConfigFormDialogProps> =
           <TextField control={control} name="end" type="datetime-local" required label="終了日時" />
         </div>
         <div className={styles.dialog__footer}>
-          <Button onClick={props.onClose}>キャンセル</Button>
+          <Button type="button" onClick={props.onClose}>
+            キャンセル
+          </Button>
           <Button type="submit">追加</Button>
         </div>
       </form>

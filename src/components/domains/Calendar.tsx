@@ -2,8 +2,8 @@ import dayjs from '@/libs/dayjs';
 import styles from '@/components/domains/Calendar.module.scss';
 import React, { useState } from 'react';
 import { Button } from '@/components/common/button/Button';
-import { CalendarConfigFormDialog } from '@/components/domains/CalendarConfigFormDialog';
 import { v4 as uuidv4 } from 'uuid';
+import { CalendarConfigFormDialogContext } from '@/contexts/CalendarConfigFormDialogContext';
 
 /**
  * １時間を何分割するか
@@ -42,8 +42,7 @@ const calculateIndexDifference = (startTime: dayjs.Dayjs, endTime: dayjs.Dayjs) 
 };
 
 const Calendar: React.FC = () => {
-  const [isOpen, setIsOpen] = React.useState<boolean>(false);
-  const [selectedEvent, setSelectedEvent] = React.useState<CalendarEvent | null>(null);
+  const { openDialog } = React.useContext(CalendarConfigFormDialogContext);
   const [baseDate, setBaseDate] = useState<dayjs.Dayjs>(dayjs('2024-07-28'));
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [dragging, setDragging] = useState<boolean>(false);
@@ -77,9 +76,8 @@ const Calendar: React.FC = () => {
     [dragging, selectedStartDay]
   );
 
-  const handleMouseUp = React.useCallback(() => {
+  const handleMouseUp = React.useCallback(async () => {
     if (dragging) {
-      setDragging(false);
       if (selectedStartDay && selectedEndDay) {
         const resultStartDay =
           selectedStartDay <= selectedEndDay ? selectedStartDay : selectedEndDay;
@@ -93,12 +91,17 @@ const Calendar: React.FC = () => {
           end: resultEndDay,
           title: '',
         };
-        setSelectedEvent(newEvent);
-        setIsOpen(true);
-        setEvents([...events, newEvent]);
+
+        const result = await openDialog(newEvent);
+
+        if (result.type === 'save') {
+          setEvents([...events, result.calendarEvent ?? newEvent]);
+        }
+
+        setDragging(false);
       }
     }
-  }, [dragging, selectedStartDay, selectedEndDay, events]);
+  }, [dragging, selectedStartDay, selectedEndDay, events, openDialog]);
 
   const handleKeyDown = React.useCallback((event: KeyboardEvent) => {
     if (event.key === 'Escape') {
@@ -107,12 +110,21 @@ const Calendar: React.FC = () => {
     }
   }, []);
 
-  const handleEventClick = React.useCallback((e: React.MouseEvent, event: CalendarEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setSelectedEvent(event);
-    setIsOpen(true);
-  }, []);
+  const handleEventClick = React.useCallback(
+    async (e: React.MouseEvent, event: CalendarEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const result = await openDialog(event);
+      if (result.type === 'save') {
+        setEvents((prev) =>
+          prev.map((e) => (e.id === event.id ? result.calendarEvent ?? event : e))
+        );
+      } else if (result.type === 'delete') {
+        setEvents(events.filter((e) => e.id !== event.id));
+      }
+    },
+    [events, openDialog]
+  );
 
   React.useEffect(() => {
     // Add event listener for keydown
@@ -264,20 +276,6 @@ const Calendar: React.FC = () => {
           </div>
         ))}
       </div>
-      <CalendarConfigFormDialog
-        open={isOpen}
-        onClose={() => setIsOpen(false)}
-        calendarEvent={selectedEvent}
-        setCalendarEvent={(calendarEvent) => {
-          const newEvents = events.map((event) => {
-            if (event.id === calendarEvent.id) {
-              return calendarEvent;
-            }
-            return event;
-          });
-          setEvents(newEvents);
-        }}
-      />
     </div>
   );
 };
