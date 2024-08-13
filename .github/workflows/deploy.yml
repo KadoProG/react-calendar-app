@@ -1,0 +1,43 @@
+name: deploy to mixhost
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: ssh key generate
+        run: |
+          echo "$SSH_PRIVATE_KEY" > key
+          chmod 600 key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.MIXHOST_SECRET_KEY }} # GitHubに登録したmixhostへの秘密鍵を指定
+
+      # - name: create env file
+      #   run: |
+      #     echo "VITE_SUPABASE_URL=$VITE_SUPABASE_URL" > .env
+      #     echo "VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY" >> .env
+      #   env:
+      #     VITE_SUPABASE_URL:
+      #     VITE_SUPABASE_ANON_KEY:
+
+      - name: vite build
+        run: |
+          npm install
+          npm run build
+
+      - name: rsync deployments
+        uses: burnett01/rsync-deployments@5.1
+        with:
+          switches: -avz --delete
+          path: dist/ # mixhostに送りたいファイルのあるパスを指定
+          remote_path: /home/bvzvxvoh/public_html/subdomains/sub9/ # mixhostのどこに同期させるか
+          remote_host: fast5-blog.com
+          remote_user: bvzvxvoh
+          remote_port: 22
+          remote_key: ${{ secrets.MIXHOST_SECRET_KEY }}
