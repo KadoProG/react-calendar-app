@@ -1,6 +1,7 @@
 import dayjs from '@/libs/dayjs';
 import styles from '@/components/Calendar.module.scss';
 import React, { useState } from 'react';
+import { Button } from '@/components/common/button/Button';
 
 /**
  * １時間を何分割するか
@@ -34,7 +35,7 @@ const calculateIndexDifference = (startTime: dayjs.Dayjs, endTime: dayjs.Dayjs) 
 };
 
 const Calendar: React.FC = () => {
-  const baseDate = dayjs('2024-08-01');
+  const [baseDate, setBaseDate] = useState<dayjs.Dayjs>(dayjs('2024-07-28'));
   const [events, setEvents] = useState<{ start: dayjs.Dayjs; end: dayjs.Dayjs; title: string }[]>(
     []
   );
@@ -42,6 +43,14 @@ const Calendar: React.FC = () => {
   const [selectedStartDay, setSelectedStartDay] = useState<dayjs.Dayjs>(dayjs());
   const [selectedEndDay, setSelectedEndDay] = useState<dayjs.Dayjs>(dayjs());
   const calendarRef = React.useRef<HTMLDivElement>(null);
+
+  const handleBasePrev = React.useCallback(() => {
+    setBaseDate(baseDate.add(-7, 'day'));
+  }, [baseDate]);
+
+  const handleBaseNext = React.useCallback(() => {
+    setBaseDate(baseDate.add(7, 'day'));
+  }, [baseDate]);
 
   /**
    * ドラッグ開始時の処理（マウスがセルをクリックしたときの処理）
@@ -105,7 +114,11 @@ const Calendar: React.FC = () => {
 
   return (
     <div>
-      <p>８月上旬の予定</p>
+      <div style={{ display: 'flex', gap: 4 }}>
+        <p>８月上旬の予定</p>
+        <Button onClick={handleBasePrev}>＜</Button>
+        <Button onClick={handleBaseNext}>＞</Button>
+      </div>
       <div
         className={styles.calendar}
         onMouseUp={handleMouseUp}
