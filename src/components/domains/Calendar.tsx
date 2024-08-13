@@ -39,12 +39,6 @@ const calculateIndexDifference = (startTime: dayjs.Dayjs, endTime: dayjs.Dayjs) 
   return indexDifference;
 };
 
-interface CalendarEvent {
-  start: dayjs.Dayjs;
-  end: dayjs.Dayjs;
-  title: string;
-}
-
 const Calendar: React.FC = () => {
   const [baseDate, setBaseDate] = useState<dayjs.Dayjs>(dayjs('2024-07-28'));
   const [events, setEvents] = useState<CalendarEvent[]>([]);
