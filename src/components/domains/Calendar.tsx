@@ -119,34 +119,36 @@ const Calendar: React.FC = () => {
 
   return (
     <div style={{ overflow: 'scroll', height: '100%' }}>
-      {/* 上部のヘッダ */}
-      <div style={{ display: 'flex', gap: 4 }}>
-        <p>８月上旬の予定</p>
-        <Button onClick={handleBasePrev}>＜</Button>
-        <Button onClick={handleBaseNext}>＞</Button>
-      </div>
+      <div className={styles.fixedContent}>
+        {/* 上部のヘッダ */}
+        <div style={{ display: 'flex', gap: 4 }}>
+          <p>８月上旬の予定</p>
+          <Button onClick={handleBasePrev}>＜</Button>
+          <Button onClick={handleBaseNext}>＞</Button>
+        </div>
 
-      {/* 日付・曜日の表示 */}
-      <div
-        style={{
-          display: 'grid',
-          width: '100%',
-          gridTemplateColumns: 'repeat(8, 1fr)',
-        }}
-      >
-        {[...Array(8)].map((_, dayIndex) => {
-          if (dayIndex === 0) {
-            return <div key={dayIndex}></div>;
-          }
-          const day = baseDate.add(dayIndex, 'day');
-          return (
-            <div key={dayIndex} style={{ textAlign: 'center' }}>
-              <p>{day.format('ddd')}</p>
-              <p>{day.format('D')}</p>
-              {/* <p>既存の予定</p> */}
-            </div>
-          );
-        })}
+        {/* 日付・曜日の表示 */}
+        <div
+          style={{
+            display: 'grid',
+            width: '100%',
+            gridTemplateColumns: 'repeat(8, 1fr)',
+          }}
+        >
+          {[...Array(8)].map((_, dayIndex) => {
+            if (dayIndex === 0) {
+              return <div key={dayIndex}></div>;
+            }
+            const day = baseDate.add(dayIndex, 'day');
+            return (
+              <div key={dayIndex} style={{ textAlign: 'center' }}>
+                <p>{day.format('ddd')}</p>
+                <p>{day.format('D')}</p>
+                {/* <p>既存の予定</p> */}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* ここからカレンダー本体 */}

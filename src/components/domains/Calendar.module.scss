@@ -1,3 +1,17 @@
+.fixedContent {
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #fff;
+  z-index: 1000;
+  user-select: none;
+  -webkit-user-drag: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -moz-user-drag: none;
+}
+
 /* 全体のカレンダーコンテナ */
 .calendar {
   display: grid;
@@ -5,11 +19,7 @@
   gap: 1px; /* セル間のスペース */
   background-color: #ccc;
   width: 100%;
-  user-select: none;
-  -webkit-user-drag: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -moz-user-drag: none;
+  padding-top: 80px;
 }
 
 /* 各日の列 */
@@ -96,6 +106,7 @@
   right: 0;
   bottom: 0;
   background-color: #2196f3;
+  width: 90%;
   color: #fff;
   padding: 5px;
   border-radius: 4px;
