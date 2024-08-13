@@ -15,7 +15,6 @@
 /* 各日の列 */
 .day_column {
   display: grid;
-  grid-template-rows: repeat(25, 40px); /* 1時間ごとに40pxの高さ */
   background-color: #fff;
 }
 
@@ -82,7 +81,7 @@
     }
     & p {
       position: absolute;
-      top: 50%;
+      top: -9px;
       right: 4px;
       font-size: 12px;
     }
