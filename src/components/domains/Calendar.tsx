@@ -2,6 +2,8 @@ import dayjs from '@/libs/dayjs';
 import styles from '@/components/domains/Calendar.module.scss';
 import React, { useState } from 'react';
 import { Button } from '@/components/common/button/Button';
+import { CalendarConfigFormDialog } from '@/components/domains/CalendarConfigFormDialog';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * １時間を何分割するか
@@ -40,6 +42,8 @@ const calculateIndexDifference = (startTime: dayjs.Dayjs, endTime: dayjs.Dayjs) 
 };
 
 const Calendar: React.FC = () => {
+  const [isOpen, setIsOpen] = React.useState<boolean>(false);
+  const [selectedEvent, setSelectedEvent] = React.useState<CalendarEvent | null>(null);
   const [baseDate, setBaseDate] = useState<dayjs.Dayjs>(dayjs('2024-07-28'));
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [dragging, setDragging] = useState<boolean>(false);
@@ -86,6 +90,7 @@ const Calendar: React.FC = () => {
             selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay
           ).add(60 / DIVISIONS_PER_HOUR, 'minute');
           const newEvent = {
+            id: uuidv4(),
             start: resultStartDay,
             end: resultEndDay,
             title,
@@ -106,7 +111,8 @@ const Calendar: React.FC = () => {
   const handleEventClick = React.useCallback((e: React.MouseEvent, event: CalendarEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log(event);
+    setSelectedEvent(event);
+    setIsOpen(true);
   }, []);
 
   React.useEffect(() => {
@@ -244,9 +250,7 @@ const Calendar: React.FC = () => {
                         key={i}
                         className={styles.event}
                         style={{
-                          height: `${
-                            (calculateIndexDifference(event.start, event.end) + 1) * 100
-                          }%`,
+                          height: `${calculateIndexDifference(event.start, event.end) * 100}%`,
                         }}
                         onMouseDown={(e) => handleEventClick(e, event)}
                       >
@@ -261,6 +265,20 @@ const Calendar: React.FC = () => {
           </div>
         ))}
       </div>
+      <CalendarConfigFormDialog
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+        calendarEvent={selectedEvent}
+        setCalendarEvent={(calendarEvent) => {
+          const newEvents = events.map((event) => {
+            if (event.id === calendarEvent.id) {
+              return calendarEvent;
+            }
+            return event;
+          });
+          setEvents(newEvents);
+        }}
+      />
     </div>
   );
 };
