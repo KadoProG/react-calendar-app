@@ -53,7 +53,6 @@ const Calendar: React.FC = () => {
   const [selectedEndDay, setSelectedEndDay] = useState<dayjs.Dayjs>(dayjs());
 
   const { addKeyDownEvent } = React.useContext(KeyDownContext);
-  addKeyDownEvent('Escape', () => setDragging(false));
 
   const handleBasePrev = React.useCallback(() => {
     setBaseDate(baseDate.add(-7, 'day'));
@@ -105,13 +104,6 @@ const Calendar: React.FC = () => {
     setDragging(false);
   }, [dragging, selectedStartDay, selectedEndDay, events, openDialog]);
 
-  // const handleKeyDown = React.useCallback((event: KeyboardEvent) => {
-  //   if (event.key === 'Escape') {
-  //     // Reset dragging state if ESC is pressed
-  //     setDragging(false);
-  //   }
-  // }, []);
-
   const handleEventClick = React.useCallback(
     async (e: React.MouseEvent, event: CalendarEvent) => {
       e.preventDefault();
@@ -128,15 +120,9 @@ const Calendar: React.FC = () => {
     [events, openDialog]
   );
 
-  // React.useEffect(() => {
-  //   // Add event listener for keydown
-  //   window.addEventListener('keydown', handleKeyDown);
-
-  //   // Cleanup event listener on component unmount
-  //   return () => {
-  //     window.removeEventListener('keydown', handleKeyDown);
-  //   };
-  // }, [handleKeyDown]);
+  React.useEffect(() => {
+    addKeyDownEvent('Escape', () => setDragging(false));
+  }, [addKeyDownEvent]);
 
   return (
     <div style={{ overflow: 'scroll', height: '100%' }}>

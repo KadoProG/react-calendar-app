@@ -12,12 +12,9 @@ export const KeyDownContext = React.createContext<KeyDownContextType>({
 
 export const KeyDownContextProvider: React.FC<{ children: React.ReactNode }> = (props) => {
   const keydownEvents = React.useRef<{ callback: () => void; key: string }[]>([]);
-  const idCounter = React.useRef<number>(0);
 
   const addKeyDownEvent = React.useCallback((key: string, callback: () => void) => {
     keydownEvents.current.push({ callback, key });
-
-    return idCounter.current;
   }, []);
 
   const removeKeyDownEvent = React.useCallback(() => {
