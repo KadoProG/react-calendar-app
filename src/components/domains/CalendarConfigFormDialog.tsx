@@ -57,7 +57,7 @@ export const CalendarConfigFormDialog: React.FC<CalendarConfigFormDialogProps> =
     <div
       className={styles.dialog}
       style={{
-        display: props.open ? 'block' : 'none',
+        display: props.open ? 'flex' : 'none',
       }}
       onClick={props.onClose}
     >
@@ -99,10 +99,12 @@ export const CalendarConfigFormDialog: React.FC<CalendarConfigFormDialogProps> =
           )}
         </div>
         <div className={styles.dialog__actions}>
-          <Button type="button" onClick={props.onClose}>
+          <Button type="button" onClick={props.onClose} width={90}>
             キャンセル
           </Button>
-          <Button type="submit">追加</Button>
+          <Button type="submit" width={100}>
+            追加
+          </Button>
         </div>
       </form>
     </div>
