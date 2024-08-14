@@ -98,7 +98,7 @@ export const CalendarConfigFormDialog: React.FC<CalendarConfigFormDialogProps> =
             </>
           )}
         </div>
-        <div className={styles.dialog__footer}>
+        <div className={styles.dialog__actions}>
           <Button type="button" onClick={props.onClose}>
             キャンセル
           </Button>
