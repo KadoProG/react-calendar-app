@@ -7,7 +7,7 @@
   padding: 8px 8px;
   cursor: pointer;
   transition: background-color 0.3s;
-  background: #ffe6e6;
+  background: var(--color-danger);
   min-height: 32px;
   &:hover {
     background: #ebd5d5;
@@ -15,6 +15,14 @@
   &:disabled {
     & * {
       opacity: 0.3;
+    }
+  }
+}
+
+@media screen and (prefers-color-scheme: dark) {
+  .deleteButton {
+    & img {
+      filter: invert(1);
     }
   }
 }
