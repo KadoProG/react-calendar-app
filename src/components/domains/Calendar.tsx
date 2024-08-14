@@ -5,6 +5,7 @@ import { Button } from '@/components/common/button/Button';
 import { v4 as uuidv4 } from 'uuid';
 import { CalendarConfigFormDialogContext } from '@/contexts/CalendarConfigFormDialogContext';
 import { KeyDownContext } from '@/contexts/KeyDownContext';
+import { CalendarEventContext } from '@/contexts/CalendarEventContext';
 
 /**
  * １時間を何分割するか
@@ -46,7 +47,8 @@ const Calendar: React.FC = () => {
   const { openDialog } = React.useContext(CalendarConfigFormDialogContext);
 
   const [baseDate, setBaseDate] = useState<dayjs.Dayjs>(dayjs('2024-07-28'));
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const { calendarEvents, addCalendarEvent, updateCalendarEvent, removeCalendarEvent } =
+    React.useContext(CalendarEventContext);
 
   const [dragging, setDragging] = useState<boolean>(false);
   const [selectedStartDay, setSelectedStartDay] = useState<dayjs.Dayjs>(dayjs());
@@ -98,11 +100,11 @@ const Calendar: React.FC = () => {
     const result = await openDialog(newEvent);
 
     if (result.type === 'save') {
-      setEvents([...events, result.calendarEvent ?? newEvent]);
+      addCalendarEvent(result.calendarEvent ?? newEvent);
     }
 
     setDragging(false);
-  }, [dragging, selectedStartDay, selectedEndDay, events, openDialog]);
+  }, [dragging, selectedStartDay, selectedEndDay, openDialog, addCalendarEvent]);
 
   const handleEventClick = React.useCallback(
     async (e: React.MouseEvent, event: CalendarEvent) => {
@@ -110,14 +112,12 @@ const Calendar: React.FC = () => {
       e.stopPropagation();
       const result = await openDialog(event);
       if (result.type === 'save') {
-        setEvents((prev) =>
-          prev.map((e) => (e.id === event.id ? (result.calendarEvent ?? event) : e))
-        );
+        updateCalendarEvent(event.id, result.calendarEvent ?? event);
       } else if (result.type === 'delete') {
-        setEvents(events.filter((e) => e.id !== event.id));
+        removeCalendarEvent(event.id);
       }
     },
-    [events, openDialog]
+    [openDialog, updateCalendarEvent, removeCalendarEvent]
   );
 
   React.useEffect(() => {
@@ -242,7 +242,7 @@ const Calendar: React.FC = () => {
                   )}
 
                   {/* １イベントごとの表示 */}
-                  {events
+                  {calendarEvents
                     .filter(
                       (event) =>
                         dayStart.format('YYYY-MM-DD HH:mm') ===
