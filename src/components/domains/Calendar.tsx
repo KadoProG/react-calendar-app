@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/common/button/Button';
 import { v4 as uuidv4 } from 'uuid';
 import { CalendarConfigFormDialogContext } from '@/contexts/CalendarConfigFormDialogContext';
-import { KeyDownContext } from '@/contexts/KeydownContext';
+import { KeyDownContext } from '@/contexts/KeyDownContext';
 
 /**
  * １時間を何分割するか
@@ -119,7 +119,7 @@ const Calendar: React.FC = () => {
       const result = await openDialog(event);
       if (result.type === 'save') {
         setEvents((prev) =>
-          prev.map((e) => (e.id === event.id ? result.calendarEvent ?? event : e))
+          prev.map((e) => (e.id === event.id ? (result.calendarEvent ?? event) : e))
         );
       } else if (result.type === 'delete') {
         setEvents(events.filter((e) => e.id !== event.id));

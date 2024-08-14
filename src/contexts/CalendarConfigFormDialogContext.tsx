@@ -1,5 +1,5 @@
 import { CalendarConfigFormDialog } from '@/components/domains/CalendarConfigFormDialog';
-import { KeyDownContext } from '@/contexts/KeydownContext';
+import { KeyDownContext } from '@/contexts/KeyDownContext';
 import React from 'react';
 
 interface CalendarEventReturnValue {
