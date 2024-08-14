@@ -21,7 +21,7 @@ export const CalendarConfigFormDialogContextProvider: React.FC<{ children: React
   props
 ) => {
   const [calendarEvent, setCalendarEvent] = React.useState<CalendarEvent | null>(null);
-  const { addKeyDownEvent } = React.useContext(KeyDownContext);
+  const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
 
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
 
@@ -56,9 +56,12 @@ export const CalendarConfigFormDialogContextProvider: React.FC<{ children: React
   }, []);
 
   React.useEffect(() => {
-    console.log('CalendarConfigFormDialogContextProvider');
-    addKeyDownEvent('Escape', () => handleCancel());
-  }, [addKeyDownEvent, handleCancel]);
+    if (isOpen) {
+      addKeyDownEvent({ id: 1, key: 'Escape', callback: handleCancel });
+    } else {
+      removeKeyDownEvent(1);
+    }
+  }, [isOpen, addKeyDownEvent, removeKeyDownEvent, handleCancel]);
 
   return (
     <CalendarConfigFormDialogContext.Provider value={value}>

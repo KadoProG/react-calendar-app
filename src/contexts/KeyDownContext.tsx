@@ -1,8 +1,14 @@
 import React from 'react';
 
+interface AddKeyDownEventArgs {
+  id: number;
+  key: KeyboardEvent['key'];
+  callback: () => void;
+}
+
 export type KeyDownContextType = {
-  addKeyDownEvent: (key: string, callback: () => void) => void;
-  removeKeyDownEvent: () => void;
+  addKeyDownEvent: (args: AddKeyDownEventArgs) => void;
+  removeKeyDownEvent: (id: number) => void;
 };
 
 export const KeyDownContext = React.createContext<KeyDownContextType>({
@@ -11,19 +17,19 @@ export const KeyDownContext = React.createContext<KeyDownContextType>({
 });
 
 export const KeyDownContextProvider: React.FC<{ children: React.ReactNode }> = (props) => {
-  const keydownEvents = React.useRef<{ callback: () => void; key: string }[]>([]);
+  const keydownEvents = React.useRef<AddKeyDownEventArgs[]>([]);
 
-  const addKeyDownEvent = React.useCallback((key: string, callback: () => void) => {
-    keydownEvents.current.push({ callback, key });
+  const addKeyDownEvent = React.useCallback(({ id, key, callback }: AddKeyDownEventArgs) => {
+    keydownEvents.current.push({ id, key, callback });
   }, []);
 
-  const removeKeyDownEvent = React.useCallback(() => {
-    delete keydownEvents.current[keydownEvents.current.length - 1];
+  const removeKeyDownEvent = React.useCallback((id: number) => {
+    keydownEvents.current = keydownEvents.current.filter((event) => event.id !== id);
   }, []);
 
   const handleKeydown = React.useCallback((e: KeyboardEvent) => {
     const key = e.key;
-    const keydownEventsReverse = keydownEvents.current.slice().reverse();
+    const keydownEventsReverse = keydownEvents.current.sort((a, b) => b.id - a.id);
     const callback = keydownEventsReverse.find((event) => event.key === key)?.callback;
     if (callback) {
       callback();
@@ -32,6 +38,10 @@ export const KeyDownContextProvider: React.FC<{ children: React.ReactNode }> = (
 
   React.useEffect(() => {
     document.addEventListener('keydown', handleKeydown);
+
+    setInterval(() => {
+      console.log(keydownEvents.current);
+    }, 1000);
 
     return () => {
       document.removeEventListener('keydown', handleKeydown);
