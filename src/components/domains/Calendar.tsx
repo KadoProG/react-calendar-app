@@ -52,7 +52,7 @@ const Calendar: React.FC = () => {
   const [selectedStartDay, setSelectedStartDay] = useState<dayjs.Dayjs>(dayjs());
   const [selectedEndDay, setSelectedEndDay] = useState<dayjs.Dayjs>(dayjs());
 
-  const { addKeyDownEvent } = React.useContext(KeyDownContext);
+  const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
 
   const handleBasePrev = React.useCallback(() => {
     setBaseDate(baseDate.add(-7, 'day'));
@@ -121,8 +121,12 @@ const Calendar: React.FC = () => {
   );
 
   React.useEffect(() => {
-    addKeyDownEvent('Escape', () => setDragging(false));
-  }, [addKeyDownEvent]);
+    if (dragging) {
+      addKeyDownEvent({ id: 0, key: 'Escape', callback: () => setDragging(false) });
+    } else {
+      removeKeyDownEvent(0);
+    }
+  }, [addKeyDownEvent, removeKeyDownEvent, dragging]);
 
   return (
     <div style={{ overflow: 'scroll', height: '100%' }}>
