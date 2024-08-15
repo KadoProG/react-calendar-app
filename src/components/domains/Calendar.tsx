@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { CalendarConfigFormDialogContext } from '@/contexts/CalendarConfigFormDialogContext';
 import { KeyDownContext } from '@/contexts/KeyDownContext';
 import { CalendarEventContext } from '@/contexts/CalendarEventContext';
+import { splitCalendarEvents } from '@/utils/convertDayjs';
 
 /**
  * １時間を何分割するか
@@ -123,8 +124,10 @@ const Calendar: React.FC = () => {
   }, [dragging, selectedStartDay, selectedEndDay, openDialog, addCalendarEvent]);
 
   const handleEventClick = React.useCallback(
-    async (e: React.MouseEvent, event: CalendarEvent) => {
+    async (e: React.MouseEvent, id: CalendarEvent['id']) => {
       e.preventDefault();
+      const event = calendarEvents.find((event) => event.id === id);
+      if (!event) return;
       const result = await openDialog(event);
       if (result.type === 'save') {
         updateCalendarEvent(event.id, result.calendarEvent ?? event);
@@ -132,7 +135,7 @@ const Calendar: React.FC = () => {
         removeCalendarEvent(event.id);
       }
     },
-    [openDialog, updateCalendarEvent, removeCalendarEvent]
+    [openDialog, updateCalendarEvent, removeCalendarEvent, calendarEvents]
   );
 
   React.useEffect(() => {
@@ -285,17 +288,19 @@ const Calendar: React.FC = () => {
               })}
 
               {/* １イベントごとの表示 */}
-              {calendarEvents
-                .filter((event) => day.format('YYYY-MM-DD') === event.start.format('YYYY-MM-DD'))
+              {splitCalendarEvents(calendarEvents)
+                .filter(
+                  (event) => day.format('YYYY-MM-DD') === event.splitStart.format('YYYY-MM-DD')
+                )
                 .map((event, i) => (
                   <button
                     key={i}
                     className={styles.calendarEvent}
                     style={{
-                      top: `${(calculateIndexDayjs(event.start) * 40) / DIVISIONS_PER_HOUR}px`,
-                      height: `${(calculateIndexDifference(event.start, event.end) * 40) / DIVISIONS_PER_HOUR}px`,
+                      top: `${(calculateIndexDayjs(event.splitStart) * 40) / DIVISIONS_PER_HOUR}px`,
+                      height: `${(calculateIndexDifference(event.splitStart, event.splitEnd) * 40) / DIVISIONS_PER_HOUR}px`,
                     }}
-                    onClick={(e) => handleEventClick(e, event)}
+                    onClick={(e) => handleEventClick(e, event.id)}
                   >
                     <p>{event.start.format('HH:mm')}</p>
                     <p>~{event.end.format('HH:mm')}</p>
