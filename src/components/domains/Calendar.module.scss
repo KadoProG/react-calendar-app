@@ -15,7 +15,6 @@
 /* 全体のカレンダーコンテナ */
 .calendar {
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
   background-color: var(--divider);
   gap: 1px; /* セル間のスペース */
   width: 100%;

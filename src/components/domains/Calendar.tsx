@@ -21,6 +21,11 @@ const DIVISIONS_PER_HOUR = 4 as const;
  */
 const HEIGHT_PER_HOUR = 40 as const;
 
+/**
+ * １画面の表示数
+ */
+const WEEK_DISPLAY_COUNT = 7 as const;
+
 const generateTime = (day: dayjs.Dayjs, index: number) => {
   const minutesPerDivision = 60 / DIVISIONS_PER_HOUR;
   const totalMinutes = index * minutesPerDivision;
@@ -57,11 +62,11 @@ const Calendar: React.FC = () => {
   const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
 
   const handleBasePrev = React.useCallback(() => {
-    setBaseDate(baseDate.add(-7, 'day'));
+    setBaseDate(baseDate.add(-WEEK_DISPLAY_COUNT, 'day'));
   }, [baseDate]);
 
   const handleBaseNext = React.useCallback(() => {
-    setBaseDate(baseDate.add(7, 'day'));
+    setBaseDate(baseDate.add(WEEK_DISPLAY_COUNT, 'day'));
   }, [baseDate]);
 
   /**
@@ -143,10 +148,10 @@ const Calendar: React.FC = () => {
           style={{
             display: 'grid',
             width: '100%',
-            gridTemplateColumns: 'repeat(8, 1fr)',
+            gridTemplateColumns: `repeat(${WEEK_DISPLAY_COUNT + 1}, 1fr)`,
           }}
         >
-          {[...Array(8)].map((_, dayIndex) => {
+          {[...Array(WEEK_DISPLAY_COUNT + 1)].map((_, dayIndex) => {
             if (dayIndex === 0) {
               return <div key={dayIndex}></div>;
             }
@@ -163,7 +168,13 @@ const Calendar: React.FC = () => {
       </div>
 
       {/* ここからカレンダー本体 */}
-      <div className={styles.calendar} onMouseUp={handleMouseUp}>
+      <div
+        className={styles.calendar}
+        onMouseUp={handleMouseUp}
+        style={{
+          gridTemplateColumns: `repeat(${WEEK_DISPLAY_COUNT + 1}, 1fr)`,
+        }}
+      >
         <div
           className={styles.day_column}
           style={{
@@ -181,7 +192,7 @@ const Calendar: React.FC = () => {
             </div>
           ))}
         </div>
-        {[...Array(7)].map((_, dayIndex) => (
+        {[...Array(WEEK_DISPLAY_COUNT)].map((_, dayIndex) => (
           <div
             key={dayIndex}
             className={styles.day_column}
