@@ -14,7 +14,10 @@ interface CalendarConfigFormDialogContextValue {
 export const CalendarConfigFormDialogContext =
   React.createContext<CalendarConfigFormDialogContextValue>({
     openDialog: () =>
-      Promise.resolve({ calendarEvent: { id: '', start: '', end: '', title: '' }, type: 'cancel' }),
+      Promise.resolve({
+        calendarEvent: { id: '', start: '', end: '', title: '', isAllDayEvent: false },
+        type: 'cancel',
+      }),
   });
 
 export const CalendarConfigFormDialogContextProvider: React.FC<{ children: React.ReactNode }> = (

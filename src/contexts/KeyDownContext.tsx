@@ -39,10 +39,6 @@ export const KeyDownContextProvider: React.FC<{ children: React.ReactNode }> = (
   React.useEffect(() => {
     document.addEventListener('keydown', handleKeydown);
 
-    setInterval(() => {
-      console.log(keydownEvents.current);
-    }, 1000);
-
     return () => {
       document.removeEventListener('keydown', handleKeydown);
     };
