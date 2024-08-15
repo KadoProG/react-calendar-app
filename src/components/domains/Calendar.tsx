@@ -35,6 +35,14 @@ const generateTime = (day: dayjs.Dayjs, index: number) => {
   return day.startOf('day').add(hours, 'hour').add(minutes, 'minute');
 };
 
+const calculateIndexDayjs = (day: dayjs.Dayjs) => {
+  const minutesPerDivision = 60 / DIVISIONS_PER_HOUR;
+  const totalMinutes = day.diff(day.startOf('day'), 'minute');
+  const index = Math.round(totalMinutes / minutesPerDivision);
+
+  return index;
+};
+
 const calculateIndexDifference = (startTime: dayjs.Dayjs, endTime: dayjs.Dayjs) => {
   // 2つの日時の差を分単位で取得
   const differenceInMinutes = endTime.diff(startTime, 'minute');
@@ -117,7 +125,6 @@ const Calendar: React.FC = () => {
   const handleEventClick = React.useCallback(
     async (e: React.MouseEvent, event: CalendarEvent) => {
       e.preventDefault();
-      e.stopPropagation();
       const result = await openDialog(event);
       if (result.type === 'save') {
         updateCalendarEvent(event.id, result.calendarEvent ?? event);
@@ -210,92 +217,94 @@ const Calendar: React.FC = () => {
             </div>
           ))}
         </div>
-        {[...Array(WEEK_DISPLAY_COUNT)].map((_, dayIndex) => (
-          <div
-            key={dayIndex}
-            className={styles.day_column}
-            style={{
-              gridTemplateRows: `repeat(${24 * DIVISIONS_PER_HOUR}, ${
-                HEIGHT_PER_HOUR / DIVISIONS_PER_HOUR
-              }px)`,
-            }}
-          >
-            {/* ユーザが触れる時刻の描写 */}
-            {[...Array(24 * DIVISIONS_PER_HOUR)].map((_, hourIndex) => {
-              const dayStart = generateTime(baseDate.add(dayIndex, 'day'), hourIndex);
 
-              const isSameDayContent =
-                dragging &&
-                dayStart.format('YYYY-MM-DD') === selectedStartDay?.format('YYYY-MM-DD');
+        {/* Week→１日ごとの表示 */}
+        {[...Array(WEEK_DISPLAY_COUNT)].map((_, dayIndex) => {
+          const day = baseDate.add(dayIndex, 'day');
+          return (
+            <div
+              key={dayIndex}
+              className={styles.day_column}
+              style={{
+                gridTemplateRows: `repeat(${24 * DIVISIONS_PER_HOUR}, ${
+                  HEIGHT_PER_HOUR / DIVISIONS_PER_HOUR
+                }px)`,
+              }}
+            >
+              {/* ユーザが触れる時刻の描写 */}
+              {[...Array(24 * DIVISIONS_PER_HOUR)].map((_, hourIndex) => {
+                const dayStart = generateTime(baseDate.add(dayIndex, 'day'), hourIndex);
 
-              const isSameContent =
-                selectedStartDay! <= selectedEndDay!
-                  ? isSameDayContent &&
-                    dayStart.format('YYYY-MM-DD HH:mm') ===
-                      selectedStartDay?.format('YYYY-MM-DD HH:mm')
-                  : isSameDayContent &&
-                    dayStart.format('YYYY-MM-DD HH:mm') ===
-                      selectedEndDay?.format('YYYY-MM-DD HH:mm');
-              return (
-                <div
-                  key={hourIndex}
-                  className={`${styles.time_cell} ${isSameDayContent ? styles.selected : ''} ${
-                    (hourIndex + 1) % DIVISIONS_PER_HOUR === 0 ? styles.drawLine : ''
-                  }`}
-                  onMouseDown={() => handleMouseDown(dayStart)}
-                  onMouseMove={() => handleMouseMove(dayStart)}
-                >
-                  {/* ドラッグ中の要素のハイライト */}
-                  {isSameContent && (
-                    <div
-                      className={styles.selected}
-                      style={{
-                        height: `${
-                          (Math.abs(calculateIndexDifference(selectedStartDay, selectedEndDay)) +
-                            1) *
-                          100
-                        }%`,
-                      }}
-                    >
-                      <p>
-                        {(selectedStartDay <= selectedEndDay
-                          ? selectedStartDay
-                          : selectedEndDay
-                        ).format('HH:mm')}
-                        ~
-                        {(selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay)!
-                          .add(60 / DIVISIONS_PER_HOUR, 'minute')
-                          .format('HH:mm')}
-                      </p>
-                    </div>
-                  )}
+                const isSameDayContent =
+                  dragging &&
+                  dayStart.format('YYYY-MM-DD') === selectedStartDay?.format('YYYY-MM-DD');
 
-                  {/* １イベントごとの表示 */}
-                  {calendarEvents
-                    .filter(
-                      (event) =>
-                        dayStart.format('YYYY-MM-DD HH:mm') ===
-                        event.start.format('YYYY-MM-DD HH:mm')
-                    )
-                    .map((event, i) => (
+                const isSameContent =
+                  selectedStartDay! <= selectedEndDay!
+                    ? isSameDayContent &&
+                      dayStart.format('YYYY-MM-DD HH:mm') ===
+                        selectedStartDay?.format('YYYY-MM-DD HH:mm')
+                    : isSameDayContent &&
+                      dayStart.format('YYYY-MM-DD HH:mm') ===
+                        selectedEndDay?.format('YYYY-MM-DD HH:mm');
+                return (
+                  <div
+                    key={hourIndex}
+                    className={`${styles.time_cell} ${isSameDayContent ? styles.selected : ''} ${
+                      (hourIndex + 1) % DIVISIONS_PER_HOUR === 0 ? styles.drawLine : ''
+                    }`}
+                    onMouseDown={() => handleMouseDown(dayStart)}
+                    onMouseMove={() => handleMouseMove(dayStart)}
+                  >
+                    {/* ドラッグ中の要素のハイライト */}
+                    {isSameContent && (
                       <div
-                        key={i}
-                        className={styles.event}
+                        className={styles.selected}
                         style={{
-                          height: `${calculateIndexDifference(event.start, event.end) * 100}%`,
+                          height: `${
+                            (Math.abs(calculateIndexDifference(selectedStartDay, selectedEndDay)) +
+                              1) *
+                            100
+                          }%`,
                         }}
-                        onMouseDown={(e) => handleEventClick(e, event)}
                       >
-                        <p>{event.start.format('HH:mm')}</p>
-                        <p>~{event.end.format('HH:mm')}</p>
-                        <p>{event.title}</p>
+                        <p>
+                          {(selectedStartDay <= selectedEndDay
+                            ? selectedStartDay
+                            : selectedEndDay
+                          ).format('HH:mm')}
+                          ~
+                          {(selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay)!
+                            .add(60 / DIVISIONS_PER_HOUR, 'minute')
+                            .format('HH:mm')}
+                        </p>
                       </div>
-                    ))}
-                </div>
-              );
-            })}
-          </div>
-        ))}
+                    )}
+                  </div>
+                );
+              })}
+
+              {/* １イベントごとの表示 */}
+              {calendarEvents
+                .filter((event) => day.format('YYYY-MM-DD') === event.start.format('YYYY-MM-DD'))
+                .map((event, i) => (
+                  <button
+                    key={i}
+                    className={styles.calendarEvent}
+                    style={{
+                      top: `${(calculateIndexDayjs(event.start) * 40) / DIVISIONS_PER_HOUR}px`,
+                      height: `${(calculateIndexDifference(event.start, event.end) * 40) / DIVISIONS_PER_HOUR}px`,
+                    }}
+                    onClick={(e) => handleEventClick(e, event)}
+                  >
+                    <p>{event.start.format('HH:mm')}</p>
+                    <p>~{event.end.format('HH:mm')}</p>
+                    <p>{event.title}</p>
+                  </button>
+                ))}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

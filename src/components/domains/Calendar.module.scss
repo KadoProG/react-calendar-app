@@ -24,6 +24,28 @@
 .day_column {
   display: grid;
   background-color: var(--background-paper);
+  width: 100%;
+  position: relative;
+
+  & > .calendarEvent {
+    position: absolute;
+    width: 90%;
+    background-color: var(--color-primary);
+    color: #fff;
+    padding: 5px;
+    border-radius: 4px;
+    font-size: 12px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    z-index: 100;
+    cursor: pointer;
+    border: none;
+    &:hover {
+      background-color: var(--color-primary-hover);
+    }
+  }
 }
 
 /* 各時間のセル */
@@ -94,28 +116,5 @@
       font-size: 12px;
       color: var(--color-secondary);
     }
-  }
-}
-
-/* イベントのスタイル */
-.event {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--color-primary);
-  width: 90%;
-  color: #fff;
-  padding: 5px;
-  border-radius: 4px;
-  font-size: 12px;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  z-index: 100;
-  &:hover {
-    background-color: var(--color-primary-hover);
   }
 }
