@@ -1,6 +1,6 @@
 import dayjs from '@/libs/dayjs';
 import styles from '@/components/domains/Calendar.module.scss';
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/common/button/Button';
 import { v4 as uuidv4 } from 'uuid';
 import { CalendarConfigFormDialogContext } from '@/contexts/CalendarConfigFormDialogContext';
@@ -51,13 +51,13 @@ const calculateIndexDifference = (startTime: dayjs.Dayjs, endTime: dayjs.Dayjs) 
 const Calendar: React.FC = () => {
   const { openDialog } = React.useContext(CalendarConfigFormDialogContext);
 
-  const [baseDate, setBaseDate] = useState<dayjs.Dayjs>(dayjs('2024-07-28'));
+  const [baseDate, setBaseDate] = React.useState<dayjs.Dayjs>(dayjs('2024-07-28'));
   const { calendarEvents, addCalendarEvent, updateCalendarEvent, removeCalendarEvent } =
     React.useContext(CalendarEventContext);
 
-  const [dragging, setDragging] = useState<boolean>(false);
-  const [selectedStartDay, setSelectedStartDay] = useState<dayjs.Dayjs>(dayjs());
-  const [selectedEndDay, setSelectedEndDay] = useState<dayjs.Dayjs>(dayjs());
+  const [dragging, setDragging] = React.useState<boolean>(false);
+  const [selectedStartDay, setSelectedStartDay] = React.useState<dayjs.Dayjs>(dayjs());
+  const [selectedEndDay, setSelectedEndDay] = React.useState<dayjs.Dayjs>(dayjs());
 
   const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
 
@@ -69,6 +69,8 @@ const Calendar: React.FC = () => {
     setBaseDate(baseDate.add(WEEK_DISPLAY_COUNT, 'day'));
   }, [baseDate]);
 
+  const fixedContentRef = React.useRef<HTMLDivElement>(null);
+  const [fixedContentHeight, setFixedContentHeight] = React.useState<number>(0);
   /**
    * ドラッグ開始時の処理（マウスがセルをクリックしたときの処理）
    */
@@ -134,9 +136,23 @@ const Calendar: React.FC = () => {
     }
   }, [addKeyDownEvent, removeKeyDownEvent, dragging]);
 
+  const updateHeight = React.useCallback(() => {
+    if (fixedContentRef.current) {
+      setFixedContentHeight(fixedContentRef.current.clientHeight);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    return () => {
+      window.removeEventListener('resize', updateHeight);
+    };
+  }, [updateHeight]);
+
   return (
     <div style={{ overflow: 'scroll', height: '100%' }}>
-      <div className={styles.fixedContent}>
+      <div className={styles.fixedContent} ref={fixedContentRef}>
         {/* 上部のヘッダ */}
         <div style={{ display: 'flex', gap: 4 }}>
           <p>８月上旬の予定</p>
@@ -174,6 +190,7 @@ const Calendar: React.FC = () => {
         onMouseUp={handleMouseUp}
         style={{
           gridTemplateColumns: `repeat(${WEEK_DISPLAY_COUNT + 1}, 1fr)`,
+          paddingTop: fixedContentHeight,
         }}
       >
         <div
