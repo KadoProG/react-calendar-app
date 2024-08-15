@@ -26,18 +26,20 @@ interface CalendarConfigFormDialogProps {
 }
 
 export const CalendarConfigFormDialog: React.FC<CalendarConfigFormDialogProps> = (props) => {
-  const defaultValues = React.useMemo<CalendarEventForm>(
-    () => ({
+  const defaultValues = React.useMemo<CalendarEventForm>(() => {
+    const endDate = props.calendarEvent?.isAllDayEvent
+      ? dayjs(props.calendarEvent?.end).add(-1, 'day')
+      : props.calendarEvent?.end;
+    return {
       id: props.calendarEvent?.id ?? '',
       start: props.calendarEvent?.start.format('YYYY-MM-DDTHH:mm'),
       end: props.calendarEvent?.end.format('YYYY-MM-DDTHH:mm'),
       startDate: props.calendarEvent?.start.format('YYYY-MM-DD'),
-      endDate: props.calendarEvent?.end.format('YYYY-MM-DD'),
+      endDate: endDate?.format('YYYY-MM-DD'),
       title: props.calendarEvent?.title ?? '',
       isAllDayEvent: props.calendarEvent?.isAllDayEvent ?? false,
-    }),
-    [props.calendarEvent]
-  );
+    };
+  }, [props.calendarEvent]);
 
   const { control, handleSubmit, setValue, watch } = useForm<CalendarEventForm>({ defaultValues });
 
@@ -50,7 +52,6 @@ export const CalendarConfigFormDialog: React.FC<CalendarConfigFormDialogProps> =
       setValue('isAllDayEvent', defaultValues.isAllDayEvent);
       setValue('startDate', defaultValues.startDate);
       setValue('endDate', defaultValues.endDate);
-      console.log(defaultValues);
     }
   }, [setValue, props.open, defaultValues]);
 
