@@ -14,7 +14,13 @@ export const CheckBox = <T extends FieldValues>(props: CheckBoxProps<T>) => {
   });
   return (
     <div className={styles.container} style={props.style}>
-      <input type="checkbox" {...field} id={props.name} className={styles.CheckBox} />
+      <input
+        type="checkbox"
+        {...field}
+        id={props.name}
+        className={styles.CheckBox}
+        checked={field.value}
+      />
       <label htmlFor={props.name} className={styles.Label}>
         {props.label}
       </label>

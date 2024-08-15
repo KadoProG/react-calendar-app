@@ -95,11 +95,12 @@ const Calendar: React.FC = () => {
       selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay
     ).add(60 / DIVISIONS_PER_HOUR, 'minute');
 
-    const newEvent = {
+    const newEvent: CalendarEvent = {
       id: uuidv4(),
       start: resultStartDay,
       end: resultEndDay,
       title: '',
+      isAllDayEvent: false,
     };
 
     const result = await openDialog(newEvent);
