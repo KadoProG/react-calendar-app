@@ -182,7 +182,7 @@ const Calendar: React.FC = () => {
             if (dayIndex === 0) {
               return <div key={dayIndex}></div>;
             }
-            const day = baseDate.add(dayIndex, 'day');
+            const day = baseDate.add(dayIndex - 1, 'day');
             return (
               <div key={dayIndex} style={{ textAlign: 'center' }}>
                 <p>{day.format('ddd')}</p>
@@ -236,7 +236,7 @@ const Calendar: React.FC = () => {
             >
               {/* ユーザが触れる時刻の描写 */}
               {[...Array(24 * DIVISIONS_PER_HOUR)].map((_, hourIndex) => {
-                const dayStart = generateTime(baseDate.add(dayIndex, 'day'), hourIndex);
+                const dayStart = generateTime(day, hourIndex);
 
                 const isSameDayContent =
                   dragging &&
