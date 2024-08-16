@@ -10,10 +10,9 @@ import { splitCalendarEvents } from '@/utils/convertDayjs';
 import { CalendarConfigContext } from '@/contexts/CalendarConfigContext';
 
 const Calendar: React.FC = () => {
-  const { config } = React.useContext(CalendarConfigContext);
+  const { config, baseDate, setBaseDate } = React.useContext(CalendarConfigContext);
   const { openDialog } = React.useContext(CalendarConfigFormDialogContext);
 
-  const [baseDate, setBaseDate] = React.useState<dayjs.Dayjs>(dayjs('2024-07-28'));
   const { calendarEvents, addCalendarEvent, updateCalendarEvent, removeCalendarEvent } =
     React.useContext(CalendarEventContext);
 
@@ -25,7 +24,11 @@ const Calendar: React.FC = () => {
 
   const handleBasePrev = React.useCallback(() => {
     setBaseDate(baseDate.add(-config.weekDisplayCount, 'day'));
-  }, [baseDate, config.weekDisplayCount]);
+  }, [baseDate, config.weekDisplayCount, setBaseDate]);
+
+  const handleBaseNext = React.useCallback(() => {
+    setBaseDate(baseDate.add(config.weekDisplayCount, 'day'));
+  }, [baseDate, config.weekDisplayCount, setBaseDate]);
 
   const generateTime = React.useCallback(
     (day: dayjs.Dayjs, index: number) => {
@@ -54,10 +57,6 @@ const Calendar: React.FC = () => {
     },
     [config.divisionsPerHour]
   );
-
-  const handleBaseNext = React.useCallback(() => {
-    setBaseDate(baseDate.add(config.weekDisplayCount, 'day'));
-  }, [baseDate, config.weekDisplayCount]);
 
   const fixedContentRef = React.useRef<HTMLDivElement>(null);
   const [fixedContentHeight, setFixedContentHeight] = React.useState<number>(0);
