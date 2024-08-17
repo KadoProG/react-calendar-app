@@ -90,6 +90,15 @@ export const CalendarConfigFormDialog: React.FC<CalendarConfigFormDialogProps> =
     }
   }, [start, end, isAllDayEvent, startDate, endDate, setValue]);
 
+  const handleDayBlur = React.useCallback(() => {
+    if (!isAllDayEvent && start > end) {
+      setValue('end', dayjs(start).add(1, 'hour').format('YYYY-MM-DDTHH:mm'));
+    }
+    if (isAllDayEvent && startDate > endDate) {
+      setValue('endDate', startDate);
+    }
+  }, [start, end, setValue, startDate, endDate, isAllDayEvent]);
+
   return (
     <div
       className={styles.dialog}
@@ -127,6 +136,7 @@ export const CalendarConfigFormDialog: React.FC<CalendarConfigFormDialogProps> =
                 required
                 label="開始日時"
                 style={{ display: isAllDayEvent ? 'block' : 'none' }}
+                onBlur={handleDayBlur}
               />
               <TextField
                 control={control}
@@ -135,6 +145,7 @@ export const CalendarConfigFormDialog: React.FC<CalendarConfigFormDialogProps> =
                 required
                 label="終了日時"
                 style={{ display: isAllDayEvent ? 'block' : 'none' }}
+                onBlur={handleDayBlur}
               />
               <TextField
                 control={control}
@@ -143,6 +154,7 @@ export const CalendarConfigFormDialog: React.FC<CalendarConfigFormDialogProps> =
                 required
                 label="開始日時"
                 style={{ display: isAllDayEvent ? 'none' : 'block' }}
+                onBlur={handleDayBlur}
               />
               <TextField
                 control={control}
@@ -151,6 +163,7 @@ export const CalendarConfigFormDialog: React.FC<CalendarConfigFormDialogProps> =
                 required
                 label="終了日時"
                 style={{ display: isAllDayEvent ? 'none' : 'block' }}
+                onBlur={handleDayBlur}
               />
             </>
           )}

@@ -16,6 +16,8 @@ export type TextFieldProps<T extends FieldValues> = UseControllerProps<T> & {
   type: React.HTMLInputTypeAttribute;
   /** ロード時フォームフォーカス */
   autoFocus?: boolean;
+  /** フィールドフォーカス解除時の動作 */
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
 };
 
 export const TextField = <T extends FieldValues>(props: TextFieldProps<T>) => {
@@ -44,6 +46,7 @@ export const TextField = <T extends FieldValues>(props: TextFieldProps<T>) => {
         type={props.type}
         autoFocus={props.autoFocus}
         className={`${styles.Input} ${fieldState.error ? styles.InputError : ''}`}
+        onBlur={props.onBlur}
       />
       {fieldState.error && <p className={styles.errorText}>{fieldState.error.message}</p>}
     </div>
