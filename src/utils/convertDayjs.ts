@@ -17,13 +17,13 @@ export const splitCalendarEvents = (events: CalendarEvent[]): SplitedCalendarEve
     if (end < start) throw new Error('Invalid date range');
 
     // 同じ日の場合はそのまま結果に追加
-    if (start.isSame(end, 'day')) {
+    if (start.isSame(end.add(-1, 'minute'), 'day')) {
       result.push({ ...event, splitStart: start, splitEnd: end });
     } else {
       // 日付をまたぐ場合
       let currentStart = start;
       let currentEnd = currentStart;
-      while (!currentStart.isSame(end, 'day')) {
+      while (!currentStart.isSame(end.add(-1, 'minute'), 'day')) {
         currentEnd = currentStart.endOf('day'); // その日の終了時刻までに設定
         result.push({
           ...event,

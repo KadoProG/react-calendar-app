@@ -15,12 +15,34 @@
     display: grid;
     width: 100%;
     &__column {
-      text-align: center;
+      width: 100%;
       border-left: 1px solid var(--divider);
       border-bottom: 1px solid var(--divider);
+      & p {
+        text-align: center;
+      }
       &:hover {
         background-color: var(--divider);
       }
     }
+  }
+}
+
+.calendarEvent {
+  width: 90%;
+  background-color: var(--color-primary);
+  color: #fff;
+  padding: 5px;
+  border-radius: 4px;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  z-index: 100;
+  cursor: pointer;
+  border: none;
+  text-align: center;
+  &:hover {
+    background-color: var(--color-primary-hover);
   }
 }

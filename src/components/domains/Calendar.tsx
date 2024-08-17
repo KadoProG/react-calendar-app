@@ -205,7 +205,9 @@ export const Calendar: React.FC = () => {
               {/* １イベントごとの表示 */}
               {splitCalendarEvents(calendarEvents)
                 .filter(
-                  (event) => day.format('YYYY-MM-DD') === event.splitStart.format('YYYY-MM-DD')
+                  (event) =>
+                    !event.isAllDayEvent &&
+                    day.format('YYYY-MM-DD') === event.splitStart.format('YYYY-MM-DD')
                 )
                 .map((event, i) => (
                   <button
