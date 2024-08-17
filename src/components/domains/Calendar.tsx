@@ -60,6 +60,7 @@ const Calendar: React.FC = () => {
 
   const fixedContentRef = React.useRef<HTMLDivElement>(null);
   const [fixedContentHeight, setFixedContentHeight] = React.useState<number>(0);
+
   /**
    * ドラッグ開始時の処理（マウスがセルをクリックしたときの処理）
    */
@@ -202,7 +203,9 @@ const Calendar: React.FC = () => {
           {[...Array(24 * config.divisionsPerHour)].map((_, hourIndex) => (
             <div key={hourIndex} className={`${styles.time_cell} ${styles.time_label}`}>
               {hourIndex % config.divisionsPerHour === 0 && (
-                <p>{generateTime(dayjs(), hourIndex).format('HH:mm')}</p>
+                <p className={styles.noSelect}>
+                  {generateTime(dayjs(), hourIndex).format('HH:mm')}
+                </p>
               )}
             </div>
           ))}
@@ -259,7 +262,7 @@ const Calendar: React.FC = () => {
                           height: `${sizeIndex * 100}%`,
                         }}
                       >
-                        <p>
+                        <small>
                           {(selectedStartDay <= selectedEndDay
                             ? selectedStartDay
                             : selectedEndDay
@@ -268,7 +271,7 @@ const Calendar: React.FC = () => {
                           {(selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay)!
                             .add(60 / config.divisionsPerHour, 'minute')
                             .format('HH:mm')}
-                        </p>
+                        </small>
                       </div>
                     )}
                   </div>

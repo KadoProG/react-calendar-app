@@ -12,6 +12,14 @@
   background-color: var(--background-paper);
 }
 
+.noSelect {
+  user-select: none;
+  -webkit-user-drag: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -moz-user-drag: none;
+}
+
 /* 全体のカレンダーコンテナ */
 .calendar {
   display: grid;
