@@ -9,8 +9,6 @@
 /* 全体のカレンダーコンテナ */
 .calendar {
   display: grid;
-  background-color: var(--divider);
-  gap: 1px; /* セル間のスペース */
   width: 100%;
 }
 
@@ -20,6 +18,7 @@
   background-color: var(--background-paper);
   width: 100%;
   position: relative;
+  border-left: 1px solid var(--divider);
 
   & > .calendarEvent {
     position: absolute;

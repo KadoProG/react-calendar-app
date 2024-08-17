@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/common/button/Button';
 import { CalendarConfigContext } from '@/contexts/CalendarConfigContext';
 import styles from '@/components/domains/CalendarHeader.module.scss';
+import { CalendarHeaderDayRows } from '@/components/domains/CalendarHeaderDayRows';
 
 interface CalenadarHeaderProps {
   setFixedContentHeight: (height: number) => void;
@@ -44,21 +45,7 @@ export const CalendarHeader: React.FC<CalenadarHeaderProps> = (props) => {
         <Button onClick={handleBasePrev}>＜</Button>
         <Button onClick={handleBaseNext}>＞</Button>
       </div>
-      <div
-        className={styles.fixedContent__row}
-        style={{ gridTemplateColumns: `repeat(${config.weekDisplayCount + 1}, 1fr)` }}
-      >
-        {[...Array(config.weekDisplayCount + 1)].map((_, dayIndex) => {
-          if (dayIndex === 0) return <div key={dayIndex}></div>;
-          const day = baseDate.add(dayIndex - 1, 'day');
-          return (
-            <div key={dayIndex} className={styles.fixedContent__row__column}>
-              <p>{day.format('ddd')}</p>
-              <p>{day.format('D')}</p>
-            </div>
-          );
-        })}
-      </div>
+      <CalendarHeaderDayRows />
     </div>
   );
 };

@@ -16,6 +16,11 @@
     width: 100%;
     &__column {
       text-align: center;
+      border-left: 1px solid var(--divider);
+      border-bottom: 1px solid var(--divider);
+      &:hover {
+        background-color: var(--divider);
+      }
     }
   }
 }
