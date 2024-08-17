@@ -238,10 +238,8 @@ const Calendar: React.FC = () => {
                       dayStart.format('YYYY-MM-DD HH:mm') ===
                         selectedEndDay?.format('YYYY-MM-DD HH:mm');
 
-                const sizeIndex = calculateIndexDifference(
-                  selectedStartDay,
-                  selectedEndDay.add(60 / config.divisionsPerHour, 'minute')
-                );
+                const sizeIndex =
+                  Math.abs(calculateIndexDifference(selectedStartDay, selectedEndDay)) + 1;
 
                 return (
                   <div
@@ -257,6 +255,7 @@ const Calendar: React.FC = () => {
                       <div
                         className={styles.selected}
                         style={{
+                          top: 0,
                           height: `${sizeIndex * 100}%`,
                         }}
                       >
