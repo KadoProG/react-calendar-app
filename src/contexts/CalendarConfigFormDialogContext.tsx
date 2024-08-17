@@ -1,5 +1,4 @@
 import dayjs from '@/libs/dayjs';
-import { v4 as uuidv4 } from 'uuid';
 import { CalendarConfigFormDialog } from '@/components/domains/CalendarConfigFormDialog';
 import { CalendarEventContext } from '@/contexts/CalendarEventContext';
 import { KeyDownContext } from '@/contexts/KeyDownContext';
@@ -60,7 +59,6 @@ export const CalendarConfigFormDialogContextProvider: React.FC<{ children: React
             }
           } else if (args.type === 'add') {
             const newCalendarEvent = {
-              id: uuidv4(),
               start: args.init?.start ?? dayjs().startOf('hour').add(1, 'hour'),
               end: args.init?.end ?? dayjs().startOf('hour').add(2, 'hour'),
               title: '',
@@ -83,13 +81,10 @@ export const CalendarConfigFormDialogContextProvider: React.FC<{ children: React
   const handleSetCalendarEvent = React.useCallback(
     (calendarEvent: CalendarEvent) => {
       setIsOpen(false);
-      console.log(calendarEvent, type);
 
       if (type === 'add') {
-        console.log('add');
         addCalendarEvent(calendarEvent);
       } else if (type === 'edit') {
-        console.log('edit');
         updateCalendarEvent(calendarEvent.id, calendarEvent);
       }
 
@@ -100,11 +95,12 @@ export const CalendarConfigFormDialogContextProvider: React.FC<{ children: React
 
   const handleDelete = React.useCallback(() => {
     setIsOpen(false);
-    resolveFunction.current?.({ type: 'delete' });
 
     if (calendarEvent) {
       removeCalendarEvent(calendarEvent.id);
     }
+
+    resolveFunction.current?.({ type: 'delete' });
   }, [calendarEvent, removeCalendarEvent]);
 
   React.useEffect(() => {

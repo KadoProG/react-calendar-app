@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import React from 'react';
 
 interface CalendarEventContextType {
@@ -18,8 +19,8 @@ export const CalendarEventProvider: React.FC<{ children: React.ReactNode }> = (p
   const [calendarEvents, setCalendarEvents] = React.useState<CalendarEvent[]>([]);
 
   const addCalendarEvent = React.useCallback((args: CalendarEvent) => {
-    console.log(args);
-    setCalendarEvents((prev) => [...prev, args]);
+    const newCalendarEvent = { ...args, id: uuidv4() };
+    setCalendarEvents((prev) => [...prev, newCalendarEvent]);
   }, []);
 
   const updateCalendarEvent = React.useCallback(
