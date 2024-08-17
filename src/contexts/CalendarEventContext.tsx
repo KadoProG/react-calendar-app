@@ -18,6 +18,7 @@ export const CalendarEventProvider: React.FC<{ children: React.ReactNode }> = (p
   const [calendarEvents, setCalendarEvents] = React.useState<CalendarEvent[]>([]);
 
   const addCalendarEvent = React.useCallback((args: CalendarEvent) => {
+    console.log(args);
     setCalendarEvents((prev) => [...prev, args]);
   }, []);
 

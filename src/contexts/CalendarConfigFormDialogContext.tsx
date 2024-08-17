@@ -1,4 +1,7 @@
+import dayjs from '@/libs/dayjs';
+import { v4 as uuidv4 } from 'uuid';
 import { CalendarConfigFormDialog } from '@/components/domains/CalendarConfigFormDialog';
+import { CalendarEventContext } from '@/contexts/CalendarEventContext';
 import { KeyDownContext } from '@/contexts/KeyDownContext';
 import React from 'react';
 
@@ -7,8 +10,19 @@ interface CalendarEventReturnValue {
   calendarEvent?: CalendarEvent;
 }
 
+type OpenDialogArgs =
+  | {
+      type: 'add';
+      init?: {
+        start?: dayjs.Dayjs;
+        end?: dayjs.Dayjs;
+        isAllDayEvent?: boolean;
+      };
+    }
+  | { type: 'edit'; id: CalendarEvent['id'] };
+
 interface CalendarConfigFormDialogContextValue {
-  openDialog: (calendarEvent: CalendarEvent | null) => Promise<CalendarEventReturnValue>;
+  openDialog: (args: OpenDialogArgs) => Promise<CalendarEventReturnValue>;
 }
 
 export const CalendarConfigFormDialogContext =
@@ -24,7 +38,10 @@ export const CalendarConfigFormDialogContextProvider: React.FC<{ children: React
   props
 ) => {
   const [calendarEvent, setCalendarEvent] = React.useState<CalendarEvent | null>(null);
+  const [type, setType] = React.useState<'add' | 'edit'>('add');
   const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
+  const { calendarEvents, addCalendarEvent, updateCalendarEvent, removeCalendarEvent } =
+    React.useContext(CalendarEventContext);
 
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
 
@@ -32,15 +49,30 @@ export const CalendarConfigFormDialogContextProvider: React.FC<{ children: React
 
   const value = React.useMemo<CalendarConfigFormDialogContextValue>(
     () => ({
-      openDialog: async (calendarEvent: CalendarEvent | null) =>
+      openDialog: async (args: OpenDialogArgs) =>
         new Promise((resolve) => {
           resolveFunction.current = resolve;
 
-          setCalendarEvent(calendarEvent);
+          if (args.type === 'edit') {
+            const newCalendarEvent = calendarEvents.find((event) => event.id === args.id);
+            if (newCalendarEvent) {
+              setCalendarEvent(newCalendarEvent);
+            }
+          } else if (args.type === 'add') {
+            const newCalendarEvent = {
+              id: uuidv4(),
+              start: args.init?.start ?? dayjs().startOf('hour').add(1, 'hour'),
+              end: args.init?.end ?? dayjs().startOf('hour').add(2, 'hour'),
+              title: '',
+              isAllDayEvent: args.init?.isAllDayEvent ?? false,
+            };
+            setCalendarEvent(newCalendarEvent);
+          }
+          setType(args.type);
           setIsOpen(true);
         }),
     }),
-    []
+    [calendarEvents]
   );
 
   const handleCancel = React.useCallback(() => {
@@ -48,15 +80,32 @@ export const CalendarConfigFormDialogContextProvider: React.FC<{ children: React
     resolveFunction.current?.({ type: 'cancel' });
   }, []);
 
-  const handleSetCalendarEvent = React.useCallback((calendarEvent: CalendarEvent) => {
-    setIsOpen(false);
-    resolveFunction.current?.({ type: 'save', calendarEvent });
-  }, []);
+  const handleSetCalendarEvent = React.useCallback(
+    (calendarEvent: CalendarEvent) => {
+      setIsOpen(false);
+      console.log(calendarEvent, type);
+
+      if (type === 'add') {
+        console.log('add');
+        addCalendarEvent(calendarEvent);
+      } else if (type === 'edit') {
+        console.log('edit');
+        updateCalendarEvent(calendarEvent.id, calendarEvent);
+      }
+
+      resolveFunction.current?.({ type: 'save' });
+    },
+    [type, addCalendarEvent, updateCalendarEvent]
+  );
 
   const handleDelete = React.useCallback(() => {
     setIsOpen(false);
     resolveFunction.current?.({ type: 'delete' });
-  }, []);
+
+    if (calendarEvent) {
+      removeCalendarEvent(calendarEvent.id);
+    }
+  }, [calendarEvent, removeCalendarEvent]);
 
   React.useEffect(() => {
     if (isOpen) {

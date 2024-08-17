@@ -1,7 +1,6 @@
 import dayjs from '@/libs/dayjs';
 import styles from '@/components/domains/Calendar.module.scss';
 import React from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { CalendarConfigFormDialogContext } from '@/contexts/CalendarConfigFormDialogContext';
 import { KeyDownContext } from '@/contexts/KeyDownContext';
 import { CalendarEventContext } from '@/contexts/CalendarEventContext';
@@ -10,28 +9,25 @@ import { CalendarConfigContext } from '@/contexts/CalendarConfigContext';
 import { CalendarHeader } from '@/components/domains/CalenadarHeader';
 
 export const Calendar: React.FC = () => {
-  const [fixedContentHeight, setFixedContentHeight] = React.useState<number>(0);
   const { config, baseDate } = React.useContext(CalendarConfigContext);
   const { openDialog } = React.useContext(CalendarConfigFormDialogContext);
-
-  const { calendarEvents, addCalendarEvent, updateCalendarEvent, removeCalendarEvent } =
-    React.useContext(CalendarEventContext);
+  const { calendarEvents } = React.useContext(CalendarEventContext);
+  const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
 
   const [dragging, setDragging] = React.useState<boolean>(false);
   const [selectedStartDay, setSelectedStartDay] = React.useState<dayjs.Dayjs>(dayjs());
   const [selectedEndDay, setSelectedEndDay] = React.useState<dayjs.Dayjs>(dayjs());
 
-  const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
+  const [fixedContentHeight, setFixedContentHeight] = React.useState<number>(0);
 
-  /**
-   * ドラッグ開始時の処理（マウスがセルをクリックしたときの処理）
-   */
+  /** ドラッグ開始時の処理（マウスがセルをクリックしたときの処理） */
   const handleMouseDown = React.useCallback((day: dayjs.Dayjs) => {
     setDragging(true);
     setSelectedStartDay(day);
     setSelectedEndDay(day);
   }, []);
 
+  /** ドラッグ動作中の処理（マウスがセル上で動いているときの処理） */
   const handleMouseMove = React.useCallback(
     (day: dayjs.Dayjs) => {
       if (dragging && day.format('YYYY-MM-DD') === selectedStartDay?.format('YYYY-MM-DD')) {
@@ -41,6 +37,7 @@ export const Calendar: React.FC = () => {
     [dragging, selectedStartDay]
   );
 
+  /** ドラッグ終了時の処理（マウスがセルのクリックから離れた場合の処理） */
   const handleMouseUp = React.useCallback(async () => {
     if (!dragging) return;
 
@@ -49,43 +46,25 @@ export const Calendar: React.FC = () => {
       selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay
     ).add(60 / config.divisionsPerHour, 'minute');
 
-    const newEvent: CalendarEvent = {
-      id: uuidv4(),
-      start: resultStartDay,
-      end: resultEndDay,
-      title: '',
-      isAllDayEvent: false,
-    };
-
-    const result = await openDialog(newEvent);
-
-    if (result.type === 'save') {
-      addCalendarEvent(result.calendarEvent ?? newEvent);
-    }
+    await openDialog({
+      type: 'add',
+      init: {
+        start: resultStartDay,
+        end: resultEndDay,
+        isAllDayEvent: false,
+      },
+    });
 
     setDragging(false);
-  }, [
-    dragging,
-    selectedStartDay,
-    selectedEndDay,
-    openDialog,
-    addCalendarEvent,
-    config.divisionsPerHour,
-  ]);
+  }, [dragging, openDialog, selectedStartDay, selectedEndDay, config.divisionsPerHour]);
 
+  /** イベントクリック時の処理（編集ダイアログが立ち上がります） */
   const handleEventClick = React.useCallback(
-    async (e: React.MouseEvent, id: CalendarEvent['id']) => {
+    (e: React.MouseEvent, id: CalendarEvent['id']) => {
       e.preventDefault();
-      const event = calendarEvents.find((event) => event.id === id);
-      if (!event) return;
-      const result = await openDialog(event);
-      if (result.type === 'save') {
-        updateCalendarEvent(event.id, result.calendarEvent ?? event);
-      } else if (result.type === 'delete') {
-        removeCalendarEvent(event.id);
-      }
+      openDialog({ type: 'edit', id });
     },
-    [openDialog, updateCalendarEvent, removeCalendarEvent, calendarEvents]
+    [openDialog]
   );
 
   React.useEffect(() => {

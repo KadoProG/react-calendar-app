@@ -11,11 +11,11 @@ createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <CalendarConfigProvider>
       <KeyDownContextProvider>
-        <CalendarConfigFormDialogContextProvider>
-          <CalendarEventProvider>
+        <CalendarEventProvider>
+          <CalendarConfigFormDialogContextProvider>
             <MyRouter />
-          </CalendarEventProvider>
-        </CalendarConfigFormDialogContextProvider>
+          </CalendarConfigFormDialogContextProvider>
+        </CalendarEventProvider>
       </KeyDownContextProvider>
     </CalendarConfigProvider>
   </React.StrictMode>
