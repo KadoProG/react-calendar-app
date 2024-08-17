@@ -9,7 +9,7 @@ import { calculateIndexDifference, generateTime, splitCalendarEvents } from '@/u
 import { CalendarConfigContext } from '@/contexts/CalendarConfigContext';
 import { CalendarHeader } from '@/components/domains/CalenadarHeader';
 
-const Calendar: React.FC = () => {
+export const Calendar: React.FC = () => {
   const [fixedContentHeight, setFixedContentHeight] = React.useState<number>(0);
   const { config, baseDate } = React.useContext(CalendarConfigContext);
   const { openDialog } = React.useContext(CalendarConfigFormDialogContext);
@@ -229,5 +229,3 @@ const Calendar: React.FC = () => {
     </div>
   );
 };
-
-export default Calendar;
