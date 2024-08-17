@@ -1,16 +1,17 @@
 import dayjs from '@/libs/dayjs';
 import styles from '@/components/domains/Calendar.module.scss';
 import React from 'react';
-import { Button } from '@/components/common/button/Button';
 import { v4 as uuidv4 } from 'uuid';
 import { CalendarConfigFormDialogContext } from '@/contexts/CalendarConfigFormDialogContext';
 import { KeyDownContext } from '@/contexts/KeyDownContext';
 import { CalendarEventContext } from '@/contexts/CalendarEventContext';
-import { splitCalendarEvents } from '@/utils/convertDayjs';
+import { calculateIndexDifference, generateTime, splitCalendarEvents } from '@/utils/convertDayjs';
 import { CalendarConfigContext } from '@/contexts/CalendarConfigContext';
+import { CalendarHeader } from '@/components/domains/CalenadarHeader';
 
 const Calendar: React.FC = () => {
-  const { config, baseDate, setBaseDate } = React.useContext(CalendarConfigContext);
+  const [fixedContentHeight, setFixedContentHeight] = React.useState<number>(0);
+  const { config, baseDate } = React.useContext(CalendarConfigContext);
   const { openDialog } = React.useContext(CalendarConfigFormDialogContext);
 
   const { calendarEvents, addCalendarEvent, updateCalendarEvent, removeCalendarEvent } =
@@ -21,45 +22,6 @@ const Calendar: React.FC = () => {
   const [selectedEndDay, setSelectedEndDay] = React.useState<dayjs.Dayjs>(dayjs());
 
   const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
-
-  const handleBasePrev = React.useCallback(() => {
-    setBaseDate(baseDate.add(-config.weekDisplayCount, 'day'));
-  }, [baseDate, config.weekDisplayCount, setBaseDate]);
-
-  const handleBaseNext = React.useCallback(() => {
-    setBaseDate(baseDate.add(config.weekDisplayCount, 'day'));
-  }, [baseDate, config.weekDisplayCount, setBaseDate]);
-
-  const generateTime = React.useCallback(
-    (day: dayjs.Dayjs, index: number) => {
-      const minutesPerDivision = 60 / config.divisionsPerHour;
-      const totalMinutes = index * minutesPerDivision;
-      const hours = Math.floor(totalMinutes / 60);
-      const minutes = totalMinutes % 60;
-
-      return day.startOf('day').add(hours, 'hour').add(minutes, 'minute');
-    },
-    [config.divisionsPerHour]
-  );
-
-  const calculateIndexDifference = React.useCallback(
-    (startTime: dayjs.Dayjs, endTime: dayjs.Dayjs) => {
-      // 2つの日時の差を分単位で取得
-      const differenceInMinutes = endTime.diff(startTime, 'minute');
-
-      // 1インデックスあたりの分数を計算
-      const minutesPerDivision = 60 / config.divisionsPerHour;
-
-      // インデックスの差を計算
-      const indexDifference = Math.round(differenceInMinutes / minutesPerDivision);
-
-      return indexDifference;
-    },
-    [config.divisionsPerHour]
-  );
-
-  const fixedContentRef = React.useRef<HTMLDivElement>(null);
-  const [fixedContentHeight, setFixedContentHeight] = React.useState<number>(0);
 
   /**
    * ドラッグ開始時の処理（マウスがセルをクリックしたときの処理）
@@ -134,53 +96,9 @@ const Calendar: React.FC = () => {
     }
   }, [addKeyDownEvent, removeKeyDownEvent, dragging]);
 
-  const updateHeight = React.useCallback(() => {
-    if (fixedContentRef.current) {
-      setFixedContentHeight(fixedContentRef.current.clientHeight);
-    }
-  }, []);
-
-  React.useEffect(() => {
-    updateHeight();
-    window.addEventListener('resize', updateHeight);
-    return () => {
-      window.removeEventListener('resize', updateHeight);
-    };
-  }, [updateHeight]);
-
   return (
     <div style={{ overflow: 'scroll', height: '100%' }}>
-      <div className={styles.fixedContent} ref={fixedContentRef}>
-        {/* 上部のヘッダ */}
-        <div style={{ display: 'flex', gap: 4 }}>
-          <p>８月上旬の予定</p>
-          <Button onClick={handleBasePrev}>＜</Button>
-          <Button onClick={handleBaseNext}>＞</Button>
-        </div>
-
-        {/* 日付・曜日の表示 */}
-        <div
-          style={{
-            display: 'grid',
-            width: '100%',
-            gridTemplateColumns: `repeat(${config.weekDisplayCount + 1}, 1fr)`,
-          }}
-        >
-          {[...Array(config.weekDisplayCount + 1)].map((_, dayIndex) => {
-            if (dayIndex === 0) {
-              return <div key={dayIndex}></div>;
-            }
-            const day = baseDate.add(dayIndex - 1, 'day');
-            return (
-              <div key={dayIndex} style={{ textAlign: 'center' }}>
-                <p>{day.format('ddd')}</p>
-                <p>{day.format('D')}</p>
-                {/* <p>既存の予定</p> */}
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      <CalendarHeader setFixedContentHeight={setFixedContentHeight} />
 
       {/* ここからカレンダー本体 */}
       <div
@@ -204,7 +122,7 @@ const Calendar: React.FC = () => {
             <div key={hourIndex} className={`${styles.time_cell} ${styles.time_label}`}>
               {hourIndex % config.divisionsPerHour === 0 && (
                 <p className={styles.noSelect}>
-                  {generateTime(dayjs(), hourIndex).format('HH:mm')}
+                  {generateTime(dayjs(), hourIndex, config.divisionsPerHour).format('HH:mm')}
                 </p>
               )}
             </div>
@@ -226,7 +144,7 @@ const Calendar: React.FC = () => {
             >
               {/* ユーザが触れる時刻の描写 */}
               {[...Array(24 * config.divisionsPerHour)].map((_, hourIndex) => {
-                const dayStart = generateTime(day, hourIndex);
+                const dayStart = generateTime(day, hourIndex, config.divisionsPerHour);
 
                 const isSameDayContent =
                   dragging &&
@@ -242,7 +160,13 @@ const Calendar: React.FC = () => {
                         selectedEndDay?.format('YYYY-MM-DD HH:mm');
 
                 const sizeIndex =
-                  Math.abs(calculateIndexDifference(selectedStartDay, selectedEndDay)) + 1;
+                  Math.abs(
+                    calculateIndexDifference(
+                      selectedStartDay,
+                      selectedEndDay,
+                      config.divisionsPerHour
+                    )
+                  ) + 1;
 
                 return (
                   <div
@@ -288,8 +212,8 @@ const Calendar: React.FC = () => {
                     key={i}
                     className={styles.calendarEvent}
                     style={{
-                      top: `${(calculateIndexDifference(day.startOf('day'), event.splitStart) * config.heightPerHour) / config.divisionsPerHour}px`,
-                      height: `${(calculateIndexDifference(event.splitStart, event.splitEnd) * config.heightPerHour) / config.divisionsPerHour}px`,
+                      top: `${(calculateIndexDifference(day.startOf('day'), event.splitStart, config.divisionsPerHour) * config.heightPerHour) / config.divisionsPerHour}px`,
+                      height: `${(calculateIndexDifference(event.splitStart, event.splitEnd, config.divisionsPerHour) * config.heightPerHour) / config.divisionsPerHour}px`,
                     }}
                     onClick={(e) => handleEventClick(e, event.id)}
                   >

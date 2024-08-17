@@ -46,3 +46,24 @@ export const splitCalendarEvents = (events: CalendarEvent[]): SplitedCalendarEve
 
   return result;
 };
+
+export const generateTime = (day: dayjs.Dayjs, index: number, divisionsPerHour: number) => {
+  const minutesPerDivision = 60 / divisionsPerHour;
+  const totalMinutes = index * minutesPerDivision;
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  return day.startOf('day').add(hours, 'hour').add(minutes, 'minute');
+};
+
+export const calculateIndexDifference = (
+  startTime: dayjs.Dayjs,
+  endTime: dayjs.Dayjs,
+  divisionsPerHour: number
+) => {
+  const differenceInMinutes = endTime.diff(startTime, 'minute');
+  const minutesPerDivision = 60 / divisionsPerHour;
+  const indexDifference = Math.round(differenceInMinutes / minutesPerDivision);
+
+  return indexDifference;
+};
