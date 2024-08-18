@@ -14,7 +14,7 @@ interface CalendarBodyProps {
 export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
   const { config, baseDate } = React.useContext(CalendarConfigContext);
   const { openDialog } = React.useContext(CalendarConfigFormDialogContext);
-  const { calendarEvents } = React.useContext(CalendarEventContext);
+  const { calendarEvents, updateCalendarEvent } = React.useContext(CalendarEventContext);
   const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
 
   const positionRef = React.useRef<DOMRect | null>(null);
@@ -23,6 +23,11 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
   const [selectedStartDay, setSelectedStartDay] = React.useState<dayjs.Dayjs>(dayjs());
   const [selectedEndDay, setSelectedEndDay] = React.useState<dayjs.Dayjs>(dayjs());
   const isMouseDownRef = React.useRef<boolean>(false);
+
+  const dragCalendarEventRef = React.useRef<{
+    calendarEvent: CalendarEvent;
+    yIndex: number;
+  } | null>(null);
 
   /** ドラッグ開始時の処理（マウスがセルをクリックしたときの処理） */
   const handleMouseDown = React.useCallback(
@@ -47,14 +52,33 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
     (e: React.MouseEvent<HTMLDivElement>, day: dayjs.Dayjs) => {
       if (!isMouseDownRef.current) return;
       setDragging(true);
-      const rect = e.currentTarget.getBoundingClientRect();
-      const dayStart = generateTime(
-        day,
-        Math.floor(((e.clientY - rect.top) / rect.height) * (24 * config.divisionsPerHour)),
-        config.divisionsPerHour
-      );
 
-      setSelectedEndDay(dayStart);
+      if (dragCalendarEventRef.current) {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const index =
+          Math.floor(((e.clientY - rect.top) / rect.height) * (24 * config.divisionsPerHour)) -
+          dragCalendarEventRef.current.yIndex;
+
+        const dayStart = generateTime(day, index, config.divisionsPerHour);
+
+        const diff =
+          dragCalendarEventRef.current.calendarEvent.end -
+          dragCalendarEventRef.current.calendarEvent.start;
+
+        const dayEnd = dayStart.add(diff).add(-60 / config.divisionsPerHour, 'minute');
+
+        setSelectedStartDay(dayStart);
+        setSelectedEndDay(dayEnd);
+      } else {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const dayStart = generateTime(
+          day,
+          Math.floor(((e.clientY - rect.top) / rect.height) * (24 * config.divisionsPerHour)),
+          config.divisionsPerHour
+        );
+
+        setSelectedEndDay(dayStart);
+      }
     },
     [config.divisionsPerHour]
   );
@@ -71,19 +95,34 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
       selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay
     ).add(60 / config.divisionsPerHour, 'minute');
 
-    await openDialog({
-      type: 'add',
-      init: {
+    if (dragCalendarEventRef.current) {
+      updateCalendarEvent(dragCalendarEventRef.current.calendarEvent.id, {
         start: resultStartDay,
         end: resultEndDay,
-        isAllDayEvent: false,
-      },
-      position: positionRef.current,
-    });
+      });
+
+      dragCalendarEventRef.current = null;
+    } else {
+      await openDialog({
+        type: 'add',
+        init: {
+          start: resultStartDay,
+          end: resultEndDay,
+        },
+        position: positionRef.current,
+      });
+    }
 
     setDragging(false);
     isMouseDownRef.current = false;
-  }, [dragging, openDialog, selectedStartDay, selectedEndDay, config.divisionsPerHour]);
+  }, [
+    dragging,
+    openDialog,
+    selectedStartDay,
+    selectedEndDay,
+    config.divisionsPerHour,
+    updateCalendarEvent,
+  ]);
 
   /** イベントクリック時の処理（編集ダイアログが立ち上がります） */
   const handleEventClick = React.useCallback(
@@ -122,6 +161,24 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
           ])
         : undefined,
     [selectedStartDay, selectedEndDay, dragging]
+  );
+
+  const handleEventMouseDown = React.useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>, id: CalendarEvent['id']) => {
+      e.stopPropagation();
+      setSelectedStartDay(dayjs(calendarEvents.find((event) => event.id === id)?.start));
+      setSelectedEndDay(dayjs(calendarEvents.find((event) => event.id === id)?.end));
+      isMouseDownRef.current = true;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const yIndex = Math.floor(
+        ((e.clientY - rect.top) / config.heightPerHour) * config.divisionsPerHour
+      );
+
+      const calendarEvent = calendarEvents.find((event) => event.id === id);
+      if (!calendarEvent) return;
+      dragCalendarEventRef.current = { calendarEvent, yIndex };
+    },
+    [calendarEvents, config.heightPerHour, config.divisionsPerHour]
   );
 
   return (
@@ -239,7 +296,7 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
                     top: `${(calculateIndexDifference(day.startOf('day'), event.splitStart, config.divisionsPerHour) * config.heightPerHour) / config.divisionsPerHour}px`,
                     height: `${(calculateIndexDifference(event.splitStart, event.splitEnd, config.divisionsPerHour) * config.heightPerHour) / config.divisionsPerHour}px`,
                   }}
-                  onMouseDown={(e) => e.stopPropagation()}
+                  onMouseDown={(e) => handleEventMouseDown(e, event.id)}
                   onClick={(e) => handleEventClick(e, event.id)}
                 >
                   <p>{event.start.format('HH:mm')}</p>
