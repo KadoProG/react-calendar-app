@@ -4,6 +4,7 @@ import { CalendarConfigContext } from '@/contexts/CalendarConfigContext';
 import styles from '@/components/domains/CalendarHeader.module.scss';
 import { CalendarHeaderDayRows } from '@/components/domains/CalendarHeaderDayRows';
 import { CalendarConfigFormDialogContext } from '@/contexts/CalendarConfigFormDialogContext';
+import { CalendarEventContext } from '@/contexts/CalendarEventContext';
 
 interface CalenadarHeaderProps {
   setFixedContentHeight: (height: number) => void;
@@ -14,6 +15,7 @@ interface CalenadarHeaderProps {
  */
 export const CalendarHeader: React.FC<CalenadarHeaderProps> = (props) => {
   const { openDialog } = React.useContext(CalendarConfigFormDialogContext);
+  const { calendarEvents } = React.useContext(CalendarEventContext);
   const { config, baseDate, setBaseDate } = React.useContext(CalendarConfigContext);
 
   const fixedContentRef = React.useRef<HTMLDivElement>(null);
@@ -41,12 +43,15 @@ export const CalendarHeader: React.FC<CalenadarHeaderProps> = (props) => {
   }, [props]);
 
   React.useEffect(() => {
-    updateHeight();
     window.addEventListener('resize', updateHeight);
     return () => {
       window.removeEventListener('resize', updateHeight);
     };
   }, [updateHeight]);
+
+  React.useEffect(() => {
+    updateHeight();
+  }, [calendarEvents, updateHeight]);
 
   return (
     <div className={styles.fixedContent} ref={fixedContentRef}>

@@ -17,6 +17,11 @@ export const splitCalendarEvents = (events: CalendarEvent[]): SplitedCalendarEve
     const start = tempStart < tempEnd ? tempStart : tempEnd;
     const end = tempStart < tempEnd ? tempEnd : tempStart;
 
+    if (start.isSame(end, 'day')) {
+      result.push({ ...event, splitStart: start, splitEnd: end });
+      return;
+    }
+
     // 同じ日の場合はそのまま結果に追加
     if (start.isSame(end.add(-1, 'minute'), 'day')) {
       result.push({ ...event, splitStart: start, splitEnd: end });

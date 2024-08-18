@@ -119,6 +119,7 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
         : undefined,
     [selectedStartDay, selectedEndDay, dragging]
   );
+
   return (
     <>
       <div
@@ -173,60 +174,52 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
                   (event) => dayStart.format('YYYY-MM-DD') === event.splitStart.format('YYYY-MM-DD')
                 );
 
-                const event = splitedSelectedCalendarEvent?.find((event) => {
-                  const isSameDayContent =
-                    dayStart.format('YYYY-MM-DD') === event.splitStart.format('YYYY-MM-DD');
-                  const isSameContent =
-                    event.splitStart <= event.splitEnd
-                      ? isSameDayContent &&
-                        dayStart.format('YYYY-MM-DD HH:mm') ===
-                          event.splitStart.format('YYYY-MM-DD HH:mm')
-                      : isSameDayContent &&
-                        dayStart.format('YYYY-MM-DD HH:mm') ===
-                          event.splitEnd.format('YYYY-MM-DD HH:mm');
-                  return isSameContent;
-                });
-
-                const sizeIndex = event
-                  ? Math.abs(
-                      calculateIndexDifference(
-                        event.splitStart,
-                        event.splitEnd,
-                        config.divisionsPerHour
-                      )
-                    ) + 1
-                  : 0;
-
                 return (
                   <div
                     key={hourIndex}
                     className={`${styles.time_cell} ${sameDayContentEvent ? styles.selected : ''} ${
                       (hourIndex + 1) % config.divisionsPerHour === 0 ? styles.drawLine : ''
                     }`}
-                  >
-                    {event && (
-                      <div
-                        className={styles.selected}
-                        style={{
-                          top: 0,
-                          height: `${sizeIndex * 100}%`,
-                        }}
-                      >
-                        <small>
-                          {(selectedStartDay <= selectedEndDay
-                            ? selectedStartDay
-                            : selectedEndDay
-                          ).format('HH:mm')}
-                          ~
-                          {(selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay)!
-                            .add(60 / config.divisionsPerHour, 'minute')
-                            .format('HH:mm')}
-                        </small>
-                      </div>
-                    )}
-                  </div>
+                  />
                 );
               })}
+
+              {splitedSelectedCalendarEvent
+                ?.filter(
+                  (event) => day.format('YYYY-MM-DD') === event.splitStart.format('YYYY-MM-DD')
+                )
+                .map((event, i) => {
+                  const sizeIndex =
+                    Math.abs(
+                      calculateIndexDifference(
+                        event.splitStart,
+                        event.splitEnd,
+                        config.divisionsPerHour
+                      )
+                    ) + 1;
+
+                  return (
+                    <div
+                      key={i}
+                      className={styles.selectedItem}
+                      style={{
+                        top: `${(calculateIndexDifference(day.startOf('day'), event.splitStart, config.divisionsPerHour) * config.heightPerHour) / config.divisionsPerHour}px`,
+                        height: `${(sizeIndex * config.heightPerHour) / config.divisionsPerHour}px`,
+                      }}
+                    >
+                      <small>
+                        {(selectedStartDay <= selectedEndDay
+                          ? selectedStartDay
+                          : selectedEndDay
+                        ).format('HH:mm')}
+                        ~
+                        {(selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay)!
+                          .add(60 / config.divisionsPerHour, 'minute')
+                          .format('HH:mm')}
+                      </small>
+                    </div>
+                  );
+                })}
 
               {/* １イベントごとの表示 */}
               {splitCalendarEvents(calendarEvents)
