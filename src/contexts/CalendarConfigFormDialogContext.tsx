@@ -17,8 +17,9 @@ type OpenDialogArgs =
         end?: dayjs.Dayjs;
         isAllDayEvent?: boolean;
       };
+      position: DOMRect | null;
     }
-  | { type: 'edit'; id: CalendarEvent['id'] };
+  | { type: 'edit'; id: CalendarEvent['id']; position: DOMRect };
 
 interface CalendarConfigFormDialogContextValue {
   openDialog: (args: OpenDialogArgs) => Promise<CalendarEventReturnValue>;
@@ -36,6 +37,7 @@ export const CalendarConfigFormDialogContext =
 export const CalendarConfigFormDialogContextProvider: React.FC<{ children: React.ReactNode }> = (
   props
 ) => {
+  const [position, setPosition] = React.useState<DOMRect | null>(null);
   const [calendarEvent, setCalendarEvent] = React.useState<CalendarEvent | null>(null);
   const [type, setType] = React.useState<'add' | 'edit'>('add');
   const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
@@ -51,6 +53,8 @@ export const CalendarConfigFormDialogContextProvider: React.FC<{ children: React
       openDialog: async (args: OpenDialogArgs) =>
         new Promise((resolve) => {
           resolveFunction.current = resolve;
+
+          setPosition(args.position);
 
           if (args.type === 'edit') {
             const newCalendarEvent = calendarEvents.find((event) => event.id === args.id);
@@ -120,6 +124,7 @@ export const CalendarConfigFormDialogContextProvider: React.FC<{ children: React
         onDeleted={handleDelete}
         calendarEvent={calendarEvent}
         setCalendarEvent={handleSetCalendarEvent}
+        position={position}
       />
     </CalendarConfigFormDialogContext.Provider>
   );

@@ -32,7 +32,7 @@ export const CalendarHeader: React.FC<CalenadarHeaderProps> = (props) => {
 
   /** カレンダーの追加（関数呼び出し） */
   const handleAddCalendar = React.useCallback(() => {
-    openDialog({ type: 'add' });
+    openDialog({ type: 'add', position: null });
   }, [openDialog]);
 
   /** 高さの更新 */

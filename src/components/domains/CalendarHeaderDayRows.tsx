@@ -12,7 +12,7 @@ export const CalendarHeaderDayRows: React.FC = () => {
   const { openDialog } = React.useContext(CalendarConfigFormDialogContext);
 
   const handleClick = React.useCallback(
-    (day: dayjs.Dayjs) => {
+    (e: React.MouseEvent<HTMLDivElement>, day: dayjs.Dayjs) => {
       openDialog({
         type: 'add',
         init: {
@@ -20,6 +20,7 @@ export const CalendarHeaderDayRows: React.FC = () => {
           end: day.startOf('day').add(1, 'day'),
           isAllDayEvent: true,
         },
+        position: e.currentTarget.getBoundingClientRect(),
       });
     },
     [openDialog]
@@ -29,7 +30,7 @@ export const CalendarHeaderDayRows: React.FC = () => {
     (e: React.MouseEvent, id: CalendarEvent['id']) => {
       e.preventDefault();
       e.stopPropagation();
-      openDialog({ type: 'edit', id });
+      openDialog({ type: 'edit', id, position: e.currentTarget.getBoundingClientRect() });
     },
     [openDialog]
   );
@@ -51,7 +52,7 @@ export const CalendarHeaderDayRows: React.FC = () => {
           <div
             key={dayIndex}
             className={styles.fixedContent__row__column}
-            onClick={() => handleClick(day)}
+            onClick={(e) => handleClick(e, day)}
           >
             <p>{day.format('ddd')}</p>
             <p>{day.format('D')}</p>

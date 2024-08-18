@@ -17,6 +17,8 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
   const { calendarEvents } = React.useContext(CalendarEventContext);
   const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
 
+  const positionRef = React.useRef<DOMRect | null>(null);
+
   const [dragging, setDragging] = React.useState<boolean>(false);
   const [selectedStartDay, setSelectedStartDay] = React.useState<dayjs.Dayjs>(dayjs());
   const [selectedEndDay, setSelectedEndDay] = React.useState<dayjs.Dayjs>(dayjs());
@@ -32,6 +34,7 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
         Math.floor(((e.clientY - rect.top) / rect.height) * (24 * config.divisionsPerHour)),
         config.divisionsPerHour
       );
+      positionRef.current = rect;
       setSelectedStartDay(dayStart);
       setSelectedEndDay(dayStart);
       isMouseDownRef.current = true;
@@ -75,6 +78,7 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
         end: resultEndDay,
         isAllDayEvent: false,
       },
+      position: positionRef.current,
     });
 
     setDragging(false);
@@ -83,8 +87,8 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
 
   /** イベントクリック時の処理（編集ダイアログが立ち上がります） */
   const handleEventClick = React.useCallback(
-    (id: CalendarEvent['id']) => {
-      openDialog({ type: 'edit', id });
+    (e: React.MouseEvent<HTMLButtonElement>, id: CalendarEvent['id']) => {
+      openDialog({ type: 'edit', id, position: e.currentTarget.getBoundingClientRect() });
     },
     [openDialog]
   );
@@ -236,7 +240,7 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
                     height: `${(calculateIndexDifference(event.splitStart, event.splitEnd, config.divisionsPerHour) * config.heightPerHour) / config.divisionsPerHour}px`,
                   }}
                   onMouseDown={(e) => e.stopPropagation()}
-                  onClick={() => handleEventClick(event.id)}
+                  onClick={(e) => handleEventClick(e, event.id)}
                 >
                   <p>{event.start.format('HH:mm')}</p>
                   <p>~{event.end.format('HH:mm')}</p>

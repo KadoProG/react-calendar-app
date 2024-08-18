@@ -23,6 +23,7 @@ interface CalendarConfigFormDialogProps {
   onDeleted: () => void;
   calendarEvent: CalendarEvent | null;
   setCalendarEvent?: (calendarEvent: CalendarEvent) => void;
+  position: DOMRect | null;
 }
 
 export const CalendarConfigFormDialog: React.FC<CalendarConfigFormDialogProps> = (props) => {
@@ -99,6 +100,31 @@ export const CalendarConfigFormDialog: React.FC<CalendarConfigFormDialogProps> =
     }
   }, [start, end, setValue, startDate, endDate, isAllDayEvent]);
 
+  const style: React.CSSProperties = React.useMemo(() => {
+    const x = props.position?.x ?? 0;
+    const width = props.position?.width ?? 0;
+
+    const left = x + width + 4;
+
+    if (left + 300 < window.innerWidth) {
+      return {
+        position: 'absolute',
+        left,
+      };
+    }
+
+    const right = window.innerWidth - x + 4;
+
+    if (right + 300 < window.innerWidth) {
+      return {
+        position: 'absolute',
+        right,
+      };
+    }
+
+    return {};
+  }, [props.position]);
+
   return (
     <div
       className={styles.dialog}
@@ -111,6 +137,7 @@ export const CalendarConfigFormDialog: React.FC<CalendarConfigFormDialogProps> =
         className={styles.dialog__content}
         onClick={(e) => e.stopPropagation()}
         onSubmit={handleFormSubmit}
+        style={style}
       >
         <div className={styles.dialog__header}>
           <h2>予定を追加</h2>
