@@ -20,26 +20,50 @@ export const Calendar: React.FC = () => {
 
   const [fixedContentHeight, setFixedContentHeight] = React.useState<number>(0);
 
+  const isMouseDownRef = React.useRef<boolean>(false);
+
   /** ドラッグ開始時の処理（マウスがセルをクリックしたときの処理） */
-  const handleMouseDown = React.useCallback((day: dayjs.Dayjs) => {
-    setDragging(true);
-    setSelectedStartDay(day);
-    setSelectedEndDay(day);
-  }, []);
+  const handleMouseDown = React.useCallback(
+    (e: React.MouseEvent<HTMLDivElement>, day: dayjs.Dayjs) => {
+      // startDayの初期化
+      const rect = e.currentTarget.getBoundingClientRect();
+      const dayStart = generateTime(
+        day,
+        Math.floor(((e.clientY - rect.top) / rect.height) * (24 * config.divisionsPerHour)),
+        config.divisionsPerHour
+      );
+      setSelectedStartDay(dayStart);
+      setSelectedEndDay(dayStart);
+      isMouseDownRef.current = true;
+    },
+    [config.divisionsPerHour]
+  );
 
   /** ドラッグ動作中の処理（マウスがセル上で動いているときの処理） */
   const handleMouseMove = React.useCallback(
-    (day: dayjs.Dayjs) => {
-      if (dragging && day.format('YYYY-MM-DD') === selectedStartDay?.format('YYYY-MM-DD')) {
-        setSelectedEndDay(day);
+    (e: React.MouseEvent<HTMLDivElement>, day: dayjs.Dayjs) => {
+      if (!isMouseDownRef.current) return;
+      setDragging(true);
+      if (day.format('YYYY-MM-DD') === selectedStartDay.format('YYYY-MM-DD')) {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const dayStart = generateTime(
+          day,
+          Math.floor(((e.clientY - rect.top) / rect.height) * (24 * config.divisionsPerHour)),
+          config.divisionsPerHour
+        );
+
+        setSelectedEndDay(dayStart);
       }
     },
-    [dragging, selectedStartDay]
+    [config.divisionsPerHour, selectedStartDay]
   );
 
   /** ドラッグ終了時の処理（マウスがセルのクリックから離れた場合の処理） */
   const handleMouseUp = React.useCallback(async () => {
-    if (!dragging) return;
+    if (!dragging) {
+      isMouseDownRef.current = false;
+      return;
+    }
 
     const resultStartDay = selectedStartDay <= selectedEndDay ? selectedStartDay : selectedEndDay;
     const resultEndDay = (
@@ -56,12 +80,12 @@ export const Calendar: React.FC = () => {
     });
 
     setDragging(false);
+    isMouseDownRef.current = false;
   }, [dragging, openDialog, selectedStartDay, selectedEndDay, config.divisionsPerHour]);
 
   /** イベントクリック時の処理（編集ダイアログが立ち上がります） */
   const handleEventClick = React.useCallback(
-    (e: React.MouseEvent, id: CalendarEvent['id']) => {
-      e.preventDefault();
+    (id: CalendarEvent['id']) => {
       openDialog({ type: 'edit', id });
     },
     [openDialog]
@@ -69,7 +93,14 @@ export const Calendar: React.FC = () => {
 
   React.useEffect(() => {
     if (dragging) {
-      addKeyDownEvent({ id: 0, key: 'Escape', callback: () => setDragging(false) });
+      addKeyDownEvent({
+        id: 0,
+        key: 'Escape',
+        callback: () => {
+          isMouseDownRef.current = false;
+          setDragging(false);
+        },
+      });
     } else {
       removeKeyDownEvent(0);
     }
@@ -115,6 +146,8 @@ export const Calendar: React.FC = () => {
             <div
               key={dayIndex}
               className={styles.day_column}
+              onMouseMove={(e) => handleMouseMove(e, day)}
+              onMouseDown={(e) => handleMouseDown(e, day)}
               style={{
                 gridTemplateRows: `repeat(${24 * config.divisionsPerHour}, ${
                   config.heightPerHour / config.divisionsPerHour
@@ -127,16 +160,16 @@ export const Calendar: React.FC = () => {
 
                 const isSameDayContent =
                   dragging &&
-                  dayStart.format('YYYY-MM-DD') === selectedStartDay?.format('YYYY-MM-DD');
+                  dayStart.format('YYYY-MM-DD') === selectedStartDay.format('YYYY-MM-DD');
 
                 const isSameContent =
-                  selectedStartDay! <= selectedEndDay!
+                  selectedStartDay <= selectedEndDay
                     ? isSameDayContent &&
                       dayStart.format('YYYY-MM-DD HH:mm') ===
-                        selectedStartDay?.format('YYYY-MM-DD HH:mm')
+                        selectedStartDay.format('YYYY-MM-DD HH:mm')
                     : isSameDayContent &&
                       dayStart.format('YYYY-MM-DD HH:mm') ===
-                        selectedEndDay?.format('YYYY-MM-DD HH:mm');
+                        selectedEndDay.format('YYYY-MM-DD HH:mm');
 
                 const sizeIndex =
                   Math.abs(
@@ -153,8 +186,6 @@ export const Calendar: React.FC = () => {
                     className={`${styles.time_cell} ${isSameDayContent ? styles.selected : ''} ${
                       (hourIndex + 1) % config.divisionsPerHour === 0 ? styles.drawLine : ''
                     }`}
-                    onMouseDown={() => handleMouseDown(dayStart)}
-                    onMouseMove={() => handleMouseMove(dayStart)}
                   >
                     {/* ドラッグ中の要素のハイライト */}
                     {isSameContent && (
@@ -196,7 +227,8 @@ export const Calendar: React.FC = () => {
                       top: `${(calculateIndexDifference(day.startOf('day'), event.splitStart, config.divisionsPerHour) * config.heightPerHour) / config.divisionsPerHour}px`,
                       height: `${(calculateIndexDifference(event.splitStart, event.splitEnd, config.divisionsPerHour) * config.heightPerHour) / config.divisionsPerHour}px`,
                     }}
-                    onClick={(e) => handleEventClick(e, event.id)}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onClick={() => handleEventClick(event.id)}
                   >
                     <p>{event.start.format('HH:mm')}</p>
                     <p>~{event.end.format('HH:mm')}</p>
