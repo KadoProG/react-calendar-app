@@ -121,133 +121,131 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
   );
 
   return (
-    <>
+    <div
+      className={styles.calendar}
+      onMouseUp={handleMouseUp}
+      style={{
+        gridTemplateColumns: `repeat(${config.weekDisplayCount + 1}, 1fr)`,
+        paddingTop: props.fixedContentHeight,
+      }}
+    >
       <div
-        className={styles.calendar}
-        onMouseUp={handleMouseUp}
+        className={styles.day_column}
         style={{
-          gridTemplateColumns: `repeat(${config.weekDisplayCount + 1}, 1fr)`,
-          paddingTop: props.fixedContentHeight,
+          gridTemplateRows: `repeat(${24 * config.divisionsPerHour}, ${
+            config.heightPerHour / config.divisionsPerHour
+          }px)`,
         }}
       >
-        <div
-          className={styles.day_column}
-          style={{
-            gridTemplateRows: `repeat(${24 * config.divisionsPerHour}, ${
-              config.heightPerHour / config.divisionsPerHour
-            }px)`,
-          }}
-        >
-          {/* 時刻の表示 */}
-          {[...Array(24 * config.divisionsPerHour)].map((_, hourIndex) => (
-            <div key={hourIndex} className={`${styles.time_cell} ${styles.time_label}`}>
-              {hourIndex % config.divisionsPerHour === 0 && (
-                <p className={styles.noSelect}>
-                  {generateTime(dayjs(), hourIndex, config.divisionsPerHour).format('HH:mm')}
-                </p>
-              )}
-            </div>
-          ))}
-        </div>
+        {/* 時刻の表示 */}
+        {[...Array(24 * config.divisionsPerHour)].map((_, hourIndex) => (
+          <div key={hourIndex} className={`${styles.time_cell} ${styles.time_label}`}>
+            {hourIndex % config.divisionsPerHour === 0 && (
+              <p className={styles.noSelect}>
+                {generateTime(dayjs(), hourIndex, config.divisionsPerHour).format('HH:mm')}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
 
-        {/* Week→１日ごとの表示 */}
-        {[...Array(config.weekDisplayCount)].map((_, dayIndex) => {
-          const day = baseDate.add(dayIndex, 'day');
+      {/* Week→１日ごとの表示 */}
+      {[...Array(config.weekDisplayCount)].map((_, dayIndex) => {
+        const day = baseDate.add(dayIndex, 'day');
 
-          return (
-            <div
-              key={dayIndex}
-              className={styles.day_column}
-              onMouseMove={(e) => handleMouseMove(e, day)}
-              onMouseDown={(e) => handleMouseDown(e, day)}
-              style={{
-                gridTemplateRows: `repeat(${24 * config.divisionsPerHour}, ${
-                  config.heightPerHour / config.divisionsPerHour
-                }px)`,
-              }}
-            >
-              {/* ユーザが触れる時刻の描写 */}
-              {[...Array(24 * config.divisionsPerHour)].map((_, hourIndex) => {
-                const dayStart = generateTime(day, hourIndex, config.divisionsPerHour);
+        return (
+          <div
+            key={dayIndex}
+            className={styles.day_column}
+            onMouseMove={(e) => handleMouseMove(e, day)}
+            onMouseDown={(e) => handleMouseDown(e, day)}
+            style={{
+              gridTemplateRows: `repeat(${24 * config.divisionsPerHour}, ${
+                config.heightPerHour / config.divisionsPerHour
+              }px)`,
+            }}
+          >
+            {/* ユーザが触れる時刻の描写 */}
+            {[...Array(24 * config.divisionsPerHour)].map((_, hourIndex) => {
+              const dayStart = generateTime(day, hourIndex, config.divisionsPerHour);
 
-                const sameDayContentEvent = splitedSelectedCalendarEvent?.find(
-                  (event) => dayStart.format('YYYY-MM-DD') === event.splitStart.format('YYYY-MM-DD')
-                );
+              const sameDayContentEvent = splitedSelectedCalendarEvent?.find(
+                (event) => dayStart.format('YYYY-MM-DD') === event.splitStart.format('YYYY-MM-DD')
+              );
+
+              return (
+                <div
+                  key={hourIndex}
+                  className={`${styles.time_cell} ${sameDayContentEvent ? styles.selected : ''} ${
+                    (hourIndex + 1) % config.divisionsPerHour === 0 ? styles.drawLine : ''
+                  }`}
+                />
+              );
+            })}
+
+            {splitedSelectedCalendarEvent
+              ?.filter(
+                (event) => day.format('YYYY-MM-DD') === event.splitStart.format('YYYY-MM-DD')
+              )
+              .map((event, i) => {
+                const sizeIndex =
+                  Math.abs(
+                    calculateIndexDifference(
+                      event.splitStart,
+                      event.splitEnd,
+                      config.divisionsPerHour
+                    )
+                  ) + 1;
 
                 return (
                   <div
-                    key={hourIndex}
-                    className={`${styles.time_cell} ${sameDayContentEvent ? styles.selected : ''} ${
-                      (hourIndex + 1) % config.divisionsPerHour === 0 ? styles.drawLine : ''
-                    }`}
-                  />
+                    key={i}
+                    className={styles.selectedItem}
+                    style={{
+                      top: `${(calculateIndexDifference(day.startOf('day'), event.splitStart, config.divisionsPerHour) * config.heightPerHour) / config.divisionsPerHour}px`,
+                      height: `${(sizeIndex * config.heightPerHour) / config.divisionsPerHour}px`,
+                    }}
+                  >
+                    <small>
+                      {(selectedStartDay <= selectedEndDay
+                        ? selectedStartDay
+                        : selectedEndDay
+                      ).format('HH:mm')}
+                      ~
+                      {(selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay)!
+                        .add(60 / config.divisionsPerHour, 'minute')
+                        .format('HH:mm')}
+                    </small>
+                  </div>
                 );
               })}
 
-              {splitedSelectedCalendarEvent
-                ?.filter(
-                  (event) => day.format('YYYY-MM-DD') === event.splitStart.format('YYYY-MM-DD')
-                )
-                .map((event, i) => {
-                  const sizeIndex =
-                    Math.abs(
-                      calculateIndexDifference(
-                        event.splitStart,
-                        event.splitEnd,
-                        config.divisionsPerHour
-                      )
-                    ) + 1;
-
-                  return (
-                    <div
-                      key={i}
-                      className={styles.selectedItem}
-                      style={{
-                        top: `${(calculateIndexDifference(day.startOf('day'), event.splitStart, config.divisionsPerHour) * config.heightPerHour) / config.divisionsPerHour}px`,
-                        height: `${(sizeIndex * config.heightPerHour) / config.divisionsPerHour}px`,
-                      }}
-                    >
-                      <small>
-                        {(selectedStartDay <= selectedEndDay
-                          ? selectedStartDay
-                          : selectedEndDay
-                        ).format('HH:mm')}
-                        ~
-                        {(selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay)!
-                          .add(60 / config.divisionsPerHour, 'minute')
-                          .format('HH:mm')}
-                      </small>
-                    </div>
-                  );
-                })}
-
-              {/* １イベントごとの表示 */}
-              {splitCalendarEvents(calendarEvents)
-                .filter(
-                  (event) =>
-                    !event.isAllDayEvent &&
-                    day.format('YYYY-MM-DD') === event.splitStart.format('YYYY-MM-DD')
-                )
-                .map((event, i) => (
-                  <button
-                    key={i}
-                    className={styles.calendarEvent}
-                    style={{
-                      top: `${(calculateIndexDifference(day.startOf('day'), event.splitStart, config.divisionsPerHour) * config.heightPerHour) / config.divisionsPerHour}px`,
-                      height: `${(calculateIndexDifference(event.splitStart, event.splitEnd, config.divisionsPerHour) * config.heightPerHour) / config.divisionsPerHour}px`,
-                    }}
-                    onMouseDown={(e) => e.stopPropagation()}
-                    onClick={() => handleEventClick(event.id)}
-                  >
-                    <p>{event.start.format('HH:mm')}</p>
-                    <p>~{event.end.format('HH:mm')}</p>
-                    <p>{event.title}</p>
-                  </button>
-                ))}
-            </div>
-          );
-        })}
-      </div>
-    </>
+            {/* １イベントごとの表示 */}
+            {splitCalendarEvents(calendarEvents)
+              .filter(
+                (event) =>
+                  !event.isAllDayEvent &&
+                  day.format('YYYY-MM-DD') === event.splitStart.format('YYYY-MM-DD')
+              )
+              .map((event, i) => (
+                <button
+                  key={i}
+                  className={styles.calendarEvent}
+                  style={{
+                    top: `${(calculateIndexDifference(day.startOf('day'), event.splitStart, config.divisionsPerHour) * config.heightPerHour) / config.divisionsPerHour}px`,
+                    height: `${(calculateIndexDifference(event.splitStart, event.splitEnd, config.divisionsPerHour) * config.heightPerHour) / config.divisionsPerHour}px`,
+                  }}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={() => handleEventClick(event.id)}
+                >
+                  <p>{event.start.format('HH:mm')}</p>
+                  <p>~{event.end.format('HH:mm')}</p>
+                  <p>{event.title}</p>
+                </button>
+              ))}
+          </div>
+        );
+      })}
+    </div>
   );
 };
