@@ -31,6 +31,10 @@ jobs:
           npm install
           npm run build
 
+      - name: copy htaccess file
+        run: |
+          cp .htaccess.example dist/.htaccess
+
       - name: rsync deployments
         uses: burnett01/rsync-deployments@5.1
         with:

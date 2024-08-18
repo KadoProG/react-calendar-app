@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # アセットやAPIリクエストなどの実際のファイルやディレクトリが存在する場合はそのままアクセス
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # フロントエンドのルーティングに必要なリクエストはindex.htmlにリダイレクト
+  RewriteRule ^ index.html [L]
+</IfModule>
