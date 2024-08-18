@@ -44,18 +44,16 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
     (e: React.MouseEvent<HTMLDivElement>, day: dayjs.Dayjs) => {
       if (!isMouseDownRef.current) return;
       setDragging(true);
-      if (day.format('YYYY-MM-DD') === selectedStartDay.format('YYYY-MM-DD')) {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const dayStart = generateTime(
-          day,
-          Math.floor(((e.clientY - rect.top) / rect.height) * (24 * config.divisionsPerHour)),
-          config.divisionsPerHour
-        );
+      const rect = e.currentTarget.getBoundingClientRect();
+      const dayStart = generateTime(
+        day,
+        Math.floor(((e.clientY - rect.top) / rect.height) * (24 * config.divisionsPerHour)),
+        config.divisionsPerHour
+      );
 
-        setSelectedEndDay(dayStart);
-      }
+      setSelectedEndDay(dayStart);
     },
-    [config.divisionsPerHour, selectedStartDay]
+    [config.divisionsPerHour]
   );
 
   /** ドラッグ終了時の処理（マウスがセルのクリックから離れた場合の処理） */
@@ -106,6 +104,21 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
     }
   }, [addKeyDownEvent, removeKeyDownEvent, dragging]);
 
+  const splitedSelectedCalendarEvent = React.useMemo(
+    () =>
+      dragging
+        ? splitCalendarEvents([
+            {
+              id: '1',
+              title: '',
+              start: selectedStartDay,
+              end: selectedEndDay,
+              isAllDayEvent: false,
+            },
+          ])
+        : undefined,
+    [selectedStartDay, selectedEndDay, dragging]
+  );
   return (
     <>
       <div
@@ -139,6 +152,7 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
         {/* Week→１日ごとの表示 */}
         {[...Array(config.weekDisplayCount)].map((_, dayIndex) => {
           const day = baseDate.add(dayIndex, 'day');
+
           return (
             <div
               key={dayIndex}
@@ -155,37 +169,42 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
               {[...Array(24 * config.divisionsPerHour)].map((_, hourIndex) => {
                 const dayStart = generateTime(day, hourIndex, config.divisionsPerHour);
 
-                const isSameDayContent =
-                  dragging &&
-                  dayStart.format('YYYY-MM-DD') === selectedStartDay.format('YYYY-MM-DD');
+                const sameDayContentEvent = splitedSelectedCalendarEvent?.find(
+                  (event) => dayStart.format('YYYY-MM-DD') === event.splitStart.format('YYYY-MM-DD')
+                );
 
-                const isSameContent =
-                  selectedStartDay <= selectedEndDay
-                    ? isSameDayContent &&
-                      dayStart.format('YYYY-MM-DD HH:mm') ===
-                        selectedStartDay.format('YYYY-MM-DD HH:mm')
-                    : isSameDayContent &&
-                      dayStart.format('YYYY-MM-DD HH:mm') ===
-                        selectedEndDay.format('YYYY-MM-DD HH:mm');
+                const event = splitedSelectedCalendarEvent?.find((event) => {
+                  const isSameDayContent =
+                    dayStart.format('YYYY-MM-DD') === event.splitStart.format('YYYY-MM-DD');
+                  const isSameContent =
+                    event.splitStart <= event.splitEnd
+                      ? isSameDayContent &&
+                        dayStart.format('YYYY-MM-DD HH:mm') ===
+                          event.splitStart.format('YYYY-MM-DD HH:mm')
+                      : isSameDayContent &&
+                        dayStart.format('YYYY-MM-DD HH:mm') ===
+                          event.splitEnd.format('YYYY-MM-DD HH:mm');
+                  return isSameContent;
+                });
 
-                const sizeIndex =
-                  Math.abs(
-                    calculateIndexDifference(
-                      selectedStartDay,
-                      selectedEndDay,
-                      config.divisionsPerHour
-                    )
-                  ) + 1;
+                const sizeIndex = event
+                  ? Math.abs(
+                      calculateIndexDifference(
+                        event.splitStart,
+                        event.splitEnd,
+                        config.divisionsPerHour
+                      )
+                    ) + 1
+                  : 0;
 
                 return (
                   <div
                     key={hourIndex}
-                    className={`${styles.time_cell} ${isSameDayContent ? styles.selected : ''} ${
+                    className={`${styles.time_cell} ${sameDayContentEvent ? styles.selected : ''} ${
                       (hourIndex + 1) % config.divisionsPerHour === 0 ? styles.drawLine : ''
                     }`}
                   >
-                    {/* ドラッグ中の要素のハイライト */}
-                    {isSameContent && (
+                    {event && (
                       <div
                         className={styles.selected}
                         style={{

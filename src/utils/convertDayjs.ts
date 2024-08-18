@@ -12,9 +12,10 @@ export const splitCalendarEvents = (events: CalendarEvent[]): SplitedCalendarEve
   const result: SplitedCalendarEvent[] = [];
 
   events.forEach((event) => {
-    const { start, end } = event;
+    const { start: tempStart, end: tempEnd } = event;
 
-    if (end < start) throw new Error('Invalid date range');
+    const start = tempStart < tempEnd ? tempStart : tempEnd;
+    const end = tempStart < tempEnd ? tempEnd : tempStart;
 
     // 同じ日の場合はそのまま結果に追加
     if (start.isSame(end.add(-1, 'minute'), 'day')) {
