@@ -38,6 +38,10 @@
     &:hover {
       background-color: var(--color-primary-hover);
     }
+
+    &__leave {
+      opacity: 0.2;
+    }
   }
   /* ドラッグで選択中のセルをハイライト */
   & > .selectedItem {
