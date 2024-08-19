@@ -15,16 +15,19 @@ interface CalendarEvent {
 
 interface CalendarContextType {
   events: CalendarEvent[] | null;
+  isLoading: boolean;
   fetchEvents: () => Promise<void>;
 }
 
 export const CalendarContext = React.createContext<CalendarContextType>({
   events: null,
+  isLoading: false,
   fetchEvents: async () => {},
 });
 
 export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [events, setEvents] = React.useState<CalendarEvent[] | null>(null);
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const { status } = React.useContext(AuthContext); // 認証情報を取得
 
   const fetchEvents = React.useCallback(async () => {
@@ -38,6 +41,7 @@ export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = 
     }
 
     try {
+      setIsLoading(true);
       await gapi.client.load('calendar', 'v3'); // ここでGoogle Calendar APIをロード
 
       const calendarListResponse = await gapi.client.calendar.calendarList.list();
@@ -70,6 +74,8 @@ export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = 
       }
 
       setEvents(allEvents);
+
+      setIsLoading(false);
     } catch (error) {
       console.error('Error fetching calendar events:', error);
     }
@@ -82,6 +88,8 @@ export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = 
   }, [status, fetchEvents]);
 
   return (
-    <CalendarContext.Provider value={{ events, fetchEvents }}>{children}</CalendarContext.Provider>
+    <CalendarContext.Provider value={{ events, fetchEvents, isLoading }}>
+      {children}
+    </CalendarContext.Provider>
   );
 };
