@@ -1,3 +1,4 @@
+import dayjs from '@/libs/dayjs';
 import { AuthContext } from '@/contexts/AuthContext';
 import { CalendarContext } from '@/contexts/CalendarContext';
 import React from 'react';
@@ -14,14 +15,18 @@ export const ApiTest: React.FC = () => {
       {status === 'unauthenticated' && <button onClick={signIn}>サインイン</button>}
       {status === 'authenticated' && <button onClick={signOut}>サインアウト</button>}
 
-      {user && <p>{user.name}</p>}
+      {user && <img src={user.imageUrl} />}
 
       {isCalendarEventsLoading && <p>イベントロード中...</p>}
       {isCalendarsLoading && <p>カレンダーリストロード中...</p>}
 
       <ul>
         {calendarEvents.map((event) => (
-          <li key={event.id}>{event.summary}</li>
+          <li key={event.id}>
+            {dayjs(event.start?.dateTime).format('YYYY-MM-DD HH:mm')}〜
+            {dayjs(event.end?.dateTime).format('YYYY-MM-DD HH:mm')}
+            {event.summary}
+          </li>
         ))}
       </ul>
       <textarea name="" id="" value={JSON.stringify(calendarEvents)} readOnly></textarea>
