@@ -6,17 +6,20 @@ import { CalendarConfigFormDialogContextProvider } from '@/contexts/CalendarConf
 import { KeyDownContextProvider } from '@/contexts/KeyDownContext.tsx';
 import { CalendarEventProvider } from '@/contexts/CalendarEventContext.tsx';
 import { CalendarConfigProvider } from '@/contexts/CalendarConfigContext.tsx';
+import { AuthContextProvider } from '@/contexts/AuthContext.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <CalendarConfigProvider>
-      <KeyDownContextProvider>
-        <CalendarEventProvider>
-          <CalendarConfigFormDialogContextProvider>
-            <MyRouter />
-          </CalendarConfigFormDialogContextProvider>
-        </CalendarEventProvider>
-      </KeyDownContextProvider>
-    </CalendarConfigProvider>
+    <AuthContextProvider>
+      <CalendarConfigProvider>
+        <KeyDownContextProvider>
+          <CalendarEventProvider>
+            <CalendarConfigFormDialogContextProvider>
+              <MyRouter />
+            </CalendarConfigFormDialogContextProvider>
+          </CalendarEventProvider>
+        </KeyDownContextProvider>
+      </CalendarConfigProvider>
+    </AuthContextProvider>
   </React.StrictMode>
 );
