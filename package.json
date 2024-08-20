@@ -13,14 +13,20 @@
   },
   "dependencies": {
     "dayjs": "^1.11.12",
+    "gapi-script": "^1.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.52.2",
     "react-router-dom": "^6.26.0",
+    "swr": "^2.2.5",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.8.0",
+    "@types/gapi": "^0.0.47",
+    "@types/gapi.auth2": "^0.0.60",
+    "@types/gapi.client": "^1.0.8",
+    "@types/gapi.client.calendar": "^3.0.12",
     "@types/node": "^22.2.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",

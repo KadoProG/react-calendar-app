@@ -5,6 +5,7 @@ export const HomePage: React.FC = () => {
     <div>
       <h1>Home</h1>
       <Link to="/calendar">Calendar</Link>
+      <Link to="/api">Api</Link>
     </div>
   );
 };
