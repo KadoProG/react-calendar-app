@@ -27,10 +27,12 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = (pro
 
   const initializeGapi = React.useCallback(async () => {
     try {
-      const authInstance = await gapi.auth2.init({
+      await gapi.client.init({
         apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
         discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
+      });
+      const authInstance = await gapi.auth2.init({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
         scope: import.meta.env.VITE_SCOPES,
       });
 

@@ -1,94 +1,60 @@
+import dayjs from '@/libs/dayjs';
 import React from 'react';
-import { gapi } from 'gapi-script';
 import { AuthContext } from './AuthContext'; // AuthContextをインポート
-
-interface CalendarEvent {
-  id: string;
-  summary: string;
-  start: {
-    dateTime: string;
-  };
-  end: {
-    dateTime: string;
-  };
-}
+import useSWR from 'swr';
+import { fetchCalendarEvents, fetchCalendars } from '@/utils/fetchCalendarEvents';
 
 interface CalendarContextType {
-  events: CalendarEvent[] | null;
-  isLoading: boolean;
-  fetchEvents: () => Promise<void>;
+  calendarEvents: gapi.client.calendar.Event[];
+  isCalendarsLoading: boolean;
+  isCalendarEventsLoading: boolean;
 }
 
 export const CalendarContext = React.createContext<CalendarContextType>({
-  events: null,
-  isLoading: false,
-  fetchEvents: async () => {},
+  calendarEvents: [],
+  isCalendarEventsLoading: false,
+  isCalendarsLoading: false,
 });
 
 export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [events, setEvents] = React.useState<CalendarEvent[] | null>(null);
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const { status } = React.useContext(AuthContext); // 認証情報を取得
+  const [calendars, setCalendars] = React.useState<gapi.client.calendar.CalendarListEntry[]>([]);
 
-  const fetchEvents = React.useCallback(async () => {
-    if (status === 'unverified') {
-      console.log('User is unverified');
-      return;
+  const [isCalendarsLoading, setIsCalendarsLoading] = React.useState<boolean>(false);
+
+  const fetchCalendarsInit = React.useCallback(async () => {
+    setIsCalendarsLoading(true);
+    const newCalendars = await fetchCalendars();
+    setCalendars(newCalendars);
+    setIsCalendarsLoading(false);
+  }, []);
+
+  const start = React.useMemo(() => dayjs('2024-08-20'), []);
+  const end = React.useMemo(() => dayjs('2024-08-26'), []);
+
+  const { data, isLoading: isCalendarEventsLoading } = useSWR(
+    calendars ? { calendars, start, end } : null,
+    fetchCalendarEvents,
+    {
+      // 自動fetchの無効化
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
     }
-    if (status === 'unauthenticated') {
-      console.warn('User is not authenticated');
-      return;
-    }
+  );
 
-    try {
-      setIsLoading(true);
-      await gapi.client.load('calendar', 'v3'); // ここでGoogle Calendar APIをロード
-
-      const calendarListResponse = await gapi.client.calendar.calendarList.list();
-      const calendars = calendarListResponse.result.items;
-
-      if (!calendars) {
-        console.warn('No calendars found');
-        return;
-      }
-
-      const allEvents: CalendarEvent[] = [];
-
-      for (const calendar of calendars) {
-        if (calendar.id === 'ja.japanese#holiday@group.v.calendar.google.com') {
-          continue;
-        }
-        const response = await gapi.client.calendar.events.list({
-          calendarId: calendar.id,
-          timeMin: new Date().toISOString(),
-          showDeleted: false,
-          singleEvents: true,
-          maxResults: 10,
-          orderBy: 'startTime',
-        });
-
-        const events = response.result.items;
-        if (events) {
-          allEvents.push(...(events as CalendarEvent[]));
-        }
-      }
-
-      setEvents(allEvents);
-
-      setIsLoading(false);
-    } catch (error) {
-      console.error('Error fetching calendar events:', error);
-    }
-  }, [status]);
+  const calendarEvents = data ?? [];
 
   React.useEffect(() => {
     if (status === 'authenticated') {
-      fetchEvents();
+      fetchCalendarsInit();
     }
-  }, [status, fetchEvents]);
+  }, [status, fetchCalendarsInit]);
 
   return (
-    <CalendarContext.Provider value={{ events, fetchEvents, isLoading }}>
+    <CalendarContext.Provider
+      value={{ calendarEvents, isCalendarEventsLoading, isCalendarsLoading }}
+    >
       {children}
     </CalendarContext.Provider>
   );
