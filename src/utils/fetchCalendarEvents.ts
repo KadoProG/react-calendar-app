@@ -4,11 +4,14 @@ import { gapi } from 'gapi-script';
 export const fetchCalendars = async (): Promise<gapi.client.calendar.CalendarListEntry[]> => {
   try {
     const response = await gapi.client.calendar.calendarList.list();
-    const calendars = response.result.items;
+    const calendars = response.result.items?.filter(
+      (calendar) => calendar.id !== 'ja.japanese#holiday@group.v.calendar.google.com'
+    );
 
     if (!calendars) {
       console.warn('No calendars found');
     }
+
     return calendars ?? [];
   } catch (error) {
     console.error('Error fetching calendars:', error);
@@ -31,7 +34,6 @@ export const fetchCalendarEvents = async (args: {
 
     for (const calendar of args.calendars) {
       if (!calendar.id) continue;
-      if (calendar.id === 'ja.japanese#holiday@group.v.calendar.google.com') continue;
 
       const response = await gapi.client.calendar.events.list({
         calendarId: calendar.id,
