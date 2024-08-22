@@ -29,6 +29,7 @@ export const useCalendarDialog = (args: { calendarId?: string; eventId?: string 
     }
     return {
       calendarId: args.calendarId || '',
+      eventId: '',
       summary: '',
       isAllDayEvent: false,
       startDate: dayjs().format('YYYY-MM-DD'),
@@ -57,20 +58,28 @@ export const useCalendarDialog = (args: { calendarId?: string; eventId?: string 
       handleSubmit(async (data) => {
         try {
           const isAllDayEvent = data.isAllDayEvent;
-          await gapi.client.calendar.events.insert({
-            calendarId: data.calendarId,
-            resource: {
-              summary: data.summary,
-              start: {
-                dateTime: !isAllDayEvent ? dayjs(data.start).toISOString() : undefined,
-                date: isAllDayEvent ? dayjs(data.startDate).format('YYYY-MM-DD') : undefined,
-              },
-              end: {
-                dateTime: !isAllDayEvent ? dayjs(data.end).toISOString() : undefined,
-                date: isAllDayEvent ? dayjs(data.endDate).format('YYYY-MM-DD') : undefined,
-              },
+
+          const resource = {
+            summary: data.summary,
+            start: {
+              dateTime: !isAllDayEvent ? dayjs(data.start).toISOString() : undefined,
+              date: isAllDayEvent ? dayjs(data.startDate).format('YYYY-MM-DD') : undefined,
             },
-          });
+            end: {
+              dateTime: !isAllDayEvent ? dayjs(data.end).toISOString() : undefined,
+              date: isAllDayEvent ? dayjs(data.endDate).format('YYYY-MM-DD') : undefined,
+            },
+          };
+
+          if (data.eventId) {
+            await gapi.client.calendar.events.update({
+              calendarId: data.calendarId,
+              eventId: data.eventId,
+              resource,
+            });
+          } else {
+            await gapi.client.calendar.events.insert({ calendarId: data.calendarId, resource });
+          }
         } catch (error) {
           console.error(error);
         }
