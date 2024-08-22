@@ -12,7 +12,7 @@ interface FetchCalendarForm {
 }
 
 interface CalendarContextType {
-  calendarEvents: gapi.client.calendar.Event[];
+  calendarEvents: (gapi.client.calendar.Event & { calendarId: string })[];
   calendars: gapi.client.calendar.CalendarListEntry[];
   isCalendarsLoading: boolean;
   isCalendarEventsLoading: boolean;

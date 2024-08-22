@@ -1,18 +1,33 @@
+import { CalendarContext } from '@/contexts/CalendarContext';
 import dayjs from '@/libs/dayjs';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
-export const useCalendarDialog = (args: { calendarId?: string }) => {
-  const { control, watch, setValue, handleSubmit } = useForm<{
-    calendarId: string;
-    summary: string;
-    isAllDayEvent: boolean;
-    startDate: string;
-    endDate: string;
-    start: string;
-    end: string;
-  }>({
-    defaultValues: {
+export const useCalendarDialog = (args: { calendarId?: string; eventId?: string }) => {
+  const { calendarEvents } = React.useContext(CalendarContext);
+
+  const defaultValues = React.useMemo(() => {
+    if (args.eventId) {
+      const event = calendarEvents.find((event) => event.id === args.eventId);
+
+      if (event) {
+        const isAllDayEvent = event.start?.date ? true : false;
+
+        const startDayjs = dayjs(isAllDayEvent ? event.start?.date : event.start?.dateTime);
+        const endDayjs = dayjs(isAllDayEvent ? event.end?.date : event.end?.dateTime);
+        return {
+          calendarId: event?.calendarId || '',
+          eventId: args.eventId || '',
+          summary: event?.summary || '',
+          isAllDayEvent: event.start?.date ? true : false,
+          startDate: startDayjs.format('YYYY-MM-DD'),
+          start: startDayjs.format('YYYY-MM-DDTHH:mm'),
+          endDate: endDayjs.format('YYYY-MM-DD'),
+          end: endDayjs.format('YYYY-MM-DDTHH:mm'),
+        };
+      }
+    }
+    return {
       calendarId: args.calendarId || '',
       summary: '',
       isAllDayEvent: false,
@@ -20,8 +35,19 @@ export const useCalendarDialog = (args: { calendarId?: string }) => {
       endDate: dayjs().format('YYYY-MM-DD'),
       start: `${dayjs().format('YYYY-MM-DD')}T10:00`,
       end: `${dayjs().format('YYYY-MM-DD')}T11:00`,
-    },
-  });
+    };
+  }, [args.calendarId, args.eventId, calendarEvents]);
+
+  const { control, watch, setValue, handleSubmit, reset } = useForm<{
+    calendarId: string;
+    eventId: string;
+    summary: string;
+    isAllDayEvent: boolean;
+    startDate: string;
+    endDate: string;
+    start: string;
+    end: string;
+  }>({ defaultValues });
 
   const { isAllDayEvent, start, startDate, end, endDate } = watch();
 
@@ -73,10 +99,10 @@ export const useCalendarDialog = (args: { calendarId?: string }) => {
   }, [start, end, isAllDayEvent, startDate, endDate, setValue]);
 
   React.useEffect(() => {
-    if (args.calendarId) {
-      setValue('calendarId', args.calendarId);
+    if (args.calendarId || args.eventId) {
+      reset(defaultValues);
     }
-  }, [args.calendarId, setValue]);
+  }, [args.calendarId, args.eventId, defaultValues, reset]);
 
   return { control, handleDayBlur, isAllDayEvent, handleFormSubmit };
 };

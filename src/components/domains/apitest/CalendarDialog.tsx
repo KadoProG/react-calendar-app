@@ -4,12 +4,13 @@ import { CheckBox } from '@/components/common/input/CheckBox';
 import React from 'react';
 import { DeleteButton } from '@/components/common/button/DeleteButton';
 import { TextField } from '@/components/common/TextField';
-import { CalendarContext } from '@/contexts/CalendarContext';
 import { Select } from '@/components/common/input/Select';
 import { useCalendarDialog } from '@/components/domains/apitest/useCalendarDialog';
+import { CalendarContext } from '@/contexts/CalendarContext';
 
 interface CalendarDialogProps {
   open: boolean;
+  eventId?: gapi.client.calendar.Event['id'];
   onClose: () => void;
   calendarId?: gapi.client.calendar.CalendarListEntry['id'];
   mutate?: () => void;
@@ -19,6 +20,7 @@ export const CalendarDialog: React.FC<CalendarDialogProps> = (props) => {
   const { calendars } = React.useContext(CalendarContext);
   const { control, isAllDayEvent, handleDayBlur, handleFormSubmit } = useCalendarDialog({
     calendarId: props.calendarId,
+    eventId: props.eventId,
   });
 
   return (

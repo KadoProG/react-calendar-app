@@ -14,19 +14,24 @@ export const ApiTest: React.FC = () => {
   const [isOpenDialog, setIsOpenDialog] = React.useState<boolean>(false);
 
   const [selectedCalendarId, setSelectedCalendarId] = React.useState<string | undefined>();
+  const [selectedEventId, setSelectedEventId] = React.useState<string | undefined>();
 
-  const handleAddDialog = React.useCallback((calendarId?: string) => {
-    setSelectedCalendarId(calendarId);
-    setIsOpenDialog(true);
-  }, []);
+  const handleAddDialog = React.useCallback(
+    (args: Partial<{ calendarId: string; eventId: string }>) => {
+      setSelectedCalendarId(args.calendarId);
+      setSelectedEventId(args.eventId);
+      setIsOpenDialog(true);
+    },
+    []
+  );
 
   return (
     <div>
       <h1>Google カレンダー一覧</h1>
       {status === 'unverified' && <p>認証中...</p>}
 
-      {status === 'unauthenticated' && <button onClick={signIn}>サインイン</button>}
-      {status === 'authenticated' && <button onClick={signOut}>サインアウト</button>}
+      {status === 'unauthenticated' && <Button onClick={signIn}>サインイン</Button>}
+      {status === 'authenticated' && <Button onClick={signOut}>サインアウト</Button>}
 
       <CheckBox name="canFetch" control={control} label="データ取得" />
 
@@ -35,13 +40,13 @@ export const ApiTest: React.FC = () => {
       {isCalendarEventsLoading && <p>イベントロード中...</p>}
 
       <ul>
-        {calendars.map((event) => (
+        {calendars.map((calendar) => (
           <li
-            key={event.id}
-            style={{ background: event.backgroundColor, display: 'flex', alignItems: 'center' }}
+            key={calendar.id}
+            style={{ background: calendar.backgroundColor, display: 'flex', alignItems: 'center' }}
           >
-            {event.primary ? '(プライマリ)' : event.summary}
-            <Button onClick={() => handleAddDialog(event.id)}>追加</Button>
+            {calendar.primary ? '(プライマリ)' : calendar.summary}
+            <Button onClick={() => handleAddDialog({ calendarId: calendar.id })}>追加</Button>
           </li>
         ))}
       </ul>
@@ -49,19 +54,21 @@ export const ApiTest: React.FC = () => {
 
       <ul>
         {calendarEvents.map((event) => (
-          <li key={event.id}>
+          <li key={event.id} style={{ display: 'flex', alignItems: 'center' }}>
             {dayjs(event.start?.dateTime).format('YYYY-MM-DD HH:mm')}〜
             {dayjs(event.end?.dateTime).format('YYYY-MM-DD HH:mm')}
             {event.summary}
+            <Button onClick={() => handleAddDialog({ eventId: event.id })}>編集</Button>
           </li>
         ))}
       </ul>
-      <textarea name="" id="" value={JSON.stringify(calendarEvents)} readOnly></textarea>
+      <textarea name="" id="" value={JSON.stringify(calendarEvents, null, 2)} readOnly></textarea>
 
       <CalendarDialog
         open={isOpenDialog}
         onClose={() => setIsOpenDialog(false)}
         calendarId={selectedCalendarId}
+        eventId={selectedEventId}
       />
     </div>
   );

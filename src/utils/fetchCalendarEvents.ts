@@ -20,23 +20,24 @@ export const fetchCalendars = async (): Promise<gapi.client.calendar.CalendarLis
 };
 
 export const fetchCalendarEvents = async (args: {
-  calendars: gapi.client.calendar.CalendarListEntry[];
+  calendars: gapi.client.calendar.Event[];
   start: dayjs.Dayjs;
   end: dayjs.Dayjs;
-}): Promise<gapi.client.calendar.Event[]> => {
+}): Promise<(gapi.client.calendar.Event & { calendarId: string })[]> => {
   try {
     if (!args.calendars) {
       console.warn('No args.calendars found');
       return [];
     }
 
-    const allEvents = [];
+    const allEvents: (gapi.client.calendar.Event & { calendarId: string })[] = [];
 
     for (const calendar of args.calendars) {
-      if (!calendar.id) continue;
+      const calendarId = calendar.id;
+      if (!calendarId) continue;
 
       const response = await gapi.client.calendar.events.list({
-        calendarId: calendar.id,
+        calendarId,
         timeMin: args.start.toISOString(),
         timeMax: args.end.toISOString(),
         showDeleted: false,
@@ -44,10 +45,11 @@ export const fetchCalendarEvents = async (args: {
         maxResults: 10,
         orderBy: 'startTime',
       });
-
       const events = response.result.items;
+
       if (events) {
-        allEvents.push(...events);
+        const newEvents = events.map((event) => ({ ...event, calendarId }));
+        allEvents.push(...newEvents);
       }
     }
 
