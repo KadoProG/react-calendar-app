@@ -3,7 +3,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 
 export const useCalendarDialog = (args: { calendarId?: string }) => {
-  const { control, watch, setValue } = useForm<{
+  const { control, watch, setValue, handleSubmit } = useForm<{
     calendarId: string;
     summary: string;
     isAllDayEvent: boolean;
@@ -25,10 +25,43 @@ export const useCalendarDialog = (args: { calendarId?: string }) => {
 
   const { isAllDayEvent, start, startDate, end, endDate } = watch();
 
-  const handleFormSubmit = React.useCallback((e: React.FormEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-  }, []);
+  const handleFormSubmit = React.useCallback(
+    (e: React.FormEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+      handleSubmit(async (data) => {
+        try {
+          const isAllDayEvent = data.isAllDayEvent;
+          await gapi.client.calendar.events.insert({
+            calendarId: data.calendarId,
+            resource: {
+              summary: data.summary,
+              start: {
+                dateTime: !isAllDayEvent ? dayjs(data.start).toISOString() : undefined,
+                date: isAllDayEvent ? dayjs(data.startDate).format('YYYY-MM-DD') : undefined,
+              },
+              end: {
+                dateTime: !isAllDayEvent ? dayjs(data.end).toISOString() : undefined,
+                date: isAllDayEvent ? dayjs(data.endDate).format('YYYY-MM-DD') : undefined,
+              },
+            },
+          });
+        } catch (error) {
+          console.error(error);
+        }
+      })();
+    },
+    [handleSubmit]
+  );
+
+  const handleDayBlur = React.useCallback(() => {
+    if (!isAllDayEvent && start > end) {
+      setValue('end', dayjs(start).add(1, 'hour').format('YYYY-MM-DDTHH:mm'));
+    }
+    if (isAllDayEvent && startDate > endDate) {
+      setValue('endDate', startDate);
+    }
+  }, [start, end, setValue, startDate, endDate, isAllDayEvent]);
 
   React.useEffect(() => {
     if (isAllDayEvent) {
@@ -39,15 +72,6 @@ export const useCalendarDialog = (args: { calendarId?: string }) => {
       setValue('endDate', dayjs(end).format('YYYY-MM-DD'));
     }
   }, [start, end, isAllDayEvent, startDate, endDate, setValue]);
-
-  const handleDayBlur = React.useCallback(() => {
-    if (!isAllDayEvent && start > end) {
-      setValue('end', dayjs(start).add(1, 'hour').format('YYYY-MM-DDTHH:mm'));
-    }
-    if (isAllDayEvent && startDate > endDate) {
-      setValue('endDate', startDate);
-    }
-  }, [start, end, setValue, startDate, endDate, isAllDayEvent]);
 
   React.useEffect(() => {
     if (args.calendarId) {
