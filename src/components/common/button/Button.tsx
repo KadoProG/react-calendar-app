@@ -11,21 +11,19 @@ interface ButtonProps {
   width?: React.CSSProperties['width'];
 }
 
-export const Button: React.FC<ButtonProps> = (props) => {
-  if (props.href) {
-    return (
-      <Link to={props.href} className={styles.button} style={{ width: props.width }}>
-        {props.children}
-      </Link>
-    );
-  }
-  <button
-    onClick={props.onClick}
-    disabled={props.disabled}
-    type={props.type}
-    className={styles.button}
-    style={{ width: props.width }}
-  >
-    {props.children}
-  </button>;
-};
+export const Button: React.FC<ButtonProps> = (props) =>
+  props.href ? (
+    <Link to={props.href} className={styles.button} style={{ width: props.width }}>
+      {props.children}
+    </Link>
+  ) : (
+    <button
+      onClick={props.onClick}
+      disabled={props.disabled}
+      type={props.type}
+      className={styles.button}
+      style={{ width: props.width }}
+    >
+      {props.children}
+    </button>
+  );
