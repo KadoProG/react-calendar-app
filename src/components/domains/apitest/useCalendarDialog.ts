@@ -27,7 +27,6 @@ export const useCalendarDialog = (args: { calendarId?: string }) => {
 
   const handleFormSubmit = React.useCallback(
     (e: React.FormEvent) => {
-      e.stopPropagation();
       e.preventDefault();
       handleSubmit(async (data) => {
         try {

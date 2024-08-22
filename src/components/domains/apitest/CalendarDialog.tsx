@@ -27,7 +27,11 @@ export const CalendarDialog: React.FC<CalendarDialogProps> = (props) => {
       style={{ display: props.open ? 'flex' : 'none' }}
       onClick={props.onClose}
     >
-      <form className={styles.dialog__content} onClick={handleFormSubmit}>
+      <form
+        className={styles.dialog__content}
+        onClick={(e) => e.stopPropagation()}
+        onSubmit={handleFormSubmit}
+      >
         <div className={styles.dialog__header}>
           <h2>予定を追加</h2>
           <DeleteButton type="button" />
