@@ -2,7 +2,7 @@ import styles from '@/components/common/button/DeleteButton.module.scss';
 import React from 'react';
 
 interface DeleteButtonProps {
-  onClick: () => void;
+  onClick?: () => void;
   disabled?: boolean;
   type?: HTMLButtonElement['type'];
 }
