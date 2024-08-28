@@ -5,6 +5,8 @@ import React from 'react';
 import { CheckBox } from '@/components/common/input/CheckBox';
 import { Button } from '@/components/common/button/Button';
 import { CalendarDialog } from '@/components/domains/apitest/CalendarDialog';
+import { SettingDialog } from '@/components/domains/apitest/SettingDialog';
+import { SettingButton } from '@/components/common/button/SettingButton';
 
 export const ApiTest: React.FC = () => {
   const { status, user, signIn, signOut } = React.useContext(AuthContext);
@@ -12,6 +14,8 @@ export const ApiTest: React.FC = () => {
     React.useContext(CalendarContext);
 
   const [isOpenDialog, setIsOpenDialog] = React.useState<boolean>(false);
+
+  const [isOpenSettingDialog, setIsOpenSettingDialog] = React.useState<boolean>(false);
 
   const [selectedCalendarId, setSelectedCalendarId] = React.useState<string | undefined>();
   const [selectedEventId, setSelectedEventId] = React.useState<string | undefined>();
@@ -29,6 +33,7 @@ export const ApiTest: React.FC = () => {
     <div>
       <h1>Google カレンダー一覧</h1>
       {status === 'unverified' && <p>認証中...</p>}
+      <SettingButton onClick={() => setIsOpenSettingDialog(true)} />
 
       {status === 'unauthenticated' && <Button onClick={signIn}>サインイン</Button>}
       {status === 'authenticated' && <Button onClick={signOut}>サインアウト</Button>}
@@ -70,6 +75,7 @@ export const ApiTest: React.FC = () => {
         calendarId={selectedCalendarId}
         eventId={selectedEventId}
       />
+      <SettingDialog isOpen={isOpenSettingDialog} onClose={() => setIsOpenSettingDialog(false)} />
     </div>
   );
 };
