@@ -1,10 +1,9 @@
 import dayjs from '@/libs/dayjs';
 import React from 'react';
-import { AuthContext } from './AuthContext'; // AuthContextをインポート
 import useSWR from 'swr';
 import { fetchCalendarEvents } from '@/utils/fetchCalendarEvents';
 import { Control, useForm } from 'react-hook-form';
-import { useCalenadarFeatLocalStorage } from '@/hooks/useLocalStorage';
+import { CalendarFeatLocalStorageContext } from '@/contexts/CalendarFeatLocalStorageContext';
 
 interface FetchCalendarForm {
   start: string;
@@ -38,9 +37,7 @@ export const CalendarContext = React.createContext<CalendarContextType>({
 });
 
 export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = React.useContext(AuthContext); // 認証情報を取得
-
-  const { calendars, isLoading } = useCalenadarFeatLocalStorage(user);
+  const { calendars, isLoading } = React.useContext(CalendarFeatLocalStorageContext); // カレンダー情報を取得
 
   const { control, watch } = useForm<FetchCalendarForm>({
     defaultValues: {

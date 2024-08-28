@@ -1,8 +1,25 @@
+import { AuthContext } from '@/contexts/AuthContext';
 import { fetchCalendars } from '@/utils/fetchCalendarEvents';
 import React from 'react';
 
-// useStateとuseEffectを使用し、localStorageを扱うためのフックを定義
-export const useCalenadarFeatLocalStorage = (user: User | null) => {
+interface CalendarFeatLocalStorageType {
+  calendars: CalendarFeatLocalStorage[];
+  setCalendars: React.Dispatch<React.SetStateAction<CalendarFeatLocalStorage[]>>;
+  isLoading: boolean;
+  mutateCalendar: () => Promise<void>;
+}
+
+export const CalendarFeatLocalStorageContext = React.createContext<CalendarFeatLocalStorageType>({
+  calendars: [],
+  setCalendars: () => {},
+  isLoading: true,
+  mutateCalendar: async () => {},
+});
+
+export const CalenadarFeatLocalStorageProvider: React.FC<{ children: React.ReactNode }> = (
+  props
+) => {
+  const { user } = React.useContext(AuthContext);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [calendars, setCalendars] = React.useState<CalendarFeatLocalStorage[]>([]);
 
@@ -43,8 +60,23 @@ export const useCalenadarFeatLocalStorage = (user: User | null) => {
   React.useEffect(() => {
     if (user) {
       initCalendarsFeatLocalStorage();
+    } else {
+      setIsLoading(false);
     }
   }, [user, initCalendarsFeatLocalStorage]);
 
-  return { calendars, setCalendars, isLoading };
+  const mutateCalendar = React.useCallback(async () => {
+    if (!user) return;
+    localStorage.removeItem(user?.email);
+    setIsLoading(true);
+    initCalendarsFeatLocalStorage();
+  }, [user, initCalendarsFeatLocalStorage]); // 依存関係にcalendarsを追加
+
+  return (
+    <CalendarFeatLocalStorageContext.Provider
+      value={{ calendars, setCalendars, isLoading, mutateCalendar }}
+    >
+      {props.children}
+    </CalendarFeatLocalStorageContext.Provider>
+  );
 };

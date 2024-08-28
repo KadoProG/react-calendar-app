@@ -1,0 +1,21 @@
+.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  background: var(--background-paper);
+  border: 1px solid var(--divider);
+  color: var(--color-main);
+  min-height: 32px;
+  &:hover {
+    background: var(--divider);
+  }
+  & > img {
+    width: 24px;
+    height: 24px;
+  }
+}
