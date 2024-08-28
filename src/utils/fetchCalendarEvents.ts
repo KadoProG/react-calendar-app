@@ -20,7 +20,7 @@ export const fetchCalendars = async (): Promise<gapi.client.calendar.CalendarLis
 };
 
 export const fetchCalendarEvents = async (args: {
-  calendars: gapi.client.calendar.Event[];
+  calendars: CalendarFeatLocalStorage[];
   start: dayjs.Dayjs;
   end: dayjs.Dayjs;
 }): Promise<(gapi.client.calendar.Event & { calendarId: string })[]> => {
@@ -34,7 +34,7 @@ export const fetchCalendarEvents = async (args: {
 
     for (const calendar of args.calendars) {
       const calendarId = calendar.id;
-      if (!calendarId) continue;
+      if (!calendarId || !calendar.hasValid) continue;
 
       const response = await gapi.client.calendar.events.list({
         calendarId,

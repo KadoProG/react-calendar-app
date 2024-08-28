@@ -2,8 +2,9 @@ import dayjs from '@/libs/dayjs';
 import React from 'react';
 import { AuthContext } from './AuthContext'; // AuthContextをインポート
 import useSWR from 'swr';
-import { fetchCalendarEvents, fetchCalendars } from '@/utils/fetchCalendarEvents';
+import { fetchCalendarEvents } from '@/utils/fetchCalendarEvents';
 import { Control, useForm } from 'react-hook-form';
+import { useCalenadarFeatLocalStorage } from '@/hooks/useLocalStorage';
 
 interface FetchCalendarForm {
   start: string;
@@ -13,7 +14,7 @@ interface FetchCalendarForm {
 
 interface CalendarContextType {
   calendarEvents: (gapi.client.calendar.Event & { calendarId: string })[];
-  calendars: gapi.client.calendar.CalendarListEntry[];
+  calendars: CalendarFeatLocalStorage[];
   isCalendarsLoading: boolean;
   isCalendarEventsLoading: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -37,10 +38,11 @@ export const CalendarContext = React.createContext<CalendarContextType>({
 });
 
 export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { status } = React.useContext(AuthContext); // 認証情報を取得
-  const [calendars, setCalendars] = React.useState<gapi.client.calendar.CalendarListEntry[]>([]);
+  const { user } = React.useContext(AuthContext); // 認証情報を取得
 
-  const { control, watch } = useForm<{ start: string; end: string; canFetch: boolean }>({
+  const { calendars, isLoading } = useCalenadarFeatLocalStorage(user);
+
+  const { control, watch } = useForm<FetchCalendarForm>({
     defaultValues: {
       start: '2024-08-20',
       end: '2024-08-26',
@@ -48,16 +50,7 @@ export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = 
     },
   });
 
-  const { start, end, canFetch } = watch();
-
-  const [isCalendarsLoading, setIsCalendarsLoading] = React.useState<boolean>(false);
-
-  const fetchCalendarsInit = React.useCallback(async () => {
-    setIsCalendarsLoading(true);
-    const newCalendars = await fetchCalendars();
-    setCalendars(newCalendars);
-    setIsCalendarsLoading(false);
-  }, []);
+  const { start, end } = watch();
 
   const startDayjs = React.useMemo(() => dayjs(start), [start]);
   const endDayjs = React.useMemo(() => dayjs(end), [end]);
@@ -75,15 +68,15 @@ export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = 
 
   const calendarEvents = data ?? [];
 
-  React.useEffect(() => {
-    if (canFetch && status === 'authenticated') {
-      fetchCalendarsInit();
-    }
-  }, [canFetch, status, fetchCalendarsInit]);
-
   return (
     <CalendarContext.Provider
-      value={{ calendarEvents, calendars, isCalendarEventsLoading, isCalendarsLoading, control }}
+      value={{
+        calendarEvents,
+        calendars,
+        isCalendarEventsLoading,
+        isCalendarsLoading: isLoading,
+        control,
+      }}
     >
       {children}
     </CalendarContext.Provider>

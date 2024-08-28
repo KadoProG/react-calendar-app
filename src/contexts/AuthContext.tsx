@@ -1,12 +1,6 @@
 import { gapi } from 'gapi-script';
 import React from 'react';
 
-interface User {
-  name: string;
-  email: string;
-  imageUrl: string;
-}
-
 interface AuthContextType {
   status: 'unverified' | 'authenticated' | 'unauthenticated';
   user: User | null;

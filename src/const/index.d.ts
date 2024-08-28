@@ -1,3 +1,9 @@
+interface User {
+  name: string;
+  email: string;
+  imageUrl: string;
+}
+
 interface CalendarEvent {
   id?: string;
   start: dayjs.Dayjs;
@@ -24,3 +30,10 @@ interface CalendarConfig {
    */
   weekDisplayCount: number;
 }
+
+/**
+ * LocalStorageに保存するカレンダー情報
+ */
+type CalendarFeatLocalStorage = gapi.client.calendar.CalendarListEntry & {
+  hasValid: boolean;
+};
