@@ -6,12 +6,14 @@ interface CalendarFeatLocalStorageType {
   calendars: CalendarFeatLocalStorage[];
   setCalendars: React.Dispatch<React.SetStateAction<CalendarFeatLocalStorage[]>>;
   isLoading: boolean;
+  mutateCalendar: () => Promise<void>;
 }
 
 export const CalendarFeatLocalStorageContext = React.createContext<CalendarFeatLocalStorageType>({
   calendars: [],
   setCalendars: () => {},
   isLoading: true,
+  mutateCalendar: async () => {},
 });
 
 export const CalenadarFeatLocalStorageProvider: React.FC<{ children: React.ReactNode }> = (
@@ -63,8 +65,17 @@ export const CalenadarFeatLocalStorageProvider: React.FC<{ children: React.React
     }
   }, [user, initCalendarsFeatLocalStorage]);
 
+  const mutateCalendar = React.useCallback(async () => {
+    if (!user) return;
+    localStorage.removeItem(user?.email);
+    setIsLoading(true);
+    initCalendarsFeatLocalStorage();
+  }, [user, initCalendarsFeatLocalStorage]); // 依存関係にcalendarsを追加
+
   return (
-    <CalendarFeatLocalStorageContext.Provider value={{ calendars, setCalendars, isLoading }}>
+    <CalendarFeatLocalStorageContext.Provider
+      value={{ calendars, setCalendars, isLoading, mutateCalendar }}
+    >
       {props.children}
     </CalendarFeatLocalStorageContext.Provider>
   );
