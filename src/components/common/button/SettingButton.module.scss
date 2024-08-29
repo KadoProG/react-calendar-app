@@ -17,5 +17,8 @@
   & > img {
     width: 24px;
     height: 24px;
+    @media screen and (prefers-color-scheme: dark) {
+      filter: invert(1);
+    }
   }
 }
