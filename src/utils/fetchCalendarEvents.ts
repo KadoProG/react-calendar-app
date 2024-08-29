@@ -19,43 +19,56 @@ export const fetchCalendars = async (): Promise<gapi.client.calendar.CalendarLis
   }
 };
 
+/**
+ * カレンダーからイベントを取得する
+ */
 export const fetchCalendarEvents = async (args: {
   calendars: CalendarFeatLocalStorage[];
   start: dayjs.Dayjs;
   end: dayjs.Dayjs;
 }): Promise<(gapi.client.calendar.Event & { calendarId: string })[]> => {
-  try {
-    if (!args.calendars) {
-      console.warn('No args.calendars found');
-      return [];
-    }
+  if (!args.calendars) {
+    console.warn('No args.calendars found');
+    return [];
+  }
 
-    const allEvents: (gapi.client.calendar.Event & { calendarId: string })[] = [];
+  const allEvents: (gapi.client.calendar.Event & { calendarId: string })[] = [];
+  const { start, end, calendars } = args;
 
-    for (const calendar of args.calendars) {
-      const calendarId = calendar.id;
-      if (!calendarId || !calendar.hasValid) continue;
+  // APIからイベントを取得する関数
+  const fetchEventsForCalendar = async (calendar: CalendarFeatLocalStorage) => {
+    const { id: calendarId } = calendar;
+    if (!calendarId || !calendar.hasValid) return;
 
+    try {
       const response = await gapi.client.calendar.events.list({
         calendarId,
-        timeMin: args.start.toISOString(),
-        timeMax: args.end.toISOString(),
+        timeMin: start.toISOString(),
+        timeMax: end.toISOString(),
         showDeleted: false,
         singleEvents: true,
         maxResults: 10,
         orderBy: 'startTime',
       });
-      const events = response.result.items;
 
+      const events = response.result.items;
       if (events) {
         const newEvents = events.map((event) => ({ ...event, calendarId }));
         allEvents.push(...newEvents);
       }
+    } catch (error) {
+      console.error(`Error fetching events for calendar ${calendarId}:`, error);
     }
+  };
 
-    return allEvents;
+  // Promiseの配列を作成し、全てのカレンダーに対してイベントをフェッチ
+  const fetchEventsPromises = calendars.map(fetchEventsForCalendar);
+
+  try {
+    await Promise.all(fetchEventsPromises);
   } catch (error) {
-    console.error('Error fetching calendar events:', error);
-    return [];
+    console.error('Error occurred while fetching calendar events:', error);
   }
+
+  return allEvents;
 };
