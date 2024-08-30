@@ -91,6 +91,7 @@ export const useCalendarDialog = (args: {
 
           args.mutate?.();
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.error(error);
         }
       })();

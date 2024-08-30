@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { HomePage } from '../pages/HomePage';
-import { CalendarPage } from '../pages/CalendarPage';
 import { APIPage } from '@/pages/APIPage';
 import { AuthContext } from '@/contexts/AuthContext';
 import { LoadingWithMessage } from '@/components/common/LoadingWithMessage';
+import { HomePage } from '@/pages/HomePage';
+import { CalendarPage } from '@/pages/CalendarPage';
 
 export const MyRouter: React.FC = () => {
   const { status } = React.useContext(AuthContext);

@@ -30,6 +30,7 @@ export const CalenadarFeatLocalStorageProvider: React.FC<{ children: React.React
       const serializedValue = JSON.stringify(calendars);
       localStorage.setItem(user.email, serializedValue);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(error);
     }
   }, [user, calendars]);
@@ -53,6 +54,7 @@ export const CalenadarFeatLocalStorageProvider: React.FC<{ children: React.React
       setCalendars(processedCalendars);
       setIsLoading(false);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(error);
     }
   }, [user]);

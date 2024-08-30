@@ -27,11 +27,7 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = (props) => {
   }, []);
 
   const setDisabledAll = React.useCallback(() => {
-    setMessageObjects((prev) =>
-      prev.map((v) => {
-        return { ...v, disabled: true };
-      })
-    );
+    setMessageObjects((prev) => prev.map((v) => ({ ...v, disabled: true })));
   }, []);
 
   return (

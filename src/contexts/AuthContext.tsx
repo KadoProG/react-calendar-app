@@ -43,6 +43,7 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = (pro
         });
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error initializing Google API client:', error);
       setStatus('unauthenticated');
     }
@@ -64,6 +65,7 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = (pro
 
       setStatus('authenticated');
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error signing in:', error);
     }
   }, []);
@@ -76,6 +78,7 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = (pro
       setUser(null);
       setStatus('unauthenticated');
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error signing out:', error);
     }
   }, []);
