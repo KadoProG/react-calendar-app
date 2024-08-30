@@ -1,3 +1,4 @@
+import { DialogBody } from '@/components/common/feedback/DialogBody';
 import { DialogContainer } from '@/components/common/feedback/DialogContainer';
 import { DialogContent } from '@/components/common/feedback/DialogContent';
 import { DialogHeader } from '@/components/common/feedback/DialogHeader';
@@ -13,7 +14,9 @@ export const SettingDialog: React.FC<SettingDialogProps> = (props) => (
   <DialogContainer isOpen={props.isOpen} onClose={props.onClose}>
     <DialogContent>
       <DialogHeader title="設定" />
-      <SettingCalendarListValid />
+      <DialogBody>
+        <SettingCalendarListValid />
+      </DialogBody>
     </DialogContent>
   </DialogContainer>
 );

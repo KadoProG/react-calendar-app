@@ -1,12 +1,15 @@
-import styles from '@/components/domains/apitest/CalendarDialog.module.scss';
 import { Button } from '@/components/common/button/Button';
 import { CheckBox } from '@/components/common/input/CheckBox';
 import React from 'react';
-import { DeleteButton } from '@/components/common/button/DeleteButton';
 import { TextField } from '@/components/common/TextField';
 import { Select } from '@/components/common/input/Select';
 import { useCalendarDialog } from '@/components/domains/apitest/useCalendarDialog';
 import { CalendarContext } from '@/contexts/CalendarContext';
+import { DialogContainer } from '@/components/common/feedback/DialogContainer';
+import { DialogContent } from '@/components/common/feedback/DialogContent';
+import { DialogHeader } from '@/components/common/feedback/DialogHeader';
+import { DialogBody } from '@/components/common/feedback/DialogBody';
+import { DialogActions } from '@/components/common/feedback/DialogActions';
 
 interface CalendarDialogProps {
   open: boolean;
@@ -18,31 +21,21 @@ interface CalendarDialogProps {
 
 export const CalendarDialog: React.FC<CalendarDialogProps> = (props) => {
   const { calendars } = React.useContext(CalendarContext);
-  const { control, isAllDayEvent, handleDayBlur, handleFormSubmit } = useCalendarDialog({
-    calendarId: props.calendarId,
-    eventId: props.eventId,
-    mutate: () => {
-      props.mutate?.();
-      props.onClose();
-    },
-  });
+  const { control, isAllDayEvent, handleDayBlur, handleFormSubmit, handleDelete } =
+    useCalendarDialog({
+      calendarId: props.calendarId,
+      eventId: props.eventId,
+      mutate: () => {
+        props.mutate?.();
+        props.onClose();
+      },
+    });
 
   return (
-    <div
-      className={styles.dialog}
-      style={{ display: props.open ? 'flex' : 'none' }}
-      onClick={props.onClose}
-    >
-      <form
-        className={styles.dialog__content}
-        onClick={(e) => e.stopPropagation()}
-        onSubmit={handleFormSubmit}
-      >
-        <div className={styles.dialog__header}>
-          <h2>予定を{props.eventId ? '編集' : '追加'}</h2>
-          <DeleteButton type="button" />
-        </div>
-        <div className={styles.dialog__body}>
+    <DialogContainer isOpen={props.open} onClose={props.onClose}>
+      <DialogContent onSubmit={handleFormSubmit} style={{ maxWidth: 300 }}>
+        <DialogHeader title={`予定を${props.eventId ? '編集' : '追加'}`} onDelete={handleDelete} />
+        <DialogBody>
           <Select
             control={control}
             name="calendarId"
@@ -98,16 +91,16 @@ export const CalendarDialog: React.FC<CalendarDialogProps> = (props) => {
             style={{ display: isAllDayEvent ? 'none' : 'block' }}
             onBlur={handleDayBlur}
           />
-        </div>
-        <div className={styles.dialog__actions}>
+        </DialogBody>
+        <DialogActions>
           <Button type="button" onClick={props.onClose} width={90}>
             キャンセル
           </Button>
           <Button type="submit" width={100}>
             {props.eventId ? '更新' : '追加'}
           </Button>
-        </div>
-      </form>
-    </div>
+        </DialogActions>
+      </DialogContent>
+    </DialogContainer>
   );
 };

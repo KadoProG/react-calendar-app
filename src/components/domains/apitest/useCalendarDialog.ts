@@ -108,6 +108,8 @@ export const useCalendarDialog = (args: {
     }
   }, [start, end, setValue, startDate, endDate, isAllDayEvent]);
 
+  const handleDelete = React.useCallback(async () => {}, []);
+
   React.useEffect(() => {
     if (isAllDayEvent) {
       setValue('start', `${startDate}T10:00`);
@@ -124,5 +126,5 @@ export const useCalendarDialog = (args: {
     }
   }, [args.calendarId, args.eventId, defaultValues, reset]);
 
-  return { control, handleDayBlur, isAllDayEvent, handleFormSubmit };
+  return { control, handleDayBlur, isAllDayEvent, handleFormSubmit, handleDelete };
 };
