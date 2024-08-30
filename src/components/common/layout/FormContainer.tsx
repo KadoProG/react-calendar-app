@@ -10,14 +10,12 @@ interface FormContainerProps {
   left?: React.ReactNode;
 }
 
-export const FormContainer: React.FC<FormContainerProps> = (props) => {
-  return (
-    <div className={styles.FormContainer}>
-      <div className={styles.FormContainer__left}>
-        <p>{props.label}</p>
-        {props.left}
-      </div>
-      <div>{props.children}</div>
+export const FormContainer: React.FC<FormContainerProps> = (props) => (
+  <div className={styles.FormContainer}>
+    <div className={styles.FormContainer__left}>
+      <p>{props.label}</p>
+      {props.left}
     </div>
-  );
-};
+    <div>{props.children}</div>
+  </div>
+);

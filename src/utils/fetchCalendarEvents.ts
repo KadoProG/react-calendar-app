@@ -9,11 +9,13 @@ export const fetchCalendars = async (): Promise<gapi.client.calendar.CalendarLis
     );
 
     if (!calendars) {
+      // eslint-disable-next-line no-console
       console.warn('No calendars found');
     }
 
     return calendars ?? [];
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error fetching calendars:', error);
     return [];
   }
@@ -28,6 +30,7 @@ export const fetchCalendarEvents = async (args: {
   end: dayjs.Dayjs;
 }): Promise<(gapi.client.calendar.Event & { calendarId: string })[]> => {
   if (!args.calendars) {
+    // eslint-disable-next-line no-console
     console.warn('No args.calendars found');
     return [];
   }
@@ -57,6 +60,7 @@ export const fetchCalendarEvents = async (args: {
         allEvents.push(...newEvents);
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(`Error fetching events for calendar ${calendarId}:`, error);
     }
   };
@@ -67,6 +71,7 @@ export const fetchCalendarEvents = async (args: {
   try {
     await Promise.all(fetchEventsPromises);
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error occurred while fetching calendar events:', error);
   }
 

@@ -32,9 +32,7 @@ export const SettingCalendarListValid: React.FC = () => {
     }
 
     setCalendars((prev) => {
-      const notChange = prev.every((calendar, index) => {
-        return calendar.hasValid === valids[index];
-      });
+      const notChange = prev.every((calendar, index) => calendar.hasValid === valids[index]);
 
       if (notChange) return prev;
 

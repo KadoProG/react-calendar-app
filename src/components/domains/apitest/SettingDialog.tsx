@@ -9,13 +9,11 @@ interface SettingDialogProps {
   onClose: () => void;
 }
 
-export const SettingDialog: React.FC<SettingDialogProps> = (props) => {
-  return (
-    <DialogContainer isOpen={props.isOpen} onClose={props.onClose}>
-      <DialogContent>
-        <DialogHeader title="設定" />
-        <SettingCalendarListValid />
-      </DialogContent>
-    </DialogContainer>
-  );
-};
+export const SettingDialog: React.FC<SettingDialogProps> = (props) => (
+  <DialogContainer isOpen={props.isOpen} onClose={props.onClose}>
+    <DialogContent>
+      <DialogHeader title="設定" />
+      <SettingCalendarListValid />
+    </DialogContent>
+  </DialogContainer>
+);

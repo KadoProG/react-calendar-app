@@ -7,11 +7,9 @@ interface DialogHeaderProps {
   onDelete?: () => void;
 }
 
-export const DialogHeader: React.FC<DialogHeaderProps> = (props) => {
-  return (
+export const DialogHeader: React.FC<DialogHeaderProps> = (props) => (
     <div className={styles.dialog__header}>
       <h2>{props.title}</h2>
       {props.onDelete && <DeleteButton type="button" onClick={props.onDelete} />}
     </div>
   );
-};
