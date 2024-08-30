@@ -1,0 +1,91 @@
+.snackbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+
+  &__container {
+    // position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    max-width: 300px;
+    border-radius: 10px;
+    &.disabled {
+      display: none;
+    }
+  }
+
+  @keyframes dialog__message_p {
+    0% {
+      transform: translateY(-120%);
+    }
+    5% {
+      transform: translateY(0);
+    }
+    95% {
+      transform: translateY(0);
+      position: initial;
+    }
+
+    100% {
+      transform: translateY(-120%);
+      position: absolute;
+      bottom: 0;
+      display: none;
+    }
+  }
+
+  &__content {
+    width: 100%;
+    display: flex;
+    margin: 8px;
+    transition: 0.35s;
+    transform: translateY(-120%);
+    animation: dialog__message_p 7s forwards;
+    border-radius: 8px;
+    overflow: hidden;
+
+    &.force {
+      display: none;
+    }
+
+    &.success {
+      background: var(--color-success);
+    }
+
+    &.info {
+      background: var(--color-info);
+    }
+
+    &.warning {
+      background: var(--color-warning);
+    }
+
+    &.error {
+      background: var(--color-error);
+    }
+
+    & p {
+      padding: 8px;
+    }
+
+    & span {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      padding: 0 16px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.2);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.4);
+      }
+    }
+  }
+}
