@@ -56,7 +56,7 @@ export const useCalendarDialog = (args: {
     end: string;
   }>({ defaultValues });
 
-  const { isAllDayEvent, start, startDate, end, endDate } = watch();
+  const { isAllDayEvent, start, startDate, end, endDate, calendarId } = watch();
 
   const handleFormSubmit = React.useCallback(
     (e: React.FormEvent) => {
@@ -108,7 +108,21 @@ export const useCalendarDialog = (args: {
     }
   }, [start, end, setValue, startDate, endDate, isAllDayEvent]);
 
-  const handleDelete = React.useCallback(async () => {}, []);
+  const handleDelete = React.useCallback(async () => {
+    if (args.eventId && calendarId) {
+      try {
+        await gapi.client.calendar.events.delete({
+          calendarId,
+          eventId: args.eventId,
+        });
+        showSnackbar({ type: 'success', message: '予定を削除しました' });
+        args.mutate?.();
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error);
+      }
+    }
+  }, [args, showSnackbar, calendarId]);
 
   React.useEffect(() => {
     if (isAllDayEvent) {
