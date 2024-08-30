@@ -21,6 +21,10 @@ export const CalendarDialog: React.FC<CalendarDialogProps> = (props) => {
   const { control, isAllDayEvent, handleDayBlur, handleFormSubmit } = useCalendarDialog({
     calendarId: props.calendarId,
     eventId: props.eventId,
+    mutate: () => {
+      props.mutate?.();
+      props.onClose();
+    },
   });
 
   return (
@@ -35,7 +39,7 @@ export const CalendarDialog: React.FC<CalendarDialogProps> = (props) => {
         onSubmit={handleFormSubmit}
       >
         <div className={styles.dialog__header}>
-          <h2>予定を追加</h2>
+          <h2>予定を{props.eventId ? '編集' : '追加'}</h2>
           <DeleteButton type="button" />
         </div>
         <div className={styles.dialog__body}>
@@ -100,7 +104,7 @@ export const CalendarDialog: React.FC<CalendarDialogProps> = (props) => {
             キャンセル
           </Button>
           <Button type="submit" width={100}>
-            追加
+            {props.eventId ? '更新' : '追加'}
           </Button>
         </div>
       </form>

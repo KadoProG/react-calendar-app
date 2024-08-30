@@ -1,9 +1,15 @@
+import { SnackbarContext } from '@/components/common/feedback/SnackbarContext';
 import { CalendarContext } from '@/contexts/CalendarContext';
 import dayjs from '@/libs/dayjs';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
-export const useCalendarDialog = (args: { calendarId?: string; eventId?: string }) => {
+export const useCalendarDialog = (args: {
+  calendarId?: string;
+  eventId?: string;
+  mutate?: () => void;
+}) => {
+  const { showSnackbar } = React.useContext(SnackbarContext);
   const { calendarEvents } = React.useContext(CalendarContext);
 
   const defaultValues = React.useMemo(() => {
@@ -80,12 +86,16 @@ export const useCalendarDialog = (args: { calendarId?: string; eventId?: string 
           } else {
             await gapi.client.calendar.events.insert({ calendarId: data.calendarId, resource });
           }
+
+          showSnackbar({ type: 'success', message: '予定を保存しました' });
+
+          args.mutate?.();
         } catch (error) {
           console.error(error);
         }
       })();
     },
-    [handleSubmit]
+    [handleSubmit, showSnackbar, args]
   );
 
   const handleDayBlur = React.useCallback(() => {

@@ -10,8 +10,14 @@ import { SettingButton } from '@/components/common/button/SettingButton';
 
 export const ApiTest: React.FC = () => {
   const { status, user, signIn, signOut } = React.useContext(AuthContext);
-  const { calendarEvents, calendars, isCalendarsLoading, isCalendarEventsLoading, control } =
-    React.useContext(CalendarContext);
+  const {
+    calendarEvents,
+    calendars,
+    isCalendarsLoading,
+    isCalendarEventsLoading,
+    control,
+    mutate,
+  } = React.useContext(CalendarContext);
 
   const [isOpenDialog, setIsOpenDialog] = React.useState<boolean>(false);
 
@@ -42,8 +48,7 @@ export const ApiTest: React.FC = () => {
 
       {user && <img src={user.imageUrl} />}
 
-      {isCalendarEventsLoading && <p>イベントロード中...</p>}
-
+      {isCalendarsLoading && <p>カレンダーリストロード中...</p>}
       <ul>
         {calendars.map((calendar) => (
           <li
@@ -55,8 +60,8 @@ export const ApiTest: React.FC = () => {
           </li>
         ))}
       </ul>
-      {isCalendarsLoading && <p>カレンダーリストロード中...</p>}
 
+      {isCalendarEventsLoading && <p>イベントロード中...</p>}
       <ul>
         {calendarEvents.map((event) => (
           <li key={event.id} style={{ display: 'flex', alignItems: 'center' }}>
@@ -74,6 +79,7 @@ export const ApiTest: React.FC = () => {
         onClose={() => setIsOpenDialog(false)}
         calendarId={selectedCalendarId}
         eventId={selectedEventId}
+        mutate={mutate}
       />
       <SettingDialog isOpen={isOpenSettingDialog} onClose={() => setIsOpenSettingDialog(false)} />
     </div>
