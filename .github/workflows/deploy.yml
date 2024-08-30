@@ -30,7 +30,7 @@ jobs:
 
       - name: vite build
         run: |
-          npm i --production
+          npm install
           npm run build
 
       - name: copy htaccess file
