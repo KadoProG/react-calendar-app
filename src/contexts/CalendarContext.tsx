@@ -18,6 +18,7 @@ interface CalendarContextType {
   isCalendarEventsLoading: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   control: Control<FetchCalendarForm, any>;
+  mutate: () => void;
 }
 
 export const CalendarContext = React.createContext<CalendarContextType>({
@@ -34,6 +35,7 @@ export const CalendarContext = React.createContext<CalendarContextType>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >,
+  mutate: () => {},
 });
 
 export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -52,7 +54,11 @@ export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = 
   const startDayjs = React.useMemo(() => dayjs(start), [start]);
   const endDayjs = React.useMemo(() => dayjs(end), [end]);
 
-  const { data, isLoading: isCalendarEventsLoading } = useSWR(
+  const {
+    data,
+    isLoading: isCalendarEventsLoading,
+    mutate,
+  } = useSWR(
     calendars ? { calendars, start: startDayjs, end: endDayjs } : null,
     fetchCalendarEvents,
     {
@@ -73,6 +79,7 @@ export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = 
         isCalendarEventsLoading,
         isCalendarsLoading: isLoading,
         control,
+        mutate,
       }}
     >
       {children}

@@ -4,11 +4,11 @@ import React from 'react';
 type AlertColor = 'success' | 'error' | 'info' | 'warning';
 
 interface SnackbarContextType {
-  addMessageObject: (message: string, color: AlertColor) => void;
+  showSnackbar: (args: { message: string; type: AlertColor }) => void;
 }
 
 export const SnackbarContext = React.createContext<SnackbarContextType>({
-  addMessageObject: () => {}, // ダミー関数
+  showSnackbar: () => {}, // ダミー関数
 });
 
 interface SnackbarProviderProps {
@@ -17,12 +17,12 @@ interface SnackbarProviderProps {
 
 export const SnackbarProvider: React.FC<SnackbarProviderProps> = (props) => {
   const [messageObjects, setMessageObjects] = React.useState<
-    { message: string; color: AlertColor; disabled: boolean }[]
+    { message: string; type: AlertColor; disabled: boolean }[]
   >([]);
 
   // メッセージを追加する関数
-  const addMessageObject = React.useCallback((message: string, color: AlertColor) => {
-    const newMessageObject = { message, color, disabled: false };
+  const showSnackbar = React.useCallback((args: { message: string; type: AlertColor }) => {
+    const newMessageObject = { ...args, disabled: false };
     setMessageObjects((prev) => [...prev, newMessageObject]);
   }, []);
 
@@ -35,15 +35,14 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = (props) => {
   }, []);
 
   return (
-    <SnackbarContext.Provider value={{ addMessageObject }}>
+    <SnackbarContext.Provider value={{ showSnackbar }}>
       {props.children}
       <div className={styles.snackbar} onClick={setDisabledAll}>
         <div className={styles.snackbar__container}>
           {messageObjects.map((v, i) => (
             <div
               key={i}
-              className={`${styles.snackbar__content} ${v.disabled ? styles.force : ''} ${styles[v.color]}`}
-              // style={{ backgroundColor: getColor(v.color) }}
+              className={`${styles.snackbar__content} ${v.disabled ? styles.force : ''} ${styles[v.type]}`}
             >
               <p>{v.message}</p>
               <span>×</span>
