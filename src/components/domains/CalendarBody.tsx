@@ -6,6 +6,7 @@ import React from 'react';
 import { CalendarConfigFormDialogContext } from '@/contexts/CalendarConfigFormDialogContext';
 import { CalendarEventContext } from '@/contexts/CalendarEventContext';
 import { KeyDownContext } from '@/contexts/KeyDownContext';
+import { getMouseSelectedCalendar } from '@/utils/calendar';
 
 interface CalendarBodyProps {
   fixedContentHeight: number;
@@ -26,17 +27,14 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
 
   const [dragCalendarEvent, setDragCalendarEvent] = React.useState<{
     calendarEvent: CalendarEvent;
+    /** ドラッグ時のマウスの位置を記録（0~{1時間の分割数}個） */
     yIndex: number;
   } | null>(null);
 
   /** ドラッグ開始時の処理（マウスがセルをクリックしたときの処理） */
   const handleMouseDown = React.useCallback(
     (e: React.MouseEvent<HTMLDivElement>, day: dayjs.Dayjs) => {
-      // startDayの初期化
-      const rect = e.currentTarget.getBoundingClientRect();
-      const index = Math.floor(
-        ((e.clientY - rect.top) / rect.height) * (24 * config.divisionsPerHour)
-      );
+      const { indexDivision: index, rect } = getMouseSelectedCalendar(e, config.divisionsPerHour);
       const dayStart = generateTime(day, index, config.divisionsPerHour);
       positionRef.current = rect;
       setSelectedStartDay(dayStart);
@@ -52,10 +50,7 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
       if (!isMouseDownRef.current) return;
       setDragging(true);
 
-      const rect = e.currentTarget.getBoundingClientRect();
-      const index = Math.floor(
-        ((e.clientY - rect.top) / rect.height) * (24 * config.divisionsPerHour)
-      );
+      const { indexDivision: index } = getMouseSelectedCalendar(e, config.divisionsPerHour);
 
       if (dragCalendarEvent) {
         const dayStart = generateTime(
@@ -166,6 +161,8 @@ export const CalendarBody: React.FC<CalendarBodyProps> = (props) => {
       setSelectedEndDay(dayjs(calendarEvents.find((event) => event.id === id)?.end));
       isMouseDownRef.current = true;
       const rect = e.currentTarget.getBoundingClientRect();
+
+      // マウスの位置からイベントの開始位置を計算（0~{1時間の分割数}個）
       const yIndex = Math.floor(
         ((e.clientY - rect.top) / config.heightPerHour) * config.divisionsPerHour
       );
