@@ -9,11 +9,12 @@ interface ButtonProps {
   children: React.ReactNode;
   href?: string;
   width?: React.CSSProperties['width'];
+  style?: React.CSSProperties;
 }
 
 export const Button: React.FC<ButtonProps> = (props) =>
   props.href ? (
-    <Link to={props.href} className={styles.button} style={{ width: props.width }}>
+    <Link to={props.href} className={styles.button} style={{ width: props.width, ...props.style }}>
       {props.children}
     </Link>
   ) : (
@@ -22,7 +23,7 @@ export const Button: React.FC<ButtonProps> = (props) =>
       disabled={props.disabled}
       type={props.type}
       className={styles.button}
-      style={{ width: props.width }}
+      style={{ width: props.width, ...props.style }}
     >
       {props.children}
     </button>
