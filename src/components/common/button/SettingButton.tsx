@@ -5,6 +5,7 @@ interface SettingButtonProps {
   onClick?: () => void;
   disabled?: boolean;
   type?: HTMLButtonElement['type'];
+  style?: React.CSSProperties;
 }
 
 export const SettingButton: React.FC<SettingButtonProps> = (props) => (
@@ -13,6 +14,7 @@ export const SettingButton: React.FC<SettingButtonProps> = (props) => (
     disabled={props.disabled}
     className={styles.button}
     type={props.type}
+    style={props.style}
   >
     <img src="/images/icons/setting.svg" alt="Setting" />
   </button>

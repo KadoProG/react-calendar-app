@@ -5,6 +5,7 @@ interface DeleteButtonProps {
   onClick?: () => void;
   disabled?: boolean;
   type?: HTMLButtonElement['type'];
+  style?: React.CSSProperties;
 }
 
 export const DeleteButton: React.FC<DeleteButtonProps> = (props) => (
@@ -13,6 +14,7 @@ export const DeleteButton: React.FC<DeleteButtonProps> = (props) => (
     disabled={props.disabled}
     className={styles.deleteButton}
     type={props.type}
+    style={props.style}
   >
     <img src="/images/icons/delete.svg" alt="Delete" />
   </button>

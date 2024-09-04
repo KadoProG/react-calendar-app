@@ -5,6 +5,7 @@ interface ButtonProps {
   onClick?: () => void;
   disabled?: boolean;
   type?: HTMLButtonElement['type'];
+  style?: React.CSSProperties;
 }
 
 /**
@@ -18,6 +19,7 @@ export const GoogleButton: React.FC<ButtonProps> = (props) => (
     disabled={props.disabled}
     onClick={props.onClick}
     type={props.type}
+    style={props.style}
   >
     <div className={styles.gsi_material_button_state} />
     <div className={styles.gsi_material_button_content_wrapper}>
