@@ -43,8 +43,8 @@ export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = 
 
   const { control, watch } = useForm<FetchCalendarForm>({
     defaultValues: {
-      start: '2024-08-20',
-      end: '2024-08-26',
+      start: dayjs().format('YYYY-MM-DD'),
+      end: dayjs().add(6, 'day').format('YYYY-MM-DD'),
       canFetch: false,
     },
   });
