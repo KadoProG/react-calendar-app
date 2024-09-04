@@ -14,17 +14,16 @@ export const CalendarHeader: React.FC = () => {
   const start = useWatch({ control, name: 'start' });
   const end = useWatch({ control, name: 'end' });
 
-  const startController = useController({
-    control,
-    name: 'start',
-  });
+  const startController = useController({ control, name: 'start' });
+  const endController = useController({ control, name: 'end' });
 
   const handleScrollDate = React.useCallback(
     (type: -1 | 1) => {
       const prev = dayjs(start).add(7 * type, 'day');
       startController.field.onChange(prev.toISOString());
+      endController.field.onChange(prev.add(6, 'day').toISOString());
     },
-    [startController, start]
+    [startController, start, endController]
   );
 
   const dateText = formatDateRange(dayjs(start), dayjs(end));
