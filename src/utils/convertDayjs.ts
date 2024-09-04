@@ -73,3 +73,26 @@ export const calculateIndexDifference = (
 
   return indexDifference;
 };
+
+/**
+ * 日付範囲をフォーマットする関数
+ *
+ * @param {string} start - 開始日 (dayjsフォーマットの文字列)
+ * @param {string} end - 終了日 (dayjsフォーマットの文字列)
+ * @returns {string} フォーマットされた日付範囲
+ */
+export const formatDateRange = (start: dayjs.Dayjs, end: dayjs.Dayjs): string => {
+  const startDate = dayjs(start);
+  const endDate = dayjs(end);
+
+  // 開始日と終了日が同じ月の場合
+  if (startDate.isSame(endDate, 'month')) {
+    return startDate.format('YYYY年MM月');
+  }
+
+  if (startDate.isSame(endDate, 'year')) {
+    return `${startDate.format('YYYY年MM')}~${endDate.format('MM')}月`;
+  }
+  // 異なる月の場合
+  return `${startDate.format('YYYY年MM月')}~${endDate.format('YYYY年MM月')}`;
+};
