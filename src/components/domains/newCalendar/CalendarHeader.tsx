@@ -7,7 +7,7 @@ import { useController, useWatch } from 'react-hook-form';
 import { Button } from '@/components/common/button/Button';
 import { SettingButton } from '@/components/common/button/SettingButton';
 
-export const CalenadarHeader: React.FC = () => {
+export const CalendarHeader: React.FC = () => {
   const { user } = React.useContext(AuthContext);
   const { control } = React.useContext(CalendarContext);
 
