@@ -41,6 +41,14 @@
     background-color: var(--color-primary-hover);
   }
 
+  &.start {
+    border-radius: 0 4px 4px 0; /* 右側の角を丸くする */
+  }
+
+  &.end {
+    border-radius: 4px 0 0 4px; /* 左側の角を丸くする */
+  }
+
   &__leave {
     opacity: 0.2;
   }
