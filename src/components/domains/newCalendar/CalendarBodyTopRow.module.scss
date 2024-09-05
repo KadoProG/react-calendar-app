@@ -22,3 +22,26 @@
     background-color: #2196f3;
   }
 }
+
+.calendarEvent {
+  width: 90%;
+  background-color: var(--color-primary);
+  color: #fff;
+  padding: 5px;
+  border-radius: 4px;
+  font-size: 12px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  z-index: 100;
+  cursor: pointer;
+  border: none;
+  &:hover {
+    background-color: var(--color-primary-hover);
+  }
+
+  &__leave {
+    opacity: 0.2;
+  }
+}

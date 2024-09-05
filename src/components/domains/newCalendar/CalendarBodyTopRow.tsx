@@ -17,11 +17,13 @@ interface CalendarBodyTopRowProps {
  */
 export const CalendarBodyTopRow: React.FC<CalendarBodyTopRowProps> = (props) => {
   // index値から日付を取得
-  const date = dayjs(props.start).add(props.i, 'day');
+  const date = React.useMemo(() => dayjs(props.start).add(props.i, 'day'), [props.start, props.i]);
 
   // 終日予定のうち、その日に該当するものを取得
-  const calendarEventsInAllDayInDay = props.calendarEventsInAllDay.filter((event) =>
-    dayjs(event.start!.date).isSame(date, 'day')
+  const calendarEventsInAllDayInDay = React.useMemo(
+    () =>
+      props.calendarEventsInAllDay.filter((event) => dayjs(event.start!.date).isSame(date, 'day')),
+    [props.calendarEventsInAllDay, date]
   );
 
   // 選択された日付と同じかどうか
@@ -46,9 +48,20 @@ export const CalendarBodyTopRow: React.FC<CalendarBodyTopRowProps> = (props) => 
     <div style={{ flex: 1, borderLeft: '1px solid var(--divider)' }}>
       <p style={{ textAlign: 'center' }}>{date.format('ddd')}</p>
       <p style={{ textAlign: 'center' }}>{date.date()}</p>
-      {calendarEventsInAllDayInDay.map((event) => (
-        <div key={event.id}>{event.summary}</div>
-      ))}
+      {calendarEventsInAllDayInDay.map((event) => {
+        const scheculeDiff = dayjs(event.end!.date).diff(dayjs(event.start!.date), 'day');
+        return (
+          <div
+            key={event.id}
+            className={styles.calendarEvent}
+            style={{
+              width: `${scheculeDiff * 100}%`,
+            }}
+          >
+            {event.summary}
+          </div>
+        );
+      })}
       <div style={{ position: 'relative' }}>
         {isSame && props.isDragging && (
           <div
