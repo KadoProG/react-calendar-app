@@ -51,23 +51,16 @@ export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = 
 
   const { start, end } = watch();
 
-  const startDayjs = React.useMemo(() => dayjs(start), [start]);
-  const endDayjs = React.useMemo(() => dayjs(end), [end]);
-
   const {
     data,
     isLoading: isCalendarEventsLoading,
     mutate,
-  } = useSWR(
-    calendars ? { calendars, start: startDayjs, end: endDayjs } : null,
-    fetchCalendarEvents,
-    {
-      // 自動fetchの無効化
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
-  );
+  } = useSWR(calendars ? { calendars, start, end } : null, fetchCalendarEvents, {
+    // 自動fetchの無効化
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 
   const calendarEvents = data ?? [];
 

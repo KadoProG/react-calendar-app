@@ -1,4 +1,3 @@
-import dayjs from '@/libs/dayjs';
 import { gapi } from 'gapi-script';
 
 export const fetchCalendars = async (): Promise<gapi.client.calendar.CalendarListEntry[]> => {
@@ -26,8 +25,8 @@ export const fetchCalendars = async (): Promise<gapi.client.calendar.CalendarLis
  */
 export const fetchCalendarEvents = async (args: {
   calendars: CalendarFeatLocalStorage[];
-  start: dayjs.Dayjs;
-  end: dayjs.Dayjs;
+  start: string;
+  end: string;
 }): Promise<(gapi.client.calendar.Event & { calendarId: string })[]> => {
   if (!args.calendars) {
     // eslint-disable-next-line no-console
@@ -46,8 +45,8 @@ export const fetchCalendarEvents = async (args: {
     try {
       const response = await gapi.client.calendar.events.list({
         calendarId,
-        timeMin: start.toISOString(),
-        timeMax: end.toISOString(),
+        timeMin: start,
+        timeMax: end,
         showDeleted: false,
         singleEvents: true,
         maxResults: 10,
