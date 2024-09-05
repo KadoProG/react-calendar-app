@@ -77,22 +77,58 @@ export const calculateIndexDifference = (
 /**
  * 日付範囲をフォーマットする関数
  *
- * @param {string} start - 開始日 (dayjsフォーマットの文字列)
- * @param {string} end - 終了日 (dayjsフォーマットの文字列)
+ * @param {dayjs.Dayjs} start - 開始日 (dayjsオブジェクト)
+ * @param {dayjs.Dayjs} end - 終了日 (dayjsオブジェクト)
+ * @param {string} rangeType - 範囲の種類 ('day', 'month', 'year')
  * @returns {string} フォーマットされた日付範囲
  */
-export const formatDateRange = (start: dayjs.Dayjs, end: dayjs.Dayjs): string => {
+export const formatDateRange = (
+  start: dayjs.Dayjs,
+  end: dayjs.Dayjs,
+  rangeType: 'day' | 'month' | 'year'
+): string => {
   const startDate = dayjs(start);
   const endDate = dayjs(end);
 
-  // 開始日と終了日が同じ月の場合
-  if (startDate.isSame(endDate, 'month')) {
-    return startDate.format('YYYY年MM月');
-  }
+  switch (rangeType) {
+    case 'day':
+      // 日単位で範囲を表示
+      if (startDate.isSame(endDate, 'day')) {
+        return startDate.format('YYYY年MM月DD日');
+      }
+      if (startDate.isSame(endDate, 'month')) {
+        return `${startDate.format('YYYY年MM月DD')}〜${endDate.format('DD日')}`;
+      }
+      if (startDate.isSame(endDate, 'year')) {
+        return `${startDate.format('YYYY年MM月DD日')}〜${endDate.format('MM月DD日')}`;
+      }
+      return `${startDate.format('YYYY年MM月DD日')}〜${endDate.format('YYYY年MM月DD日')}`;
 
-  if (startDate.isSame(endDate, 'year')) {
-    return `${startDate.format('YYYY年MM')}~${endDate.format('MM')}月`;
+    case 'month':
+      // 月単位で範囲を表示
+      if (startDate.isSame(endDate, 'month')) {
+        return startDate.format('YYYY年MM月');
+      }
+      if (startDate.isSame(endDate, 'year')) {
+        return `${startDate.format('YYYY年MM')}〜${endDate.format('MM月')}`;
+      }
+      return `${startDate.format('YYYY年MM月')}〜${endDate.format('YYYY年MM月')}`;
+
+    case 'year':
+      // 年単位で範囲を表示
+      if (startDate.isSame(endDate, 'year')) {
+        return startDate.format('YYYY年');
+      }
+      return `${startDate.format('YYYY')}〜${endDate.format('YYYY年')}`;
+
+    default:
+      // デフォルトは月単位でフォーマット
+      if (startDate.isSame(endDate, 'month')) {
+        return startDate.format('YYYY年MM月');
+      }
+      if (startDate.isSame(endDate, 'year')) {
+        return `${startDate.format('YYYY年MM月')}〜${endDate.format('MM月')}`;
+      }
+      return `${startDate.format('YYYY年MM月')}〜${endDate.format('YYYY年MM月')}`;
   }
-  // 異なる月の場合
-  return `${startDate.format('YYYY年MM月')}~${endDate.format('YYYY年MM月')}`;
 };

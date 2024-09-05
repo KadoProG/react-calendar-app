@@ -26,7 +26,8 @@ export const CalendarHeader: React.FC = () => {
     [startController, start, endController]
   );
 
-  const dateText = formatDateRange(dayjs(start), dayjs(end));
+  const dateText = formatDateRange(dayjs(start), dayjs(end), 'month');
+
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
       <div style={{ width: 38, height: 38 }}>
