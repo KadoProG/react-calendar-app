@@ -5,6 +5,7 @@ import React from 'react';
 import { useWatch } from 'react-hook-form';
 import { getMouseSelectedCalendar } from '@/components/domains/newCalendar/calendarUtils';
 import { CalendarBodyTopRow } from '@/components/domains/newCalendar/CalendarBodyTopRow';
+import { LEFT_WIDTH } from '@/const/const';
 
 export const CalendarBodyTop: React.FC = () => {
   const { control, calendarEvents } = React.useContext(CalendarContext);
@@ -13,7 +14,6 @@ export const CalendarBodyTop: React.FC = () => {
   const [selectedEndDay, setSelectedEndDay] = React.useState<dayjs.Dayjs | null>(null);
 
   const isMouseDownRef = React.useRef<boolean>(false);
-  const leftElementRef = React.useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = React.useState<boolean>(false);
 
   const start = useWatch({ control, name: 'start' });
@@ -25,7 +25,7 @@ export const CalendarBodyTop: React.FC = () => {
 
   const handleMouseDown = React.useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      const { xIndex } = getMouseSelectedCalendar(e, leftElementRef.current!.clientWidth, 7);
+      const { xIndex } = getMouseSelectedCalendar(e, 7);
       const resultDate = dayjs(start).add(xIndex, 'day');
 
       setSelectedStartDay(resultDate);
@@ -39,7 +39,7 @@ export const CalendarBodyTop: React.FC = () => {
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (!isMouseDownRef.current) return;
       setIsDragging(true);
-      const { xIndex } = getMouseSelectedCalendar(e, leftElementRef.current!.clientWidth, 7);
+      const { xIndex } = getMouseSelectedCalendar(e, 7);
       const resultDate = dayjs(start).add(xIndex, 'day');
       setSelectedEndDay(resultDate);
     },
@@ -53,12 +53,12 @@ export const CalendarBodyTop: React.FC = () => {
 
   return (
     <div
-      style={{ display: 'flex' }}
+      style={{ display: 'flex', minHeight: 72 }}
       onMouseMove={(e) => handleMouseMove(e)}
       onMouseDown={(e) => handleMouseDown(e)}
       onMouseUp={handleMouseUp}
     >
-      <div ref={leftElementRef}>
+      <div style={{ minWidth: LEFT_WIDTH }}>
         <Button style={{ padding: '2px 4px' }}>
           ＋<br />
           新規

@@ -6,6 +6,7 @@ import React from 'react';
 import { useController, useWatch } from 'react-hook-form';
 import { Button } from '@/components/common/button/Button';
 import { SettingButton } from '@/components/common/button/SettingButton';
+import { Link } from 'react-router-dom';
 
 export const CalendarHeader: React.FC = () => {
   const { user } = React.useContext(AuthContext);
@@ -30,13 +31,13 @@ export const CalendarHeader: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-      <div style={{ width: 38, height: 38 }}>
+      <Link to="/" style={{ width: 38, height: 38 }}>
         <img
           src="/images/icons/vite.svg"
           alt="calendar"
           style={{ width: '100%', height: '100%' }}
         />
-      </div>
+      </Link>
       <p style={{ fontWeight: 'bold' }}>{dateText}</p>
       <Button onClick={() => handleScrollDate(-1)}>＜</Button>
       <Button onClick={() => handleScrollDate(1)}>＞</Button>

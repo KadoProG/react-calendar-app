@@ -1,3 +1,4 @@
+import { LEFT_WIDTH } from '@/const/const';
 import React from 'react';
 
 /**
@@ -7,12 +8,11 @@ import React from 'react';
  */
 export const getMouseSelectedCalendar = (
   e: React.MouseEvent<HTMLElement>,
-  leftWidth: number,
   weekDisplayCount: number
 ) => {
   const rect = e.currentTarget.getBoundingClientRect();
-  const nowLeftPosition = e.clientX - rect.left - leftWidth; // 現在の左位置
-  const xIndex = Math.floor((nowLeftPosition / (rect.width - leftWidth)) * weekDisplayCount);
+  const nowLeftPosition = e.clientX - rect.left - LEFT_WIDTH; // 現在の左位置
+  const xIndex = Math.floor((nowLeftPosition / (rect.width - LEFT_WIDTH)) * weekDisplayCount);
 
   return { xIndex };
 };
