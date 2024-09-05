@@ -1,68 +1,49 @@
 import styles from '@/components/domains/newCalendar/CalendarBodyMain.module.scss';
 import { CalendarBodyMainRow } from '@/components/domains/newCalendar/CalendarBodyMainRow';
-import { getMouseSelectedCalendar } from '@/components/domains/newCalendar/calendarUtils';
 import { LEFT_WIDTH } from '@/const/const';
 import { CalendarConfigContext } from '@/contexts/CalendarConfigContext';
-import { CalendarContext } from '@/contexts/CalendarContext';
 import dayjs from '@/libs/dayjs';
+import { splitCalendarEvents } from '@/utils/convertDayjs';
 import React from 'react';
-import { useWatch } from 'react-hook-form';
 
-export const CalendarBodyMain: React.FC = () => {
-  const { control, calendarEvents } = React.useContext(CalendarContext);
-  const start = useWatch({ control, name: 'start' });
+interface CalendarBodyMainProps {
+  start: dayjs.Dayjs;
+  calendarEvents: (gapi.client.calendar.Event & { calendarId: string })[];
+  selectedStartDay: dayjs.Dayjs | null;
+  selectedEndDay: dayjs.Dayjs | null;
+  isMouseDownRef: React.MutableRefObject<'allday' | 'timely' | null>;
+  isDragging: boolean;
+}
+
+export const CalendarBodyMain: React.FC<CalendarBodyMainProps> = (props) => {
   const {
     config: { heightPerHour, divisionsPerHour },
   } = React.useContext(CalendarConfigContext);
 
-  const [selectedStartDay, setSelectedStartDay] = React.useState<dayjs.Dayjs | null>(null);
-  const [selectedEndDay, setSelectedEndDay] = React.useState<dayjs.Dayjs | null>(null);
-
-  const [isDragging, setIsDragging] = React.useState<boolean>(false);
-
-  const isMouseDownRef = React.useRef<boolean>(false);
-
   const calendarEventsInTimely = React.useMemo(
-    () => calendarEvents.filter((event) => !!event.start?.dateTime && !!event.end?.dateTime),
-    [calendarEvents]
+    () => props.calendarEvents.filter((event) => !!event.start?.dateTime && !!event.end?.dateTime),
+    [props.calendarEvents]
   );
 
-  const handleMouseDown = React.useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      const { xIndex } = getMouseSelectedCalendar(e, 7);
-      const resultDate = dayjs(start).add(xIndex, 'day');
-
-      setSelectedStartDay(resultDate);
-      setSelectedEndDay(resultDate);
-      isMouseDownRef.current = true;
-    },
-    [start]
+  const splitedSelectedCalendarEvents = React.useMemo(
+    () =>
+      props.isDragging
+        ? splitCalendarEvents([
+            {
+              id: '1',
+              title: '',
+              start: props.selectedStartDay,
+              end: props.selectedEndDay,
+              isAllDayEvent: false,
+            },
+          ])
+        : undefined,
+    [props.selectedStartDay, props.selectedEndDay, props.isDragging]
   );
-
-  const handleMouseMove = React.useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      if (!isMouseDownRef.current) return;
-      setIsDragging(true);
-      const { xIndex } = getMouseSelectedCalendar(e, 7);
-      const resultDate = dayjs(start).add(xIndex, 'day');
-      setSelectedEndDay(resultDate);
-    },
-    [start]
-  );
-
-  const handleMouseUp = React.useCallback(() => {
-    setIsDragging(false);
-    isMouseDownRef.current = false;
-  }, []);
 
   return (
     <div>
-      <div
-        style={{ display: 'flex' }}
-        onMouseMove={(e) => handleMouseMove(e)}
-        onMouseDown={(e) => handleMouseDown(e)}
-        onMouseUp={handleMouseUp}
-      >
+      <div style={{ display: 'flex' }}>
         <div style={{ minWidth: LEFT_WIDTH }}>
           {Array.from({ length: 24 }).map((_, i) => {
             const time = dayjs().startOf('day').add(i, 'hour').format('HH:mm');
@@ -78,13 +59,14 @@ export const CalendarBodyMain: React.FC = () => {
             <CalendarBodyMainRow
               key={i}
               i={i}
-              isDragging={isDragging}
-              selectedStartDay={selectedStartDay}
-              selectedEndDay={selectedEndDay}
-              start={dayjs(start)}
+              isDragging={props.isDragging}
+              selectedStartDay={props.selectedStartDay}
+              selectedEndDay={props.selectedEndDay}
+              start={props.start}
               calendarEventsInTimely={calendarEventsInTimely}
               divisionsPerHour={divisionsPerHour}
               heightPerHour={heightPerHour}
+              splitedSelectedCalendarEvents={splitedSelectedCalendarEvents}
             />
           ))}
         </div>

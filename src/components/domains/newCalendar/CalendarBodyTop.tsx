@@ -1,63 +1,26 @@
 import dayjs from '@/libs/dayjs';
 import { Button } from '@/components/common/button/Button';
-import { CalendarContext } from '@/contexts/CalendarContext';
 import React from 'react';
-import { useWatch } from 'react-hook-form';
-import { getMouseSelectedCalendar } from '@/components/domains/newCalendar/calendarUtils';
 import { CalendarBodyTopRow } from '@/components/domains/newCalendar/CalendarBodyTopRow';
 import { LEFT_WIDTH } from '@/const/const';
 
-export const CalendarBodyTop: React.FC = () => {
-  const { control, calendarEvents } = React.useContext(CalendarContext);
+interface CalendarBodyTopProps {
+  start: dayjs.Dayjs;
+  calendarEvents: (gapi.client.calendar.Event & { calendarId: string })[];
+  selectedStartDay: dayjs.Dayjs | null;
+  selectedEndDay: dayjs.Dayjs | null;
+  isMouseDownRef: React.MutableRefObject<'allday' | 'timely' | null>;
+  isDragging: boolean;
+}
 
-  const [selectedStartDay, setSelectedStartDay] = React.useState<dayjs.Dayjs | null>(null);
-  const [selectedEndDay, setSelectedEndDay] = React.useState<dayjs.Dayjs | null>(null);
-
-  const isMouseDownRef = React.useRef<boolean>(false);
-  const [isDragging, setIsDragging] = React.useState<boolean>(false);
-
-  const start = useWatch({ control, name: 'start' });
-
+export const CalendarBodyTop: React.FC<CalendarBodyTopProps> = (props) => {
   const calendarEventsInAllDay = React.useMemo(
-    () => calendarEvents.filter((event) => !!event.start?.date && !!event.end?.date),
-    [calendarEvents]
+    () => props.calendarEvents.filter((event) => !!event.start?.date && !!event.end?.date),
+    [props.calendarEvents]
   );
-
-  const handleMouseDown = React.useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      const { xIndex } = getMouseSelectedCalendar(e, 7);
-      const resultDate = dayjs(start).add(xIndex, 'day');
-
-      setSelectedStartDay(resultDate);
-      setSelectedEndDay(resultDate);
-      isMouseDownRef.current = true;
-    },
-    [start]
-  );
-
-  const handleMouseMove = React.useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      if (!isMouseDownRef.current) return;
-      setIsDragging(true);
-      const { xIndex } = getMouseSelectedCalendar(e, 7);
-      const resultDate = dayjs(start).add(xIndex, 'day');
-      setSelectedEndDay(resultDate);
-    },
-    [start]
-  );
-
-  const handleMouseUp = React.useCallback(() => {
-    setIsDragging(false);
-    isMouseDownRef.current = false;
-  }, []);
 
   return (
-    <div
-      style={{ display: 'flex', minHeight: 72 }}
-      onMouseMove={(e) => handleMouseMove(e)}
-      onMouseDown={(e) => handleMouseDown(e)}
-      onMouseUp={handleMouseUp}
-    >
+    <div style={{ display: 'flex', minHeight: 72 }}>
       <div style={{ minWidth: LEFT_WIDTH }}>
         <Button style={{ padding: '2px 4px' }}>
           ＋<br />
@@ -69,12 +32,12 @@ export const CalendarBodyTop: React.FC = () => {
         {Array.from({ length: 7 }).map((_, i) => (
           <CalendarBodyTopRow
             key={i}
-            start={dayjs(start)}
+            start={props.start}
             calendarEventsInAllDay={calendarEventsInAllDay}
             i={i}
-            selectedStartDay={selectedStartDay}
-            selectedEndDay={selectedEndDay}
-            isDragging={isDragging}
+            selectedStartDay={props.selectedStartDay}
+            selectedEndDay={props.selectedEndDay}
+            isDragging={props.isDragging}
           />
         ))}
       </div>

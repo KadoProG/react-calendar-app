@@ -1,3 +1,13 @@
+.dayColumn {
+  background-color: var(--background-paper);
+  width: 100%;
+  position: relative;
+  border-left: 1px solid var(--divider);
+
+  flex: 1;
+  border-left: 1px solid var(--divider);
+}
+
 .timeCell {
   position: relative;
   cursor: pointer;
@@ -21,5 +31,30 @@
     &:hover {
       background: initial;
     }
+  }
+}
+
+.selectedItem {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  height: 30px;
+  background-color: rgba(33, 150, 243, 0.3); /* ハイライトの色 */
+  border: 1px solid #2196f3; /* ハイライトの境界線 */
+  user-select: none;
+  -webkit-user-drag: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -moz-user-drag: none;
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: #2196f3;
   }
 }

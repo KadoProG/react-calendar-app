@@ -1,6 +1,8 @@
 import styles from '@/components/domains/newCalendar/CalendarBodyMainRow.module.scss';
 import dayjs from '@/libs/dayjs';
+import { calculateIndexDifference, splitCalendarEvents } from '@/utils/convertDayjs';
 import React from 'react';
+
 interface CalendarBodyMainRowProps {
   start: dayjs.Dayjs;
   calendarEventsInTimely: (gapi.client.calendar.Event & { calendarId: string })[];
@@ -10,6 +12,7 @@ interface CalendarBodyMainRowProps {
   isDragging: boolean;
   divisionsPerHour: number;
   heightPerHour: number;
+  splitedSelectedCalendarEvents?: ReturnType<typeof splitCalendarEvents>;
 }
 
 /**
@@ -33,52 +36,81 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
     [props.calendarEventsInTimely, date, props.i]
   );
 
-  // 選択された日付と同じかどうか
-  const isSame = React.useMemo(
-    () => props.selectedStartDay && props.selectedStartDay.isSame(date, 'day'),
-    [props.selectedStartDay, date]
-  );
+  // // 選択された日付と同じかどうか
+  // const isSame = React.useMemo(
+  //   () => props.selectedStartDay && props.selectedStartDay.isSame(date, 'day'),
+  //   [props.selectedStartDay, date]
+  // );
 
-  // 選択された日付の差分
-  const diff = React.useMemo(() => {
-    if (!props.selectedStartDay || !props.selectedEndDay) return 0;
-    return Math.abs(props.selectedEndDay.diff(props.selectedStartDay, 'day')) + 1;
-  }, [props.selectedStartDay, props.selectedEndDay]);
+  // // 選択された日付の差分
+  // const diff = React.useMemo(() => {
+  //   if (!props.selectedStartDay || !props.selectedEndDay) return 0;
+  //   return Math.abs(props.selectedEndDay.diff(props.selectedStartDay, 'day')) + 1;
+  // }, [props.selectedStartDay, props.selectedEndDay]);
 
-  // 選択された日付の左位置（startからの日数、endがstartより前の場合のみ）
-  const leftPosition = React.useMemo(() => {
-    if (!props.selectedEndDay || props.selectedEndDay.isAfter(props.selectedStartDay)) return 0;
-    return props.selectedEndDay.diff(props.selectedStartDay, 'day');
-  }, [props.selectedStartDay, props.selectedEndDay]);
+  // // 選択された日付の左位置（startからの日数、endがstartより前の場合のみ）
+  // const leftPosition = React.useMemo(() => {
+  //   if (!props.selectedEndDay || props.selectedEndDay.isAfter(props.selectedStartDay)) return 0;
+  //   return props.selectedEndDay.diff(props.selectedStartDay, 'day');
+  // }, [props.selectedStartDay, props.selectedEndDay]);
 
   // １日ずつ（Weekに対する列）の表示
   return (
-    <div style={{ flex: 1, borderLeft: '1px solid var(--divider)' }}>
+    <div className={styles.dayColumn}>
       {/* ユーザが触れる時刻の描写 */}
       {[...Array(24 * props.divisionsPerHour)].map((_, hourIndex) => {
-        // const dayStart = date
-        //   .startOf('day')
-        //   .add(Math.floor(hourIndex / props.divisionsPerHour), 'hour');
+        const dayStart = date
+          .startOf('day')
+          .add(Math.floor(hourIndex / props.divisionsPerHour), 'hour');
 
-        // const sameDayContentEvent = splitedSelectedCalendarEvent?.find(
-        //   (event) => dayStart.format('YYYY-MM-DD') === event.splitStart.format('YYYY-MM-DD')
-        // );
+        const sameDayContentEvent = props.splitedSelectedCalendarEvents?.find(
+          (event) => dayStart.format('YYYY-MM-DD') === event.splitStart.format('YYYY-MM-DD')
+        );
 
-        console.log('test'); // eslint-disable-line no-console
         return (
           <div
             key={hourIndex}
-            className={`${styles.timeCell} ${
-              // sameDayContentEvent ? styles.selected : ''
-              ''
-            }
+            className={`${styles.timeCell} ${sameDayContentEvent ? styles.selected : ''}
                ${(hourIndex + 1) % props.divisionsPerHour === 0 ? styles.drawLine : ''}`}
             style={{ height: props.heightPerHour / props.divisionsPerHour }}
           />
         );
       })}
+
+      {props.splitedSelectedCalendarEvents
+        ?.filter((event) => date.isSame(event.splitStart, 'day'))
+        .map((event, i) => {
+          const sizeIndex =
+            Math.abs(
+              calculateIndexDifference(event.splitStart, event.splitEnd, props.divisionsPerHour)
+            ) + 1;
+
+          return (
+            <div
+              key={i}
+              className={styles.selectedItem}
+              style={{
+                top: `${(calculateIndexDifference(date.startOf('day'), event.splitStart, props.divisionsPerHour) * props.heightPerHour) / props.divisionsPerHour}px`,
+                height: `${(sizeIndex * props.heightPerHour) / props.divisionsPerHour}px`,
+              }}
+            >
+              <small>
+                {(props.selectedStartDay! <= props.selectedEndDay!
+                  ? props.selectedStartDay!
+                  : props.selectedEndDay!
+                ).format('HH:mm')}
+                ~
+                {(props.selectedStartDay! > props.selectedEndDay!
+                  ? props.selectedStartDay
+                  : props.selectedEndDay)!
+                  .add(60 / props.divisionsPerHour, 'minute')
+                  .format('HH:mm')}
+              </small>
+            </div>
+          );
+        })}
+
       {calendarEventsInTimelyInDay.map((event) => {
-        // const startDate = dayjs(event.start!.date);
         const endDate = dayjs(event.end!.date);
         const scheculeDiff = endDate.diff(dayjs(date), 'day');
         const overDiff = !(scheculeDiff + props.i < 7);
@@ -101,21 +133,6 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
           </div>
         );
       })}
-      <div style={{ position: 'relative' }}>
-        {isSame && props.isDragging && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: leftPosition * 100,
-              width: diff * 100,
-              height: 24,
-              backgroundColor: 'rgba(0, 0, 0, 0.1)',
-              zIndex: 2,
-            }}
-          ></div>
-        )}
-      </div>
     </div>
   );
 };

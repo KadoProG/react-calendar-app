@@ -13,6 +13,7 @@ export const getMouseSelectedCalendar = (
   const rect = e.currentTarget.getBoundingClientRect();
   const nowLeftPosition = e.clientX - rect.left - LEFT_WIDTH; // 現在の左位置
   const xIndex = Math.floor((nowLeftPosition / (rect.width - LEFT_WIDTH)) * weekDisplayCount);
+  const yIndex = Math.floor((e.clientY - rect.top) / (rect.height / 24));
 
-  return { xIndex };
+  return { xIndex, yIndex };
 };
