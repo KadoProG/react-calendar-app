@@ -7,12 +7,14 @@ import { getMouseSelectedCalendar } from '@/components/domains/newCalendar/calen
 import { CalendarContext } from '@/contexts/CalendarContext';
 import { useWatch } from 'react-hook-form';
 import { CalendarConfigContext } from '@/contexts/CalendarConfigContext';
+import { KeyDownContext } from '@/contexts/KeyDownContext';
 
 export const NewCalendar: React.FC = () => {
   const { control, calendarEvents } = React.useContext(CalendarContext);
   const {
     config: { divisionsPerHour },
   } = React.useContext(CalendarConfigContext);
+  const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
 
   const start = dayjs(useWatch({ control, name: 'start' })).startOf('day');
 
@@ -68,6 +70,21 @@ export const NewCalendar: React.FC = () => {
     setIsDragging(false);
     isMouseDownRef.current = null;
   }, []);
+
+  React.useEffect(() => {
+    if (isDragging) {
+      addKeyDownEvent({
+        id: 0,
+        key: 'Escape',
+        callback: () => {
+          isMouseDownRef.current = null;
+          setIsDragging(false);
+        },
+      });
+    } else {
+      removeKeyDownEvent(0);
+    }
+  }, [addKeyDownEvent, removeKeyDownEvent, isDragging]);
 
   return (
     <div style={{ height: '100svh', display: 'flex', flexDirection: 'column' }}>
