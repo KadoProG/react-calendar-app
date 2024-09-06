@@ -1,17 +1,17 @@
 .timeLabel {
-  cursor: default;
   position: relative;
-  &::after {
-    display: none;
-  }
-  &:hover {
-    background-color: initial;
-  }
-  & p {
+
+  & > p {
     position: absolute;
     top: -9px;
     right: 4px;
     font-size: 12px;
     color: var(--color-secondary);
+
+    user-select: none;
+    -webkit-user-drag: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -moz-user-drag: none;
   }
 }

@@ -47,7 +47,7 @@ export const CalendarBodyMain: React.FC<CalendarBodyMainProps> = (props) => {
           const time = dayjs().startOf('day').add(i, 'hour').format('HH:mm');
           return (
             <div className={styles.timeLabel} key={i} style={{ height: heightPerHour }}>
-              <p>{time}</p>
+              {i !== 0 && <p>{time}</p>}
             </div>
           );
         })}
