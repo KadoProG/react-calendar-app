@@ -11,12 +11,12 @@ import { KeyDownContext } from '@/contexts/KeyDownContext';
 
 export const NewCalendar: React.FC = () => {
   const { control, calendarEvents } = React.useContext(CalendarContext);
-  const {
-    config: { divisionsPerHour },
-  } = React.useContext(CalendarConfigContext);
+  const { config } = React.useContext(CalendarConfigContext);
   const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
 
   const start = dayjs(useWatch({ control, name: 'start' })).startOf('day');
+
+  const scrollRef = React.useRef<HTMLDivElement>(null);
 
   const [selectedStartDay, setSelectedStartDay] = React.useState<dayjs.Dayjs | null>(null);
   const [selectedEndDay, setSelectedEndDay] = React.useState<dayjs.Dayjs | null>(null);
@@ -28,7 +28,7 @@ export const NewCalendar: React.FC = () => {
 
   const handleMouseDown = React.useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      const { xIndex, yIndex } = getMouseSelectedCalendar(e, 7, divisionsPerHour, topHeight);
+      const { xIndex, yIndex } = getMouseSelectedCalendar(e, scrollRef.current!, config, topHeight);
 
       if (yIndex < 0) {
         const resultDate = start.add(xIndex, 'day');
@@ -38,13 +38,13 @@ export const NewCalendar: React.FC = () => {
         return;
       }
 
-      const resultDate = start.add(xIndex, 'day').add(yIndex / divisionsPerHour, 'hour');
+      const resultDate = start.add(xIndex, 'day').add(yIndex / config.divisionsPerHour, 'hour');
 
       setSelectedStartDay(resultDate);
       setSelectedEndDay(resultDate);
       isMouseDownRef.current = 'timely';
     },
-    [start, divisionsPerHour, topHeight]
+    [start, topHeight, config]
   );
 
   const handleMouseMove = React.useCallback(
@@ -52,7 +52,7 @@ export const NewCalendar: React.FC = () => {
       if (!isMouseDownRef.current) return;
       setIsDragging(true);
 
-      const { xIndex, yIndex } = getMouseSelectedCalendar(e, 7, divisionsPerHour, topHeight);
+      const { xIndex, yIndex } = getMouseSelectedCalendar(e, scrollRef.current!, config, topHeight);
 
       if (isMouseDownRef.current === 'allday') {
         const resultDate = start.add(xIndex, 'day');
@@ -60,10 +60,10 @@ export const NewCalendar: React.FC = () => {
         return;
       }
 
-      const resultDate = start.add(xIndex, 'day').add(yIndex / divisionsPerHour, 'hour');
+      const resultDate = start.add(xIndex, 'day').add(yIndex / config.divisionsPerHour, 'hour');
       setSelectedEndDay(resultDate);
     },
-    [start, divisionsPerHour, topHeight]
+    [start, config, topHeight]
   );
 
   const handleMouseUp = React.useCallback(() => {
@@ -106,6 +106,7 @@ export const NewCalendar: React.FC = () => {
           isDragging={isDragging && isMouseDownRef.current === 'allday'}
         />
         <div
+          ref={scrollRef}
           style={{
             height: '100%',
             overflow: 'scroll',

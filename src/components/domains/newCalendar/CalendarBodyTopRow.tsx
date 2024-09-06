@@ -52,7 +52,7 @@ export const CalendarBodyTopRow: React.FC<CalendarBodyTopRowProps> = (props) => 
   }, [props.selectedStartDay, props.selectedEndDay]);
 
   return (
-    <div style={{ flex: 1, borderLeft: '1px solid var(--divider)' }}>
+    <div className={styles.dayColumn}>
       <p style={{ textAlign: 'center' }}>{date.format('ddd')}</p>
       <p style={{ textAlign: 'center' }}>{date.date()}</p>
       {calendarEventsInAllDayInDay.map((event) => {

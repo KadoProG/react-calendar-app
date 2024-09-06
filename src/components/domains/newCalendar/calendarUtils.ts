@@ -10,15 +10,21 @@ import React from 'react';
  */
 export const getMouseSelectedCalendar = (
   e: React.MouseEvent<HTMLElement>,
-  weekDisplayCount: number,
-  divisionsPerHour: number,
+  scrollBase: HTMLElement,
+  config: CalendarConfig,
   topHeight: number
 ) => {
   const rect = e.currentTarget.getBoundingClientRect();
   const nowLeftPosition = e.clientX - rect.left - LEFT_WIDTH; // 現在の左位置
-  const xIndex = Math.floor((nowLeftPosition / (rect.width - LEFT_WIDTH)) * weekDisplayCount);
-  const nowTopPosition = e.clientY - rect.top - topHeight; // 現在の上位置
-  const yIndex = Math.floor((nowTopPosition / (rect.height - topHeight)) * 24 * divisionsPerHour);
+  const xIndex = Math.floor(
+    (nowLeftPosition / (rect.width - LEFT_WIDTH)) * config.weekDisplayCount
+  );
+
+  if (e.clientY < rect.top + topHeight) {
+    return { xIndex, yIndex: -1 };
+  }
+  const nowTopPosition = e.clientY - rect.top - topHeight + scrollBase.scrollTop; // 現在の上位置
+  const yIndex = Math.floor(nowTopPosition / (config.heightPerHour / config.divisionsPerHour));
 
   return { xIndex, yIndex };
 };
