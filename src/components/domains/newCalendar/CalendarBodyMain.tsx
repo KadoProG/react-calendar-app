@@ -1,24 +1,20 @@
 import styles from '@/components/domains/newCalendar/CalendarBodyMain.module.scss';
 import { CalendarBodyMainRow } from '@/components/domains/newCalendar/CalendarBodyMainRow';
 import { LEFT_WIDTH } from '@/const/const';
-import { CalendarConfigContext } from '@/contexts/CalendarConfigContext';
 import dayjs from '@/libs/dayjs';
 import { splitCalendarEvents } from '@/utils/convertDayjs';
 import React from 'react';
 
 interface CalendarBodyMainProps {
   start: dayjs.Dayjs;
-  calendarEvents: (gapi.client.calendar.Event & { calendarId: string })[];
+  calendarEvents: CalendarEventWithCalendarId[];
   selectedStartDay: dayjs.Dayjs | null;
   selectedEndDay: dayjs.Dayjs | null;
   isDragging: boolean;
+  config: CalendarConfig;
 }
 
 export const CalendarBodyMain: React.FC<CalendarBodyMainProps> = (props) => {
-  const {
-    config: { heightPerHour, divisionsPerHour },
-  } = React.useContext(CalendarConfigContext);
-
   const calendarEventsInTimely = React.useMemo(
     () => props.calendarEvents.filter((event) => !!event.start?.dateTime && !!event.end?.dateTime),
     [props.calendarEvents]
@@ -46,7 +42,11 @@ export const CalendarBodyMain: React.FC<CalendarBodyMainProps> = (props) => {
         {Array.from({ length: 24 }).map((_, i) => {
           const time = dayjs().startOf('day').add(i, 'hour').format('HH:mm');
           return (
-            <div className={styles.timeLabel} key={i} style={{ height: heightPerHour }}>
+            <div
+              className={styles.timeLabel}
+              key={i}
+              style={{ height: props.config.heightPerHour }}
+            >
               {i !== 0 && <p>{time}</p>}
             </div>
           );
@@ -62,9 +62,8 @@ export const CalendarBodyMain: React.FC<CalendarBodyMainProps> = (props) => {
             selectedEndDay={props.selectedEndDay}
             start={props.start}
             calendarEventsInTimely={calendarEventsInTimely}
-            divisionsPerHour={divisionsPerHour}
-            heightPerHour={heightPerHour}
             splitedSelectedCalendarEvents={splitedSelectedCalendarEvents}
+            config={props.config}
           />
         ))}
       </div>

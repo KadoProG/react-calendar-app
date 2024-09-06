@@ -37,3 +37,11 @@ interface CalendarConfig {
 type CalendarFeatLocalStorage = gapi.client.calendar.CalendarListEntry & {
   hasValid: boolean;
 };
+
+/**
+ * カレンダーイベント
+ */
+type CalendarEventWithCalendarId = gapi.client.calendar.Event & {
+  calendarId: string;
+  backgroundColor: string;
+};

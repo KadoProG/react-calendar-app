@@ -7,10 +7,11 @@ import { LEFT_WIDTH } from '@/const/const';
 interface CalendarBodyTopProps {
   setTopHeight: React.Dispatch<React.SetStateAction<number>>;
   start: dayjs.Dayjs;
-  calendarEvents: (gapi.client.calendar.Event & { calendarId: string })[];
+  calendarEvents: CalendarEventWithCalendarId[];
   selectedStartDay: dayjs.Dayjs | null;
   selectedEndDay: dayjs.Dayjs | null;
   isDragging: boolean;
+  config: CalendarConfig;
 }
 
 export const CalendarBodyTop: React.FC<CalendarBodyTopProps> = (props) => {
@@ -57,6 +58,7 @@ export const CalendarBodyTop: React.FC<CalendarBodyTopProps> = (props) => {
             selectedStartDay={props.selectedStartDay}
             selectedEndDay={props.selectedEndDay}
             isDragging={props.isDragging}
+            config={props.config}
           />
         ))}
       </div>

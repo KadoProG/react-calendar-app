@@ -5,11 +5,12 @@ import React from 'react';
 
 interface CalendarBodyTopRowProps {
   start: dayjs.Dayjs;
-  calendarEventsInAllDay: (gapi.client.calendar.Event & { calendarId: string })[];
+  calendarEventsInAllDay: CalendarEventWithCalendarId[];
   i: number;
   selectedStartDay: dayjs.Dayjs | null;
   selectedEndDay: dayjs.Dayjs | null;
   isDragging: boolean;
+  config: CalendarConfig;
 }
 
 /**
@@ -52,9 +53,14 @@ export const CalendarBodyTopRow: React.FC<CalendarBodyTopRowProps> = (props) => 
   }, [props.selectedStartDay, props.selectedEndDay]);
 
   return (
-    <div className={styles.dayColumn}>
+    <div
+      className={styles.dayColumn}
+      style={{ width: `calc(100% / ${props.config.weekDisplayCount})` }}
+    >
       <p style={{ textAlign: 'center' }}>{date.format('ddd')}</p>
       <p style={{ textAlign: 'center' }}>{date.date()}</p>
+
+      {/* カレンダーイベント */}
       {calendarEventsInAllDayInDay.map((event) => {
         const startDate = dayjs(event.start!.date);
         const endDate = dayjs(event.end!.date);
@@ -62,15 +68,17 @@ export const CalendarBodyTopRow: React.FC<CalendarBodyTopRowProps> = (props) => 
         const overDiff = !(scheculeDiff + props.i < 7);
         const resultDiff = overDiff ? 7 - props.i : scheculeDiff + props.i;
         return (
-          <div
+          <button
             key={event.id}
             className={`${styles.calendarEvent} ${startDate.isBefore(date, 'day') ? styles.start : ''} ${overDiff ? styles.end : ''}`}
-            style={{ width: `${resultDiff * 100}%` }}
+            style={{ width: `${resultDiff * 100}%`, backgroundColor: event.backgroundColor }}
           >
-            {event.summary}
-          </div>
+            <p>{event.summary}</p>
+          </button>
         );
       })}
+
+      {/* 選択時のハイライト表示 */}
       <div style={{ position: 'relative' }}>
         {isSame && props.isDragging && (
           <div

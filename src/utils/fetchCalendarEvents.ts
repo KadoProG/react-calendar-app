@@ -27,14 +27,14 @@ export const fetchCalendarEvents = async (args: {
   calendars: CalendarFeatLocalStorage[];
   start: string;
   end: string;
-}): Promise<(gapi.client.calendar.Event & { calendarId: string })[]> => {
+}): Promise<CalendarEventWithCalendarId[]> => {
   if (!args.calendars) {
     // eslint-disable-next-line no-console
     console.warn('No args.calendars found');
     return [];
   }
 
-  const allEvents: (gapi.client.calendar.Event & { calendarId: string })[] = [];
+  const allEvents: CalendarEventWithCalendarId[] = [];
   const { start, end, calendars } = args;
 
   // APIからイベントを取得する関数
@@ -55,7 +55,11 @@ export const fetchCalendarEvents = async (args: {
 
       const events = response.result.items;
       if (events) {
-        const newEvents = events.map((event) => ({ ...event, calendarId }));
+        const newEvents = events.map((event) => ({
+          ...event,
+          calendarId,
+          backgroundColor: calendar.backgroundColor ?? '',
+        }));
         allEvents.push(...newEvents);
       }
     } catch (error) {

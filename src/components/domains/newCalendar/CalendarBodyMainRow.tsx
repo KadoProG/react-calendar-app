@@ -5,33 +5,33 @@ import React from 'react';
 
 interface CalendarBodyMainRowProps {
   start: dayjs.Dayjs;
-  calendarEventsInTimely: (gapi.client.calendar.Event & { calendarId: string })[];
+  calendarEventsInTimely: CalendarEventWithCalendarId[];
   i: number;
   selectedStartDay: dayjs.Dayjs | null;
   selectedEndDay: dayjs.Dayjs | null;
   isDragging: boolean;
-  divisionsPerHour: number;
-  heightPerHour: number;
   splitedSelectedCalendarEvents?: ReturnType<typeof splitCalendarEvents>;
+  config: CalendarConfig;
 }
 
 /**
  * カレンダー時刻部分の１行を描写する
  */
 export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) => {
+  const { heightPerHour, divisionsPerHour } = props.config;
   // index値から日付を取得
   const date = React.useMemo(
     () => props.start.startOf('day').add(props.i, 'day'),
     [props.start, props.i]
   );
 
-  // 終日予定のうち、その日に該当するものを取得
+  // 時刻付き予定のうち、その日に該当するものを取得
   const calendarEventsInTimelyInDay = React.useMemo(
     () =>
       props.calendarEventsInTimely.filter(
         (event) =>
-          dayjs(event.start!.date).isSame(date, 'day') ||
-          (props.i === 0 && dayjs(event.start!.date).isBefore(date, 'day'))
+          dayjs(event.start!.dateTime).isSame(date, 'day') ||
+          (props.i === 0 && dayjs(event.start!.dateTime).isBefore(date, 'day'))
       ),
     [props.calendarEventsInTimely, date, props.i]
   );
@@ -40,10 +40,8 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
   return (
     <div className={styles.dayColumn}>
       {/* ユーザが触れる時刻の描写 */}
-      {[...Array(24 * props.divisionsPerHour)].map((_, hourIndex) => {
-        const dayStart = date
-          .startOf('day')
-          .add(Math.floor(hourIndex / props.divisionsPerHour), 'hour');
+      {[...Array(24 * divisionsPerHour)].map((_, hourIndex) => {
+        const dayStart = date.startOf('day').add(Math.floor(hourIndex / divisionsPerHour), 'hour');
 
         const sameDayContentEvent = props.splitedSelectedCalendarEvents?.find(
           (event) => dayStart.format('YYYY-MM-DD') === event.splitStart.format('YYYY-MM-DD')
@@ -53,8 +51,8 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
           <div
             key={hourIndex}
             className={`${styles.timeCell} ${sameDayContentEvent ? styles.selected : ''}
-               ${(hourIndex + 1) % props.divisionsPerHour === 0 ? styles.drawLine : ''}`}
-            style={{ height: props.heightPerHour / props.divisionsPerHour }}
+               ${(hourIndex + 1) % divisionsPerHour === 0 ? styles.drawLine : ''}`}
+            style={{ height: heightPerHour / divisionsPerHour }}
           />
         );
       })}
@@ -63,17 +61,16 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
         ?.filter((event) => date.isSame(event.splitStart, 'day'))
         .map((event, i) => {
           const sizeIndex =
-            Math.abs(
-              calculateIndexDifference(event.splitStart, event.splitEnd, props.divisionsPerHour)
-            ) + 1;
+            Math.abs(calculateIndexDifference(event.splitStart, event.splitEnd, divisionsPerHour)) +
+            1;
 
           return (
             <div
               key={i}
               className={styles.selectedItem}
               style={{
-                top: `${(calculateIndexDifference(date.startOf('day'), event.splitStart, props.divisionsPerHour) * props.heightPerHour) / props.divisionsPerHour}px`,
-                height: `${(sizeIndex * props.heightPerHour) / props.divisionsPerHour}px`,
+                top: `${(calculateIndexDifference(date.startOf('day'), event.splitStart, divisionsPerHour) * heightPerHour) / divisionsPerHour}px`,
+                height: `${(sizeIndex * heightPerHour) / divisionsPerHour}px`,
               }}
             >
               <small>
@@ -85,7 +82,7 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
                 {(props.selectedStartDay! > props.selectedEndDay!
                   ? props.selectedStartDay
                   : props.selectedEndDay)!
-                  .add(60 / props.divisionsPerHour, 'minute')
+                  .add(60 / divisionsPerHour, 'minute')
                   .format('HH:mm')}
               </small>
             </div>
@@ -93,26 +90,23 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
         })}
 
       {calendarEventsInTimelyInDay.map((event) => {
-        const endDate = dayjs(event.end!.date);
-        const scheculeDiff = endDate.diff(dayjs(date), 'day');
-        const overDiff = !(scheculeDiff + props.i < 7);
-        const resultDiff = overDiff ? 7 - props.i : scheculeDiff + props.i;
+        const startDate = dayjs(event.start!.dateTime);
+        const endDate = dayjs(event.end!.dateTime);
+        const startDiff = calculateIndexDifference(date, startDate, divisionsPerHour);
+        const endDiff = calculateIndexDifference(startDate, endDate, divisionsPerHour);
+
         return (
-          <div
+          <button
             key={event.id}
+            className={styles.calendarEvent}
             style={{
-              position: 'absolute',
-              top: 0,
-              left: overDiff ? 0 : resultDiff * 100,
-              width: overDiff ? 100 * (7 - props.i) : 100 * (scheculeDiff + 1),
-              height: 24,
-              backgroundColor: 'lightblue',
-              border: '1px solid var(--divider)',
-              zIndex: 1,
+              top: `${(startDiff * props.config.heightPerHour) / props.config.divisionsPerHour}px`,
+              height: `${(endDiff * props.config.heightPerHour) / props.config.divisionsPerHour}px`,
+              backgroundColor: event.backgroundColor,
             }}
           >
             {event.summary}
-          </div>
+          </button>
         );
       })}
     </div>

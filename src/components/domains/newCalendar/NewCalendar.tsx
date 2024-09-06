@@ -104,6 +104,7 @@ export const NewCalendar: React.FC = () => {
           selectedStartDay={selectedStartDay}
           selectedEndDay={selectedEndDay}
           isDragging={isDragging && isMouseDownRef.current === 'allday'}
+          config={config}
         />
         <div
           ref={scrollRef}
@@ -119,6 +120,7 @@ export const NewCalendar: React.FC = () => {
             selectedStartDay={selectedStartDay}
             selectedEndDay={selectedEndDay}
             isDragging={isDragging && isMouseDownRef.current === 'timely'}
+            config={config}
           />
         </div>
       </div>
