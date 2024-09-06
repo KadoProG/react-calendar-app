@@ -11,7 +11,6 @@ interface CalendarBodyMainProps {
   calendarEvents: (gapi.client.calendar.Event & { calendarId: string })[];
   selectedStartDay: dayjs.Dayjs | null;
   selectedEndDay: dayjs.Dayjs | null;
-  isMouseDownRef: React.MutableRefObject<'allday' | 'timely' | null>;
   isDragging: boolean;
 }
 

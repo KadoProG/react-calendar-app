@@ -14,7 +14,7 @@ export const NewCalendar: React.FC = () => {
     config: { divisionsPerHour },
   } = React.useContext(CalendarConfigContext);
 
-  const start = useWatch({ control, name: 'start' });
+  const start = dayjs(useWatch({ control, name: 'start' })).startOf('day');
 
   const [selectedStartDay, setSelectedStartDay] = React.useState<dayjs.Dayjs | null>(null);
   const [selectedEndDay, setSelectedEndDay] = React.useState<dayjs.Dayjs | null>(null);
@@ -26,8 +26,17 @@ export const NewCalendar: React.FC = () => {
 
   const handleMouseDown = React.useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      const { xIndex } = getMouseSelectedCalendar(e, 7, divisionsPerHour, topHeight);
-      const resultDate = dayjs(start).add(xIndex, 'day');
+      const { xIndex, yIndex } = getMouseSelectedCalendar(e, 7, divisionsPerHour, topHeight);
+
+      if (yIndex < 0) {
+        const resultDate = start.add(xIndex, 'day');
+        setSelectedStartDay(resultDate);
+        setSelectedEndDay(resultDate);
+        isMouseDownRef.current = 'allday';
+        return;
+      }
+
+      const resultDate = start.add(xIndex, 'day').add(yIndex / divisionsPerHour, 'hour');
 
       setSelectedStartDay(resultDate);
       setSelectedEndDay(resultDate);
@@ -40,9 +49,17 @@ export const NewCalendar: React.FC = () => {
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (!isMouseDownRef.current) return;
       setIsDragging(true);
+
       const { xIndex, yIndex } = getMouseSelectedCalendar(e, 7, divisionsPerHour, topHeight);
-      const resultDate = dayjs(start).add(xIndex, 'day');
-      setSelectedEndDay(resultDate.add(yIndex, 'hour'));
+
+      if (isMouseDownRef.current === 'allday') {
+        const resultDate = start.add(xIndex, 'day');
+        setSelectedEndDay(resultDate);
+        return;
+      }
+
+      const resultDate = start.add(xIndex, 'day').add(yIndex / divisionsPerHour, 'hour');
+      setSelectedEndDay(resultDate);
     },
     [start, divisionsPerHour, topHeight]
   );
@@ -65,12 +82,11 @@ export const NewCalendar: React.FC = () => {
       >
         <CalendarBodyTop
           setTopHeight={setTopHeight}
-          start={dayjs(start)}
+          start={start}
           calendarEvents={calendarEvents}
           selectedStartDay={selectedStartDay}
           selectedEndDay={selectedEndDay}
-          isDragging={isDragging}
-          isMouseDownRef={isMouseDownRef}
+          isDragging={isDragging && isMouseDownRef.current === 'allday'}
         />
         <div
           style={{
@@ -80,12 +96,11 @@ export const NewCalendar: React.FC = () => {
           }}
         >
           <CalendarBodyMain
-            start={dayjs(start)}
+            start={start}
             calendarEvents={calendarEvents}
             selectedStartDay={selectedStartDay}
             selectedEndDay={selectedEndDay}
-            isDragging={isDragging}
-            isMouseDownRef={isMouseDownRef}
+            isDragging={isDragging && isMouseDownRef.current === 'timely'}
           />
         </div>
       </div>
