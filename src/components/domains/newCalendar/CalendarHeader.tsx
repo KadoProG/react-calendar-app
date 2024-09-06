@@ -7,6 +7,7 @@ import { useController, useWatch } from 'react-hook-form';
 import { Button } from '@/components/common/button/Button';
 import { SettingButton } from '@/components/common/button/SettingButton';
 import { Link } from 'react-router-dom';
+import { HEADER_HEIGHT } from '@/const/const';
 
 export const CalendarHeader: React.FC = () => {
   const { user } = React.useContext(AuthContext);
@@ -30,7 +31,7 @@ export const CalendarHeader: React.FC = () => {
   const dateText = formatDateRange(dayjs(start), dayjs(end), 'month');
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 4, height: HEADER_HEIGHT }}>
       <Link to="/" style={{ width: 38, height: 38 }}>
         <img
           src="/images/icons/vite.svg"
