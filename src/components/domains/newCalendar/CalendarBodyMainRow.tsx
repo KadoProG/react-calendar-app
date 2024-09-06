@@ -21,7 +21,7 @@ interface CalendarBodyMainRowProps {
 export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) => {
   // index値から日付を取得
   const date = React.useMemo(
-    () => dayjs(props.start).startOf('day').add(props.i, 'day'),
+    () => props.start.startOf('day').add(props.i, 'day'),
     [props.start, props.i]
   );
 
@@ -35,24 +35,6 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
       ),
     [props.calendarEventsInTimely, date, props.i]
   );
-
-  // // 選択された日付と同じかどうか
-  // const isSame = React.useMemo(
-  //   () => props.selectedStartDay && props.selectedStartDay.isSame(date, 'day'),
-  //   [props.selectedStartDay, date]
-  // );
-
-  // // 選択された日付の差分
-  // const diff = React.useMemo(() => {
-  //   if (!props.selectedStartDay || !props.selectedEndDay) return 0;
-  //   return Math.abs(props.selectedEndDay.diff(props.selectedStartDay, 'day')) + 1;
-  // }, [props.selectedStartDay, props.selectedEndDay]);
-
-  // // 選択された日付の左位置（startからの日数、endがstartより前の場合のみ）
-  // const leftPosition = React.useMemo(() => {
-  //   if (!props.selectedEndDay || props.selectedEndDay.isAfter(props.selectedStartDay)) return 0;
-  //   return props.selectedEndDay.diff(props.selectedStartDay, 'day');
-  // }, [props.selectedStartDay, props.selectedEndDay]);
 
   // １日ずつ（Weekに対する列）の表示
   return (
