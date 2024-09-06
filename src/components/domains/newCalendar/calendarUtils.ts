@@ -11,14 +11,14 @@ import React from 'react';
 export const getMouseSelectedCalendar = (
   e: React.MouseEvent<HTMLElement>,
   weekDisplayCount: number,
-  divisionsPerHour: number
+  divisionsPerHour: number,
+  topHeight: number
 ) => {
   const rect = e.currentTarget.getBoundingClientRect();
   const nowLeftPosition = e.clientX - rect.left - LEFT_WIDTH; // 現在の左位置
   const xIndex = Math.floor((nowLeftPosition / (rect.width - LEFT_WIDTH)) * weekDisplayCount);
-  const yIndex = Math.floor((e.clientY - rect.top) / (rect.height / 24));
-
-  console.log('xIndex:', xIndex, 'yIndex:', yIndex, divisionsPerHour); // eslint-disable-line
+  const nowTopPosition = e.clientY - rect.top - topHeight; // 現在の上位置
+  const yIndex = Math.floor((nowTopPosition / (rect.height - topHeight)) * 24 * divisionsPerHour);
 
   return { xIndex, yIndex };
 };
