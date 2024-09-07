@@ -8,8 +8,10 @@ import { CalendarContext } from '@/contexts/CalendarContext';
 import { useWatch } from 'react-hook-form';
 import { CalendarConfigContext } from '@/contexts/CalendarConfigContext';
 import { KeyDownContext } from '@/contexts/KeyDownContext';
+import { CalendarMenuContext } from '@/components/domains/newCalendar/CalendarMenuContext';
 
 export const NewCalendar: React.FC = () => {
+  const { openMenu } = React.useContext(CalendarMenuContext);
   const { control, calendarEvents } = React.useContext(CalendarContext);
   const { config } = React.useContext(CalendarConfigContext);
   const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
@@ -66,29 +68,29 @@ export const NewCalendar: React.FC = () => {
     [start, config, topHeight]
   );
 
-  const handleMouseUp = React.useCallback(async () => {
-    setIsDragging(false);
-    isMouseDownRef.current = null;
+  const handleMouseUp = React.useCallback(
+    async (e: React.MouseEvent) => {
+      isMouseDownRef.current = null;
 
-    if (!isDragging) return;
+      if (!isDragging) return;
 
-    if (!selectedStartDay || !selectedEndDay) return;
+      if (!selectedStartDay || !selectedEndDay) return;
 
-    const resultStartDay = selectedStartDay <= selectedEndDay ? selectedStartDay : selectedEndDay;
-    const resultEndDay = (
-      selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay
-    ).add(60 / config.divisionsPerHour, 'minute');
+      const resultStartDay = selectedStartDay <= selectedEndDay ? selectedStartDay : selectedEndDay;
+      const resultEndDay = (
+        selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay
+      ).add(60 / config.divisionsPerHour, 'minute');
 
-    console.log({ resultStartDay, resultEndDay }); // eslint-disable-line
+      await openMenu({
+        anchorEl: e.target as HTMLElement,
+        start: resultStartDay,
+        end: resultEndDay,
+      });
 
-    // await openMenu({
-    //   anchorEl: e.target as HTMLElement,
-    //   start: resultStartDay,
-    //   end: resultEndDay,
-    // });
-
-    setIsDragging(false);
-  }, [selectedStartDay, selectedEndDay, isDragging, config]);
+      setIsDragging(false);
+    },
+    [selectedStartDay, selectedEndDay, isDragging, config, openMenu]
+  );
 
   React.useEffect(() => {
     if (isDragging) {
