@@ -66,10 +66,29 @@ export const NewCalendar: React.FC = () => {
     [start, config, topHeight]
   );
 
-  const handleMouseUp = React.useCallback(() => {
+  const handleMouseUp = React.useCallback(async () => {
     setIsDragging(false);
     isMouseDownRef.current = null;
-  }, []);
+
+    if (!isDragging) return;
+
+    if (!selectedStartDay || !selectedEndDay) return;
+
+    const resultStartDay = selectedStartDay <= selectedEndDay ? selectedStartDay : selectedEndDay;
+    const resultEndDay = (
+      selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay
+    ).add(60 / config.divisionsPerHour, 'minute');
+
+    console.log({ resultStartDay, resultEndDay }); // eslint-disable-line
+
+    // await openMenu({
+    //   anchorEl: e.target as HTMLElement,
+    //   start: resultStartDay,
+    //   end: resultEndDay,
+    // });
+
+    setIsDragging(false);
+  }, [selectedStartDay, selectedEndDay, isDragging, config]);
 
   React.useEffect(() => {
     if (isDragging) {
