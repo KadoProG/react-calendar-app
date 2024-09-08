@@ -1,8 +1,7 @@
 import { CalendarDetailEditMenu } from '@/components/domains/newCalendar/CalendarDetailEditMenu';
-import { KeyDownContext } from '@/contexts/KeyDownContext';
+import { useCalendarMenuForm } from '@/components/domains/newCalendar/useCalendarMenuForm';
 import dayjs from '@/libs/dayjs';
 import React from 'react';
-import { useForm } from 'react-hook-form';
 
 interface OpenMenuArgs {
   anchorEl: HTMLElement;
@@ -29,19 +28,19 @@ export const CalendarMenuContext = React.createContext<CalendarMenuContextValue>
 });
 
 export const CalendarMenuProvider: React.FC<{ children: React.ReactNode }> = (props) => {
-  const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const resolveFunction = React.useRef<() => void>(() => {});
 
-  const { control, setValue, watch, reset } = useForm<CalendarMenuForm>({
-    defaultValues: {
-      summary: '',
-      start: '',
-      end: '',
-      startDate: '',
-      endDate: '',
-      isAllDay: false,
-    },
+  const onClose = React.useCallback(() => {
+    if (resolveFunction.current) {
+      resolveFunction.current();
+    }
+    setAnchorEl(null);
+  }, []);
+
+  const { control, setValue, watch, reset, handleFormSubmit } = useCalendarMenuForm({
+    isOpen: !!anchorEl,
+    onClose,
   });
 
   const openMenu = React.useCallback(
@@ -61,22 +60,7 @@ export const CalendarMenuProvider: React.FC<{ children: React.ReactNode }> = (pr
     [reset]
   );
 
-  const onClose = React.useCallback(() => {
-    if (resolveFunction.current) {
-      resolveFunction.current();
-    }
-    setAnchorEl(null);
-  }, []);
-
   const value = React.useMemo(() => ({ openMenu }), [openMenu]);
-
-  React.useEffect(() => {
-    if (anchorEl) {
-      addKeyDownEvent({ id: 1, key: 'Escape', callback: onClose });
-    } else {
-      removeKeyDownEvent(1);
-    }
-  }, [anchorEl, addKeyDownEvent, removeKeyDownEvent, onClose]);
 
   return (
     <CalendarMenuContext.Provider value={value}>
@@ -87,7 +71,7 @@ export const CalendarMenuProvider: React.FC<{ children: React.ReactNode }> = (pr
           control={control}
           setValue={setValue}
           watch={watch}
-          handleFormSubmit={() => {}}
+          handleFormSubmit={handleFormSubmit}
           onClose={onClose}
         />
       </div>
