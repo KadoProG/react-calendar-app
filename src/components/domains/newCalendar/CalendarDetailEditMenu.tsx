@@ -21,7 +21,10 @@ interface CalendarDetailEditMenuProps {
 }
 
 export const CalendarDetailEditMenu: React.FC<CalendarDetailEditMenuProps> = (props) => {
-  const { isAllDay, start, end, startDate, endDate } = React.useMemo(() => props.watch(), [props]);
+  const { isAllDay, start, end, startDate, endDate, eventId } = React.useMemo(
+    () => props.watch(),
+    [props]
+  );
   const { calendars } = React.useContext(CalendarFeatLocalStorageContext);
 
   // endがstartより前にならないようにする
@@ -78,7 +81,7 @@ export const CalendarDetailEditMenu: React.FC<CalendarDetailEditMenuProps> = (pr
         style={style}
       >
         <div className={styles.dialog__header}>
-          <h2>予定を追加</h2>
+          <h2>{`予定を${eventId ? '編集' : '追加'}`}</h2>
           <DeleteButton type="button" />
         </div>
         <div className={styles.dialog__body}>
@@ -144,7 +147,7 @@ export const CalendarDetailEditMenu: React.FC<CalendarDetailEditMenuProps> = (pr
             キャンセル
           </Button>
           <Button type="submit" width={100}>
-            追加
+            {eventId ? '更新' : '追加'}
           </Button>
         </div>
       </form>
