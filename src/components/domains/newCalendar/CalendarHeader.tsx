@@ -24,7 +24,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = (props) => {
     (type: -1 | 1) => {
       const prev = dayjs(start).add(7 * type, 'day');
       startController.field.onChange(prev.toISOString());
-      endController.field.onChange(prev.add(6, 'day').toISOString());
+      endController.field.onChange(prev.endOf('day').add(6, 'day').toISOString());
     },
     [startController, start, endController]
   );
