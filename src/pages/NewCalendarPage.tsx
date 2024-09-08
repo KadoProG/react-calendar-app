@@ -5,10 +5,10 @@ import { CalendarFeatLocalStorageProvider } from '@/contexts/CalendarFeatLocalSt
 
 export const NewCalendarPage: React.FC = () => (
   <CalendarFeatLocalStorageProvider>
-    <CalendarMenuProvider>
-      <CalendarContextProvider>
+    <CalendarContextProvider>
+      <CalendarMenuProvider>
         <NewCalendar />
-      </CalendarContextProvider>
-    </CalendarMenuProvider>
+      </CalendarMenuProvider>
+    </CalendarContextProvider>
   </CalendarFeatLocalStorageProvider>
 );

@@ -1,5 +1,6 @@
 import { CalendarDetailEditMenu } from '@/components/domains/newCalendar/CalendarDetailEditMenu';
 import { useCalendarMenuForm } from '@/components/domains/newCalendar/useCalendarMenuForm';
+import { CalendarContext } from '@/contexts/CalendarContext';
 import dayjs from '@/libs/dayjs';
 import React from 'react';
 
@@ -35,6 +36,7 @@ export const CalendarMenuContext = React.createContext<CalendarMenuContextValue>
 export const CalendarMenuProvider: React.FC<{ children: React.ReactNode }> = (props) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const resolveFunction = React.useRef<() => void>(() => {});
+  const { mutate } = React.useContext(CalendarContext);
 
   const onClose = React.useCallback(() => {
     if (resolveFunction.current) {
@@ -46,6 +48,7 @@ export const CalendarMenuProvider: React.FC<{ children: React.ReactNode }> = (pr
   const { control, setValue, watch, reset, handleFormSubmit } = useCalendarMenuForm({
     isOpen: !!anchorEl,
     onClose,
+    mutate,
   });
 
   const openMenu = React.useCallback(

@@ -5,7 +5,11 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { SnackbarContext } from '@/components/common/feedback/SnackbarContext';
 
-export const useCalendarMenuForm = (args: { isOpen: boolean; onClose: () => void }) => {
+export const useCalendarMenuForm = (args: {
+  isOpen: boolean;
+  onClose: () => void;
+  mutate?: () => void;
+}) => {
   const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
   const { showSnackbar } = React.useContext(SnackbarContext);
 
@@ -54,8 +58,11 @@ export const useCalendarMenuForm = (args: { isOpen: boolean; onClose: () => void
       }
 
       showSnackbar({ type: 'success', message: '予定を保存しました' });
+
+      args.onClose();
+      args.mutate?.();
     })();
-  }, [handleSubmit, showSnackbar]);
+  }, [handleSubmit, showSnackbar, args]);
 
   return { control, setValue, watch, reset, handleFormSubmit };
 };
