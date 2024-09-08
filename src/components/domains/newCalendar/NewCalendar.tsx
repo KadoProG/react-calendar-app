@@ -108,7 +108,7 @@ export const NewCalendar: React.FC = () => {
 
   return (
     <div style={{ height: '100svh', display: 'flex', flexDirection: 'column' }}>
-      <CalendarHeader />
+      <CalendarHeader control={control} />
 
       {/* カレンダー本体（ドラッグイベントの範囲） */}
       <div

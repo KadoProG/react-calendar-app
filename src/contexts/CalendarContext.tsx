@@ -6,7 +6,7 @@ import { Control, useForm } from 'react-hook-form';
 import { CalendarFeatLocalStorageContext } from '@/contexts/CalendarFeatLocalStorageContext';
 import { CalendarConfigContext } from '@/contexts/CalendarConfigContext';
 
-interface FetchCalendarForm {
+export interface FetchCalendarForm {
   start: string;
   end: string;
   canFetch: boolean;

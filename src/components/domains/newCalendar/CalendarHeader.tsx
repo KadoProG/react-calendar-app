@@ -1,23 +1,26 @@
 import dayjs from '@/libs/dayjs';
 import { AuthContext } from '@/contexts/AuthContext';
-import { CalendarContext } from '@/contexts/CalendarContext';
+import { FetchCalendarForm } from '@/contexts/CalendarContext';
 import { formatDateRange } from '@/utils/convertDayjs';
 import React from 'react';
-import { useController, useWatch } from 'react-hook-form';
+import { Control, useController, useWatch } from 'react-hook-form';
 import { Button } from '@/components/common/button/Button';
 import { SettingButton } from '@/components/common/button/SettingButton';
 import { Link } from 'react-router-dom';
 import { HEADER_HEIGHT } from '@/const/const';
 
-export const CalendarHeader: React.FC = () => {
+interface CalendarHeaderProps {
+  control: Control<FetchCalendarForm>;
+}
+
+export const CalendarHeader: React.FC<CalendarHeaderProps> = (props) => {
   const { user } = React.useContext(AuthContext);
-  const { control } = React.useContext(CalendarContext);
 
-  const start = useWatch({ control, name: 'start' });
-  const end = useWatch({ control, name: 'end' });
+  const start = useWatch({ control: props.control, name: 'start' });
+  const end = useWatch({ control: props.control, name: 'end' });
 
-  const startController = useController({ control, name: 'start' });
-  const endController = useController({ control, name: 'end' });
+  const startController = useController({ control: props.control, name: 'start' });
+  const endController = useController({ control: props.control, name: 'end' });
 
   const handleScrollDate = React.useCallback(
     (type: -1 | 1) => {
