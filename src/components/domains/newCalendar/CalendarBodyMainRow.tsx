@@ -1,4 +1,5 @@
 import styles from '@/components/domains/newCalendar/CalendarBodyMainRow.module.scss';
+import { CalendarBodyMainRowSelectedItem } from '@/components/domains/newCalendar/CalendarBodyMainRowSelectedItem';
 import { CalendarMenuContext } from '@/components/domains/newCalendar/CalendarMenuContext';
 import dayjs from '@/libs/dayjs';
 import { calculateIndexDifference, splitCalendarEvents } from '@/utils/convertDayjs';
@@ -80,35 +81,17 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
 
       {props.splitedSelectedCalendarEvents
         ?.filter((event) => date.isSame(event.splitStart, 'day'))
-        .map((event, i) => {
-          const sizeIndex =
-            Math.abs(calculateIndexDifference(event.splitStart, event.splitEnd, divisionsPerHour)) +
-            1;
-
-          return (
-            <div
-              key={i}
-              className={styles.selectedItem}
-              style={{
-                top: `${(calculateIndexDifference(date.startOf('day'), event.splitStart, divisionsPerHour) * heightPerHour) / divisionsPerHour}px`,
-                height: `${(sizeIndex * heightPerHour) / divisionsPerHour}px`,
-              }}
-            >
-              <small>
-                {(props.selectedStartDay! <= props.selectedEndDay!
-                  ? props.selectedStartDay!
-                  : props.selectedEndDay!
-                ).format('HH:mm')}
-                ~
-                {(props.selectedStartDay! > props.selectedEndDay!
-                  ? props.selectedStartDay
-                  : props.selectedEndDay)!
-                  .add(60 / divisionsPerHour, 'minute')
-                  .format('HH:mm')}
-              </small>
-            </div>
-          );
-        })}
+        .map((event, i) => (
+          <CalendarBodyMainRowSelectedItem
+            key={i}
+            i={i}
+            event={event}
+            config={props.config}
+            selectedStartDay={props.selectedStartDay}
+            selectedEndDay={props.selectedEndDay}
+            baseDate={date}
+          />
+        ))}
 
       {calendarEventsInTimelyInDay.map((event) => {
         const startDate = dayjs(event.start!.dateTime);
@@ -123,8 +106,8 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => handleScheduleClick(e, event.id ?? '')}
             style={{
-              top: `${(startDiff * props.config.heightPerHour) / props.config.divisionsPerHour}px`,
-              height: `${(endDiff * props.config.heightPerHour) / props.config.divisionsPerHour}px`,
+              top: `${(startDiff * heightPerHour) / divisionsPerHour}px`,
+              height: `${(endDiff * heightPerHour) / divisionsPerHour}px`,
               backgroundColor: event.backgroundColor,
             }}
           >
