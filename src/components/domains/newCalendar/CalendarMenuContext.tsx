@@ -17,6 +17,8 @@ export interface CalendarMenuForm {
   startDate: string;
   endDate: string;
   isAllDay: boolean;
+  eventId: string;
+  calendarId: string;
 }
 
 interface CalendarMenuContextValue {

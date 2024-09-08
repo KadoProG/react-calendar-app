@@ -16,7 +16,7 @@ export const CalendarFeatLocalStorageContext = React.createContext<CalendarFeatL
   mutateCalendar: async () => {},
 });
 
-export const CalenadarFeatLocalStorageProvider: React.FC<{ children: React.ReactNode }> = (
+export const CalendarFeatLocalStorageProvider: React.FC<{ children: React.ReactNode }> = (
   props
 ) => {
   const { user } = React.useContext(AuthContext);

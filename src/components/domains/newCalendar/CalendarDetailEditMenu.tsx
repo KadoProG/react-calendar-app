@@ -7,6 +7,8 @@ import { TextField } from '@/components/common/TextField';
 import { Button } from '@/components/common/button/Button';
 import { Control, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { CheckBox } from '@/components/common/input/CheckBox';
+import { Select } from '@/components/common/input/Select';
+import { CalendarFeatLocalStorageContext } from '@/contexts/CalendarFeatLocalStorageContext';
 
 interface CalendarDetailEditMenuProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -20,6 +22,7 @@ interface CalendarDetailEditMenuProps {
 
 export const CalendarDetailEditMenu: React.FC<CalendarDetailEditMenuProps> = (props) => {
   const { isAllDay, start, end, startDate, endDate } = React.useMemo(() => props.watch(), [props]);
+  const { calendars } = React.useContext(CalendarFeatLocalStorageContext);
 
   // endがstartより前にならないようにする
   const handleDayBlur = React.useCallback(() => {
@@ -79,6 +82,15 @@ export const CalendarDetailEditMenu: React.FC<CalendarDetailEditMenuProps> = (pr
           <DeleteButton type="button" />
         </div>
         <div className={styles.dialog__body}>
+          <Select
+            control={props.control}
+            name="calendarId"
+            label="カレンダー"
+            options={calendars.map((calendar) => ({
+              label: calendar.primary ? '(プライマリ)' : calendar.summary || '',
+              value: calendar.id || '',
+            }))}
+          />
           <TextField
             control={props.control}
             name="summary"
