@@ -7,6 +7,7 @@ import { Button } from '@/components/common/button/Button';
 import { SettingButton } from '@/components/common/button/SettingButton';
 import { Link } from 'react-router-dom';
 import { HEADER_HEIGHT } from '@/const/const';
+import { SettingDialog } from '@/components/domains/apitest/SettingDialog';
 
 interface CalendarHeaderProps {
   control: Control<FetchCalendarForm>;
@@ -14,6 +15,7 @@ interface CalendarHeaderProps {
 }
 
 export const CalendarHeader: React.FC<CalendarHeaderProps> = (props) => {
+  const [isOpenSettingDialog, setIsOpenSettingDialog] = React.useState<boolean>(false);
   const start = useWatch({ control: props.control, name: 'start' });
   const end = useWatch({ control: props.control, name: 'end' });
 
@@ -43,7 +45,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = (props) => {
       <p style={{ fontWeight: 'bold' }}>{dateText}</p>
       <Button onClick={() => handleScrollDate(-1)}>＜</Button>
       <Button onClick={() => handleScrollDate(1)}>＞</Button>
-      <SettingButton style={{ marginLeft: 4 }} />
+      <SettingButton style={{ marginLeft: 4 }} onClick={() => setIsOpenSettingDialog(true)} />
 
       <div style={{ flex: 1 }} />
 
@@ -52,6 +54,8 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = (props) => {
           <img src={props.user?.imageUrl} alt="お前" width={32} height={32} />
         </Button>
       )}
+
+      <SettingDialog isOpen={isOpenSettingDialog} onClose={() => setIsOpenSettingDialog(false)} />
     </div>
   );
 };

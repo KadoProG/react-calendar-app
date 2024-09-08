@@ -55,12 +55,12 @@ export const SettingCalendarListValid: React.FC = () => {
       label="カレンダーの表示"
       left={<Button onClick={mutateCalendar}>最新を取得</Button>}
     >
-      {calendars.map((calendar, index) => (
+      {valids.map((_, index) => (
         <CheckBox
-          key={calendar.id ?? index}
+          key={index}
           control={control}
           name={`valids.${index}`}
-          label={calendar.summary ?? ''}
+          label={calendars[index].summary ?? ''}
         />
       ))}
     </FormContainer>
