@@ -73,7 +73,7 @@
   cursor: pointer;
   border: none;
   &:hover {
-    background-color: var(--color-primary-hover);
+    filter: brightness(1.1);
   }
 
   &__leave {

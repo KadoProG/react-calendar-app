@@ -99,6 +99,7 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
           <button
             key={event.id}
             className={styles.calendarEvent}
+            onMouseDown={(e) => e.stopPropagation()}
             style={{
               top: `${(startDiff * props.config.heightPerHour) / props.config.divisionsPerHour}px`,
               height: `${(endDiff * props.config.heightPerHour) / props.config.divisionsPerHour}px`,

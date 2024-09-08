@@ -70,6 +70,7 @@ export const CalendarBodyTopRow: React.FC<CalendarBodyTopRowProps> = (props) => 
         return (
           <button
             key={event.id}
+            onMouseDown={(e) => e.stopPropagation()}
             className={`${styles.calendarEvent} ${startDate.isBefore(date, 'day') ? styles.start : ''} ${overDiff ? styles.end : ''}`}
             style={{ width: `${resultDiff * 100}%`, backgroundColor: event.backgroundColor }}
           >
