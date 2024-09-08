@@ -30,6 +30,7 @@ export const NewCalendar: React.FC = () => {
 
   const handleMouseDown = React.useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
+      if (isMouseDownRef.current) return;
       const { xIndex, yIndex } = getMouseSelectedCalendar(e, scrollRef.current!, config, topHeight);
 
       if (yIndex < 0) {

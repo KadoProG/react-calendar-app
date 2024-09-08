@@ -49,7 +49,6 @@ export const fetchCalendarEvents = async (args: {
         timeMax: end,
         showDeleted: false,
         singleEvents: true,
-        maxResults: 10,
         orderBy: 'startTime',
       });
 
