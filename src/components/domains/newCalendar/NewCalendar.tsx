@@ -6,14 +6,12 @@ import { CalendarBodyMain } from '@/components/domains/newCalendar/CalendarBodyM
 import { getMouseSelectedCalendar } from '@/components/domains/newCalendar/calendarUtils';
 import { CalendarContext } from '@/contexts/CalendarContext';
 import { useWatch } from 'react-hook-form';
-import { CalendarConfigContext } from '@/contexts/CalendarConfigContext';
 import { KeyDownContext } from '@/contexts/KeyDownContext';
 import { CalendarMenuContext } from '@/components/domains/newCalendar/CalendarMenuContext';
 
 export const NewCalendar: React.FC = () => {
   const { openMenu } = React.useContext(CalendarMenuContext);
-  const { control, calendarEvents } = React.useContext(CalendarContext);
-  const { config } = React.useContext(CalendarConfigContext);
+  const { control, calendarEvents, config } = React.useContext(CalendarContext);
   const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
 
   const start = dayjs(useWatch({ control, name: 'start' })).startOf('day');

@@ -4,6 +4,7 @@ import useSWR from 'swr';
 import { fetchCalendarEvents } from '@/utils/fetchCalendarEvents';
 import { Control, useForm } from 'react-hook-form';
 import { CalendarFeatLocalStorageContext } from '@/contexts/CalendarFeatLocalStorageContext';
+import { CalendarConfigContext } from '@/contexts/CalendarConfigContext';
 
 interface FetchCalendarForm {
   start: string;
@@ -18,6 +19,7 @@ interface CalendarContextType {
   isCalendarEventsLoading: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   control: Control<FetchCalendarForm, any>;
+  config: CalendarConfig;
   mutate: () => void;
 }
 
@@ -35,16 +37,21 @@ export const CalendarContext = React.createContext<CalendarContextType>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >,
+  config: {} as CalendarConfig,
   mutate: () => {},
 });
 
 export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { config } = React.useContext(CalendarConfigContext);
   const { calendars, isLoading } = React.useContext(CalendarFeatLocalStorageContext); // カレンダー情報を取得
 
   const { control, watch } = useForm<FetchCalendarForm>({
     defaultValues: {
       start: dayjs().startOf('day').toISOString(),
-      end: dayjs().endOf('day').add(6, 'day').toISOString(),
+      end: dayjs()
+        .endOf('day')
+        .add(config.weekDisplayCount - 1, 'day')
+        .toISOString(),
       canFetch: false,
     },
   });
@@ -72,6 +79,7 @@ export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = 
         isCalendarEventsLoading,
         isCalendarsLoading: isLoading,
         control,
+        config,
         mutate,
       }}
     >
