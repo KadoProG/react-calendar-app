@@ -8,9 +8,11 @@ import { CalendarContext } from '@/contexts/CalendarContext';
 import { useWatch } from 'react-hook-form';
 import { KeyDownContext } from '@/contexts/KeyDownContext';
 import { CalendarMenuContext } from '@/components/domains/newCalendar/CalendarMenuContext';
+import { AuthContext } from '@/contexts/AuthContext';
 
 export const NewCalendar: React.FC = () => {
   const { openMenu } = React.useContext(CalendarMenuContext);
+  const { user } = React.useContext(AuthContext);
   const { control, calendarEvents, config } = React.useContext(CalendarContext);
   const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
 
@@ -83,12 +85,15 @@ export const NewCalendar: React.FC = () => {
         start: resultStartDay,
         end: resultEndDay,
         isAllDay: isMouseDownRef.current === 'allday',
+        calendarId: user?.email ?? '',
+        eventId: '',
+        summary: '',
       });
 
       isMouseDownRef.current = null;
       setIsDragging(false);
     },
-    [selectedStartDay, selectedEndDay, isDragging, config, openMenu]
+    [selectedStartDay, selectedEndDay, isDragging, config, openMenu, user]
   );
 
   React.useEffect(() => {
@@ -108,7 +113,7 @@ export const NewCalendar: React.FC = () => {
 
   return (
     <div style={{ height: '100svh', display: 'flex', flexDirection: 'column' }}>
-      <CalendarHeader control={control} />
+      <CalendarHeader control={control} user={user} />
 
       {/* カレンダー本体（ドラッグイベントの範囲） */}
       <div

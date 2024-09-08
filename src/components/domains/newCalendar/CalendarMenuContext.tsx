@@ -8,6 +8,9 @@ interface OpenMenuArgs {
   start: dayjs.Dayjs;
   end: dayjs.Dayjs;
   isAllDay?: boolean;
+  eventId: string;
+  calendarId: string;
+  summary: string;
 }
 
 export interface CalendarMenuForm {
@@ -51,12 +54,14 @@ export const CalendarMenuProvider: React.FC<{ children: React.ReactNode }> = (pr
         resolveFunction.current = resolve;
         setAnchorEl(args.anchorEl);
         reset({
-          summary: '',
+          summary: args.summary,
           start: args.start.format('YYYY-MM-DDTHH:mm'),
           end: args.end.format('YYYY-MM-DDTHH:mm'),
           startDate: args.start.format('YYYY-MM-DD'),
           endDate: args.end.format('YYYY-MM-DD'),
           isAllDay: args.isAllDay ?? false,
+          eventId: args.eventId ?? '',
+          calendarId: args.calendarId ?? '',
         });
       }),
     [reset]

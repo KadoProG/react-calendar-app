@@ -1,4 +1,5 @@
 import styles from '@/components/domains/newCalendar/CalendarBodyTopRow.module.scss';
+import { CalendarMenuContext } from '@/components/domains/newCalendar/CalendarMenuContext';
 import dayjs from '@/libs/dayjs';
 import { formatDateRange } from '@/utils/convertDayjs';
 import React from 'react';
@@ -17,6 +18,8 @@ interface CalendarBodyTopRowProps {
  * カレンダーの上部の日付・曜日が記載された部分のヘッダの１行を描写する
  */
 export const CalendarBodyTopRow: React.FC<CalendarBodyTopRowProps> = (props) => {
+  const { openMenu } = React.useContext(CalendarMenuContext);
+
   // index値から日付を取得
   const date = React.useMemo(
     () => dayjs(props.start).startOf('day').add(props.i, 'day'),
@@ -52,6 +55,26 @@ export const CalendarBodyTopRow: React.FC<CalendarBodyTopRowProps> = (props) => 
     return props.selectedEndDay.diff(props.selectedStartDay, 'day');
   }, [props.selectedStartDay, props.selectedEndDay]);
 
+  const handleScheduleClick = React.useCallback(
+    async (e: React.MouseEvent<HTMLButtonElement>, id: string) => {
+      const event = calendarEventsInAllDayInDay.find((event) => event.id === id);
+      if (!event) return;
+
+      const isAllDay = event.start?.date;
+
+      await openMenu({
+        anchorEl: e.currentTarget,
+        start: dayjs(isAllDay ? event.start?.date : event.start?.dateTime),
+        end: dayjs(isAllDay ? event.end?.date : event.end?.dateTime),
+        eventId: event.id ?? '',
+        calendarId: event.calendarId,
+        summary: event.summary ?? '',
+        isAllDay: !!isAllDay,
+      });
+    },
+    [openMenu, calendarEventsInAllDayInDay]
+  );
+
   return (
     <div
       className={styles.dayColumn}
@@ -71,6 +94,7 @@ export const CalendarBodyTopRow: React.FC<CalendarBodyTopRowProps> = (props) => 
           <button
             key={event.id}
             onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => handleScheduleClick(e, event.id ?? '')}
             className={`${styles.calendarEvent} ${startDate.isBefore(date, 'day') ? styles.start : ''} ${overDiff ? styles.end : ''}`}
             style={{ width: `${resultDiff * 100}%`, backgroundColor: event.backgroundColor }}
           >

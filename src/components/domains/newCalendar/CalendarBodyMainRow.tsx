@@ -1,4 +1,5 @@
 import styles from '@/components/domains/newCalendar/CalendarBodyMainRow.module.scss';
+import { CalendarMenuContext } from '@/components/domains/newCalendar/CalendarMenuContext';
 import dayjs from '@/libs/dayjs';
 import { calculateIndexDifference, splitCalendarEvents } from '@/utils/convertDayjs';
 import React from 'react';
@@ -18,6 +19,7 @@ interface CalendarBodyMainRowProps {
  * カレンダー時刻部分の１行を描写する
  */
 export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) => {
+  const { openMenu } = React.useContext(CalendarMenuContext);
   const { heightPerHour, divisionsPerHour } = props.config;
   // index値から日付を取得
   const date = React.useMemo(
@@ -34,6 +36,25 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
           (props.i === 0 && dayjs(event.start!.dateTime).isBefore(date, 'day'))
       ),
     [props.calendarEventsInTimely, date, props.i]
+  );
+
+  const handleScheduleClick = React.useCallback(
+    async (e: React.MouseEvent<HTMLButtonElement>, id: string) => {
+      const event = props.calendarEventsInTimely.find((event) => event.id === id);
+      if (!event) return;
+
+      const isAllDay = event.start?.date;
+
+      await openMenu({
+        anchorEl: e.currentTarget,
+        start: dayjs(isAllDay ? event.start?.date : event.start?.dateTime),
+        end: dayjs(isAllDay ? event.end?.date : event.end?.dateTime),
+        eventId: event.id ?? '',
+        calendarId: event.calendarId,
+        summary: event.summary ?? '',
+      });
+    },
+    [openMenu, props.calendarEventsInTimely]
   );
 
   // １日ずつ（Weekに対する列）の表示
@@ -100,6 +121,7 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
             key={event.id}
             className={styles.calendarEvent}
             onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => handleScheduleClick(e, event.id ?? '')}
             style={{
               top: `${(startDiff * props.config.heightPerHour) / props.config.divisionsPerHour}px`,
               height: `${(endDiff * props.config.heightPerHour) / props.config.divisionsPerHour}px`,

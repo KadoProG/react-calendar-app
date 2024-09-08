@@ -1,5 +1,4 @@
 import dayjs from '@/libs/dayjs';
-import { AuthContext } from '@/contexts/AuthContext';
 import { FetchCalendarForm } from '@/contexts/CalendarContext';
 import { formatDateRange } from '@/utils/convertDayjs';
 import React from 'react';
@@ -11,11 +10,10 @@ import { HEADER_HEIGHT } from '@/const/const';
 
 interface CalendarHeaderProps {
   control: Control<FetchCalendarForm>;
+  user: User | null;
 }
 
 export const CalendarHeader: React.FC<CalendarHeaderProps> = (props) => {
-  const { user } = React.useContext(AuthContext);
-
   const start = useWatch({ control: props.control, name: 'start' });
   const end = useWatch({ control: props.control, name: 'end' });
 
@@ -49,9 +47,9 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = (props) => {
 
       <div style={{ flex: 1 }} />
 
-      {user && (
+      {props.user && (
         <Button width={50} style={{ padding: 2 }}>
-          <img src={user?.imageUrl} alt="お前" width={32} height={32} />
+          <img src={props.user?.imageUrl} alt="お前" width={32} height={32} />
         </Button>
       )}
     </div>
