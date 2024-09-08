@@ -70,8 +70,6 @@ export const NewCalendar: React.FC = () => {
 
   const handleMouseUp = React.useCallback(
     async (e: React.MouseEvent) => {
-      isMouseDownRef.current = null;
-
       if (!isDragging) return;
 
       if (!selectedStartDay || !selectedEndDay) return;
@@ -85,8 +83,10 @@ export const NewCalendar: React.FC = () => {
         anchorEl: e.target as HTMLElement,
         start: resultStartDay,
         end: resultEndDay,
+        isAllDay: isMouseDownRef.current === 'allday',
       });
 
+      isMouseDownRef.current = null;
       setIsDragging(false);
     },
     [selectedStartDay, selectedEndDay, isDragging, config, openMenu]
