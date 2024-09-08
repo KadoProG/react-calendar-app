@@ -45,11 +45,12 @@ export const CalendarMenuProvider: React.FC<{ children: React.ReactNode }> = (pr
     setAnchorEl(null);
   }, []);
 
-  const { control, setValue, watch, reset, handleFormSubmit } = useCalendarMenuForm({
-    isOpen: !!anchorEl,
-    onClose,
-    mutate,
-  });
+  const { control, setValue, watch, reset, handleFormSubmit, handleDelete, isSubmitting } =
+    useCalendarMenuForm({
+      isOpen: !!anchorEl,
+      onClose,
+      mutate,
+    });
 
   const openMenu = React.useCallback(
     async (args: OpenMenuArgs) =>
@@ -77,12 +78,14 @@ export const CalendarMenuProvider: React.FC<{ children: React.ReactNode }> = (pr
       <div style={{ position: 'relative' }}>
         {props.children}
         <CalendarDetailEditMenu
+          isSubmitting={isSubmitting}
           anchorEl={anchorEl}
           control={control}
           setValue={setValue}
           watch={watch}
           handleFormSubmit={handleFormSubmit}
           onClose={onClose}
+          handleDelete={handleDelete}
         />
       </div>
     </CalendarMenuContext.Provider>

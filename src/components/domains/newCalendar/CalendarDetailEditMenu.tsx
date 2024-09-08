@@ -18,6 +18,8 @@ interface CalendarDetailEditMenuProps {
   watch: UseFormWatch<CalendarMenuForm>;
   handleFormSubmit: () => void;
   onClose: () => void;
+  handleDelete: () => void;
+  isSubmitting: boolean;
 }
 
 export const CalendarDetailEditMenu: React.FC<CalendarDetailEditMenuProps> = (props) => {
@@ -82,7 +84,7 @@ export const CalendarDetailEditMenu: React.FC<CalendarDetailEditMenuProps> = (pr
       >
         <div className={styles.dialog__header}>
           <h2>{`予定を${eventId ? '編集' : '追加'}`}</h2>
-          <DeleteButton type="button" />
+          <DeleteButton type="button" onClick={props.handleDelete} />
         </div>
         <div className={styles.dialog__body}>
           <Select
@@ -93,6 +95,7 @@ export const CalendarDetailEditMenu: React.FC<CalendarDetailEditMenuProps> = (pr
               label: calendar.primary ? '(プライマリ)' : calendar.summary || '',
               value: calendar.id || '',
             }))}
+            disabled={props.isSubmitting}
           />
           <TextField
             control={props.control}
@@ -102,8 +105,14 @@ export const CalendarDetailEditMenu: React.FC<CalendarDetailEditMenuProps> = (pr
             label="タイトル"
             autoFocus
             isActiveFocus={!!props.anchorEl}
+            disabled={props.isSubmitting}
           />
-          <CheckBox control={props.control} name="isAllDay" label="終日" />
+          <CheckBox
+            control={props.control}
+            name="isAllDay"
+            label="終日"
+            disabled={props.isSubmitting}
+          />
 
           <TextField
             control={props.control}
@@ -113,6 +122,7 @@ export const CalendarDetailEditMenu: React.FC<CalendarDetailEditMenuProps> = (pr
             label="開始日時"
             style={{ display: isAllDay ? 'block' : 'none' }}
             onBlur={handleDayBlur}
+            disabled={props.isSubmitting}
           />
           <TextField
             control={props.control}
@@ -122,6 +132,7 @@ export const CalendarDetailEditMenu: React.FC<CalendarDetailEditMenuProps> = (pr
             label="終了日時"
             style={{ display: isAllDay ? 'block' : 'none' }}
             onBlur={handleDayBlur}
+            disabled={props.isSubmitting}
           />
           <TextField
             control={props.control}
@@ -131,6 +142,7 @@ export const CalendarDetailEditMenu: React.FC<CalendarDetailEditMenuProps> = (pr
             label="開始日時"
             style={{ display: isAllDay ? 'none' : 'block' }}
             onBlur={handleDayBlur}
+            disabled={props.isSubmitting}
           />
           <TextField
             control={props.control}
@@ -140,13 +152,14 @@ export const CalendarDetailEditMenu: React.FC<CalendarDetailEditMenuProps> = (pr
             label="終了日時"
             style={{ display: isAllDay ? 'none' : 'block' }}
             onBlur={handleDayBlur}
+            disabled={props.isSubmitting}
           />
         </div>
         <div className={styles.dialog__actions}>
           <Button type="button" onClick={props.onClose} width={90}>
             キャンセル
           </Button>
-          <Button type="submit" width={100}>
+          <Button type="submit" width={100} disabled={props.isSubmitting}>
             {eventId ? '更新' : '追加'}
           </Button>
         </div>
