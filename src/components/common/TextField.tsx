@@ -18,9 +18,12 @@ export type TextFieldProps<T extends FieldValues> = UseControllerProps<T> & {
   autoFocus?: boolean;
   /** フィールドフォーカス解除時の動作 */
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
+  /** フィールドが有効か否か */
+  isActiveFocus?: boolean;
 };
 
 export const TextField = <T extends FieldValues>(props: TextFieldProps<T>) => {
+  const ref = React.useRef<HTMLInputElement>(null);
   const { field, fieldState } = useController<T>({
     name: props.name,
     control: props.control,
@@ -29,6 +32,12 @@ export const TextField = <T extends FieldValues>(props: TextFieldProps<T>) => {
       required: props.required ? '入力必須の項目です' : undefined,
     },
   });
+
+  React.useEffect(() => {
+    if (props.isActiveFocus) {
+      ref.current?.focus();
+    }
+  }, [props.isActiveFocus]);
 
   return (
     <div className={styles.container} style={props.style}>
@@ -41,6 +50,7 @@ export const TextField = <T extends FieldValues>(props: TextFieldProps<T>) => {
       <input
         id={props.name}
         {...field}
+        ref={ref}
         placeholder={props.placeholder}
         disabled={props.disabled}
         type={props.type}

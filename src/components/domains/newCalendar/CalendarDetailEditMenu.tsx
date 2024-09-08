@@ -14,7 +14,7 @@ interface CalendarDetailEditMenuProps {
   anchorEl: HTMLElement | null;
   setValue: UseFormSetValue<CalendarMenuForm>;
   watch: UseFormWatch<CalendarMenuForm>;
-  handleFormSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  handleFormSubmit: () => void;
   onClose: () => void;
 }
 
@@ -51,21 +51,27 @@ export const CalendarDetailEditMenu: React.FC<CalendarDetailEditMenuProps> = (pr
       resultTop = top - 460; // 上側にスペースがあれば下を基準にして表示
     }
 
-    return { top: resultTop, left: resultLeft };
+    return { display: 'flex', top: resultTop, left: resultLeft };
   }, [props.anchorEl]);
+
+  const handleFormSubmit = React.useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      props.handleFormSubmit();
+    },
+    [props]
+  );
 
   return (
     <div
       className={styles.dialog}
-      style={{
-        display: props.anchorEl ? 'flex' : 'none',
-      }}
+      style={{ display: props.anchorEl ? 'flex' : 'none' }}
       onClick={props.onClose}
     >
       <form
         className={styles.dialog__content}
         onClick={(e) => e.stopPropagation()}
-        onSubmit={props.handleFormSubmit}
+        onSubmit={handleFormSubmit}
         style={style}
       >
         <div className={styles.dialog__header}>
@@ -80,6 +86,7 @@ export const CalendarDetailEditMenu: React.FC<CalendarDetailEditMenuProps> = (pr
             required
             label="タイトル"
             autoFocus
+            isActiveFocus={!!props.anchorEl}
           />
           <CheckBox control={props.control} name="isAllDay" label="終日" />
 
