@@ -5,6 +5,7 @@ import { fetchCalendarEvents } from '@/utils/fetchCalendarEvents';
 import { Control, useForm } from 'react-hook-form';
 import { CalendarFeatLocalStorageContext } from '@/contexts/CalendarFeatLocalStorageContext';
 import { CalendarConfigContext } from '@/contexts/CalendarConfigContext';
+import { convertCalendarRange } from '@/components/domains/newCalendar/calendarUtils';
 
 export interface FetchCalendarForm {
   start: string;
@@ -45,13 +46,12 @@ export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = 
   const { config } = React.useContext(CalendarConfigContext);
   const { calendars, isLoading } = React.useContext(CalendarFeatLocalStorageContext); // カレンダー情報を取得
 
+  const initDate = convertCalendarRange(dayjs(), config);
+
   const { control, watch } = useForm<FetchCalendarForm>({
     defaultValues: {
-      start: dayjs().startOf('day').toISOString(),
-      end: dayjs()
-        .endOf('day')
-        .add(config.weekDisplayCount - 1, 'day')
-        .toISOString(),
+      start: initDate.start.toISOString(),
+      end: initDate.end.toISOString(),
       canFetch: false,
     },
   });

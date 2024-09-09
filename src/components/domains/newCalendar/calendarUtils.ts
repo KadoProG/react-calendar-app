@@ -1,3 +1,4 @@
+import dayjs from '@/libs/dayjs';
 import { LEFT_WIDTH } from '@/const/const';
 import React from 'react';
 
@@ -27,4 +28,25 @@ export const getMouseSelectedCalendar = (
   const yIndex = Math.floor(nowTopPosition / (config.heightPerHour / config.divisionsPerHour));
 
   return { xIndex, yIndex };
+};
+
+/**
+ * カレンダーの開始・終了時間を取得する
+ */
+export const convertCalendarRange = (
+  day: dayjs.Dayjs,
+  config: CalendarConfig
+): { start: dayjs.Dayjs; end: dayjs.Dayjs } => {
+  let start: dayjs.Dayjs = day;
+  if (config.dateRangeStartTime === 'SunDay') {
+    start = start.startOf('week');
+  } else if (config.dateRangeStartTime === 'MonDay') {
+    start = start.startOf('week').add(1, 'day');
+  } else {
+    start = start.startOf('day');
+  }
+
+  const end = start.add(config.weekDisplayCount - 1, 'day').endOf('day');
+
+  return { start, end };
 };
