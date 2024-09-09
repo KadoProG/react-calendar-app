@@ -53,7 +53,7 @@ export const CalendarBodyMain: React.FC<CalendarBodyMainProps> = (props) => {
         })}
       </div>
       <div style={{ display: 'flex', width: '100%' }}>
-        {Array.from({ length: 7 }).map((_, i) => (
+        {Array.from({ length: props.config.weekDisplayCount }).map((_, i) => (
           <CalendarBodyMainRow
             key={i}
             i={i}

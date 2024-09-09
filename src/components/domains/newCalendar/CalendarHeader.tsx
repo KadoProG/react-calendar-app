@@ -8,10 +8,12 @@ import { SettingButton } from '@/components/common/button/SettingButton';
 import { Link } from 'react-router-dom';
 import { HEADER_HEIGHT } from '@/const/const';
 import { SettingDialog } from '@/components/domains/apitest/SettingDialog';
+import { convertCalendarRange } from '@/components/domains/newCalendar/calendarUtils';
 
 interface CalendarHeaderProps {
   control: Control<FetchCalendarForm>;
   user: User | null;
+  config: CalendarConfig;
 }
 
 export const CalendarHeader: React.FC<CalendarHeaderProps> = (props) => {
@@ -24,11 +26,12 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = (props) => {
 
   const handleScrollDate = React.useCallback(
     (type: -1 | 1) => {
-      const prev = dayjs(start).add(7 * type, 'day');
-      startController.field.onChange(prev.toISOString());
-      endController.field.onChange(prev.endOf('day').add(6, 'day').toISOString());
+      const { start: startResult, end } = convertCalendarRange(dayjs(start), props.config, type);
+
+      startController.field.onChange(startResult.toISOString());
+      endController.field.onChange(end.toISOString());
     },
-    [startController, start, endController]
+    [startController.field, endController.field, start, props.config]
   );
 
   const dateText = formatDateRange(dayjs(start), dayjs(end), 'month');

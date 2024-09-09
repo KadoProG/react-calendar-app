@@ -88,8 +88,8 @@ export const CalendarBodyTopRow: React.FC<CalendarBodyTopRowProps> = (props) => 
         const startDate = dayjs(event.start!.date);
         const endDate = dayjs(event.end!.date);
         const scheculeDiff = endDate.diff(dayjs(date), 'day');
-        const overDiff = !(scheculeDiff + props.i < 7);
-        const resultDiff = overDiff ? 7 - props.i : scheculeDiff + props.i;
+        const overDiff = !(scheculeDiff + props.i < props.config.weekDisplayCount);
+        const resultDiff = overDiff ? props.config.weekDisplayCount - props.i : scheculeDiff;
         return (
           <button
             key={event.id}

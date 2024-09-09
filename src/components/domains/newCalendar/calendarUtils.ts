@@ -35,9 +35,11 @@ export const getMouseSelectedCalendar = (
  */
 export const convertCalendarRange = (
   day: dayjs.Dayjs,
-  config: CalendarConfig
+  config: CalendarConfig,
+  scroll?: -1 | 1
 ): { start: dayjs.Dayjs; end: dayjs.Dayjs } => {
-  let start: dayjs.Dayjs = day;
+  let start: dayjs.Dayjs = day.add(config.weekDisplayCount * (scroll || 0), 'day');
+
   if (config.dateRangeStartTime === 'SunDay') {
     start = start.startOf('week');
   } else if (config.dateRangeStartTime === 'MonDay') {

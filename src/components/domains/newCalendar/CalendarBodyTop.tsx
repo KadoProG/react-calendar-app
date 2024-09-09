@@ -49,7 +49,7 @@ export const CalendarBodyTop: React.FC<CalendarBodyTopProps> = (props) => {
       </div>
 
       <div style={{ display: 'flex', width: '100%' }}>
-        {Array.from({ length: 7 }).map((_, i) => (
+        {Array.from({ length: props.config.weekDisplayCount }).map((_, i) => (
           <CalendarBodyTopRow
             key={i}
             start={props.start}
