@@ -35,7 +35,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = (props) => {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 4, height: HEADER_HEIGHT }}>
-      <Link to="/" style={{ width: 38, height: 38 }}>
+      <Link to="/" style={{ width: HEADER_HEIGHT, height: HEADER_HEIGHT }}>
         <img
           src="/images/icons/vite.svg"
           alt="calendar"

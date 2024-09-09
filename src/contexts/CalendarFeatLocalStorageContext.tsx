@@ -2,19 +2,20 @@ import { AuthContext } from '@/contexts/AuthContext';
 import { fetchCalendars } from '@/utils/fetchCalendarEvents';
 import React from 'react';
 
-interface CalendarFeatLocalStorageType {
+interface CalendarFeatLocalStorageContextType {
   calendars: CalendarFeatLocalStorage[];
   setCalendars: React.Dispatch<React.SetStateAction<CalendarFeatLocalStorage[]>>;
   isLoading: boolean;
   mutateCalendar: () => Promise<void>;
 }
 
-export const CalendarFeatLocalStorageContext = React.createContext<CalendarFeatLocalStorageType>({
-  calendars: [],
-  setCalendars: () => {},
-  isLoading: true,
-  mutateCalendar: async () => {},
-});
+export const CalendarFeatLocalStorageContext =
+  React.createContext<CalendarFeatLocalStorageContextType>({
+    calendars: [],
+    setCalendars: () => {},
+    isLoading: true,
+    mutateCalendar: async () => {},
+  });
 
 export const CalendarFeatLocalStorageProvider: React.FC<{ children: React.ReactNode }> = (
   props
