@@ -68,7 +68,7 @@
   border: none;
   height: 24px;
   &:hover {
-    background-color: var(--color-primary-hover);
+    filter: brightness(1.1);
   }
 
   &.start {
@@ -81,5 +81,14 @@
 
   &__leave {
     opacity: 0.2;
+  }
+}
+
+@media screen and (prefers-color-scheme: dark) {
+  .calendarEvent {
+    filter: brightness(0.8);
+    &:hover {
+      filter: brightness(1);
+    }
   }
 }

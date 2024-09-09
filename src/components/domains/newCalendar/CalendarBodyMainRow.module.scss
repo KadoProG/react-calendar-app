@@ -55,3 +55,12 @@
     opacity: 0.2;
   }
 }
+
+@media screen and (prefers-color-scheme: dark) {
+  .calendarEvent {
+    filter: brightness(0.8);
+    &:hover {
+      filter: brightness(1);
+    }
+  }
+}
