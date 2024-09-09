@@ -1,5 +1,5 @@
 import { FieldValues, UseControllerProps, useController } from 'react-hook-form';
-import styles from '@/components/common/TextField.module.scss';
+import styles from '@/components/common/input/TextField.module.scss';
 import React from 'react';
 
 export type TextFieldProps<T extends FieldValues> = UseControllerProps<T> & {
