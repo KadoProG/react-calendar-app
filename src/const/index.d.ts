@@ -14,7 +14,7 @@ interface CalendarEvent {
 
 interface CalendarConfig {
   /**
-   * １時間を何分割するか
+   * 1時間を何分割するか
    * - 1: 1時間ごと
    * - 2: 30分ごと
    * - 3: 20分ごと
@@ -22,11 +22,11 @@ interface CalendarConfig {
    */
   divisionsPerHour: number;
   /**
-   * １時間あたりの高さ
+   * 1時間あたりの高さ
    */
   heightPerHour: number;
   /**
-   * １画面の表示数
+   * 1画面の表示数
    */
   weekDisplayCount: number;
   /**

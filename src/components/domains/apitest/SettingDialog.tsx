@@ -3,6 +3,7 @@ import { DialogContainer } from '@/components/common/feedback/DialogContainer';
 import { DialogContent } from '@/components/common/feedback/DialogContent';
 import { DialogHeader } from '@/components/common/feedback/DialogHeader';
 import { SettingCalendarListValid } from '@/components/domains/apitest/SettingCalendarListValid';
+import { SettingOtherFormItems } from '@/components/domains/apitest/SettingOtherFormItems';
 import React from 'react';
 
 interface SettingDialogProps {
@@ -16,6 +17,7 @@ export const SettingDialog: React.FC<SettingDialogProps> = (props) => (
       <DialogHeader title="設定" />
       <DialogBody>
         <SettingCalendarListValid />
+        <SettingOtherFormItems />
       </DialogBody>
     </DialogContent>
   </DialogContainer>

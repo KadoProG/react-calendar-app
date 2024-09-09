@@ -1,7 +1,7 @@
 import { FieldValues, useController, UseControllerProps } from 'react-hook-form';
 
 type SelectProps<T extends FieldValues> = UseControllerProps<T> & {
-  label: string;
+  label?: string;
   options: { label: string; value: string }[];
   style?: React.CSSProperties;
 };
@@ -14,7 +14,7 @@ export const Select = <T extends FieldValues>(props: SelectProps<T>) => {
 
   return (
     <div style={props.style}>
-      <label>{props.label}</label>
+      {props.label && <label>{props.label}</label>}
       <select {...field}>
         {props.options.map((option) => (
           <option key={option.value} value={option.value}>
