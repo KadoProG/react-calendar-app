@@ -69,21 +69,20 @@ export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = 
     revalidateOnReconnect: false,
   });
 
-  const calendarEvents = data ?? [];
+  const calendarEvents = React.useMemo(() => data ?? [], [data]);
 
-  return (
-    <CalendarContext.Provider
-      value={{
-        calendarEvents,
-        calendars,
-        isCalendarEventsLoading,
-        isCalendarsLoading: isLoading,
-        control,
-        config,
-        mutate,
-      }}
-    >
-      {children}
-    </CalendarContext.Provider>
+  const value = React.useMemo(
+    () => ({
+      calendarEvents,
+      calendars,
+      isCalendarEventsLoading,
+      isCalendarsLoading: isLoading,
+      control,
+      config,
+      mutate,
+    }),
+    [calendarEvents, calendars, isCalendarEventsLoading, isLoading, control, config, mutate]
   );
+
+  return <CalendarContext.Provider value={value}>{children}</CalendarContext.Provider>;
 };

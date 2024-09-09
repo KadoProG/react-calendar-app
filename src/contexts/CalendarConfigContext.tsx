@@ -25,11 +25,16 @@ export const CalendarConfigContext = React.createContext<CalendarConfigContextVa
 });
 
 export const CalendarConfigProvider: React.FC<{ children: React.ReactNode }> = (props) => {
-  const context = React.useContext(CalendarConfigContext);
-  const config = context.config;
   const [baseDate, setBaseDate] = React.useState<dayjs.Dayjs>(dayjs());
 
-  const { control, watch, reset } = useForm<CalendarConfig>({ defaultValues: config });
+  const { control, watch, reset } = useForm<CalendarConfig>({
+    defaultValues: {
+      divisionsPerHour: 4,
+      heightPerHour: 40,
+      weekDisplayCount: 7,
+      dateRangeStartTime: 'SunDay',
+    },
+  });
 
   const watchConfig = watch();
 
