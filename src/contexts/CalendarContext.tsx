@@ -4,7 +4,6 @@ import useSWR from 'swr';
 import { fetchCalendarEvents } from '@/utils/fetchCalendarEvents';
 import { Control, useForm } from 'react-hook-form';
 import { CalendarFeatLocalStorageContext } from '@/contexts/CalendarFeatLocalStorageContext';
-import { CalendarConfigContext } from '@/contexts/CalendarConfigContext';
 import { convertCalendarRange } from '@/components/domains/newCalendar/calendarUtils';
 
 export interface FetchCalendarForm {
@@ -43,8 +42,11 @@ export const CalendarContext = React.createContext<CalendarContextType>({
 });
 
 export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { config } = React.useContext(CalendarConfigContext);
-  const { calendars, isLoading } = React.useContext(CalendarFeatLocalStorageContext); // カレンダー情報を取得
+  const {
+    calendars,
+    isLoading,
+    calendarConfig: config,
+  } = React.useContext(CalendarFeatLocalStorageContext); // カレンダー情報を取得
 
   const initDate = convertCalendarRange(dayjs(), config);
 

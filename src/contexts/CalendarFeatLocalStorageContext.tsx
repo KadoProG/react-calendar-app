@@ -1,12 +1,17 @@
+import { LOCAL_STORAGE_KEY } from '@/const/const';
 import { AuthContext } from '@/contexts/AuthContext';
+import { saveUserConfigInLocalStorage } from '@/contexts/localStorageUtils';
 import { fetchCalendars } from '@/utils/fetchCalendarEvents';
 import React from 'react';
+import { Control, useForm } from 'react-hook-form';
 
 interface CalendarFeatLocalStorageContextType {
   calendars: CalendarFeatLocalStorage[];
   setCalendars: React.Dispatch<React.SetStateAction<CalendarFeatLocalStorage[]>>;
   isLoading: boolean;
   mutateCalendar: () => Promise<void>;
+  calendarConfig: CalendarConfig;
+  control: Control<CalendarConfig>;
 }
 
 export const CalendarFeatLocalStorageContext =
@@ -15,6 +20,8 @@ export const CalendarFeatLocalStorageContext =
     setCalendars: () => {},
     isLoading: true,
     mutateCalendar: async () => {},
+    calendarConfig: {} as CalendarConfig,
+    control: {} as Control<CalendarConfig>,
   });
 
 export const CalendarFeatLocalStorageProvider: React.FC<{ children: React.ReactNode }> = (
@@ -24,29 +31,64 @@ export const CalendarFeatLocalStorageProvider: React.FC<{ children: React.ReactN
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [calendars, setCalendars] = React.useState<CalendarFeatLocalStorage[]>([]);
 
+  const { control, watch, reset } = useForm<CalendarConfig>({
+    defaultValues: {
+      divisionsPerHour: 4,
+      heightPerHour: 40,
+      weekDisplayCount: 5,
+      dateRangeStartTime: 'SunDay',
+    },
+  });
+
+  const calendarConfig = watch();
+
   // useEffectを使用し、stateの値が変更された時にlocalStorageに値を保存
   React.useEffect(() => {
+    console.log('LocalStorageの更新'); // eslint-disable-line no-console
     if (!user || !calendars || calendars.length === 0) return;
     try {
-      const serializedValue = JSON.stringify(calendars);
-      localStorage.setItem(user.email, serializedValue);
+      const value: LocalStorageType = { id: user.email, calendars, calendarConfig };
+      saveUserConfigInLocalStorage(value);
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(error);
     }
-  }, [user, calendars]);
+  }, [user, calendars, calendarConfig]);
 
   const initCalendarsFeatLocalStorage = React.useCallback(async () => {
     if (!user) return;
     try {
-      const item = localStorage.getItem(user.email);
+      // ローカルストレージからデータを取得
+      const item = localStorage.getItem(LOCAL_STORAGE_KEY);
       const parsedItem = item ? JSON.parse(item) : null;
 
-      if (parsedItem && Array.isArray(parsedItem) && parsedItem.length > 0) {
-        setCalendars(parsedItem);
-        setIsLoading(false);
-        return;
+      // データがあった場合の処理
+      if (parsedItem && Array.isArray(parsedItem)) {
+        const userConfig: LocalStorageType | undefined = parsedItem.find(
+          (userConfig: LocalStorageType) => userConfig.id === user.email
+        );
+
+        // 対象のユーザデータがあった場合の処理
+        if (userConfig) {
+          if (userConfig.calendars) {
+            setCalendars(userConfig.calendars);
+          } else {
+            const fetchedCalendars = await fetchCalendars();
+            const processedCalendars = fetchedCalendars.map((calendar) => ({
+              ...calendar,
+              hasValid: !!calendar.primary,
+            }));
+            setCalendars(processedCalendars);
+          }
+
+          if (userConfig.calendarConfig) {
+            reset(userConfig.calendarConfig);
+          }
+          setIsLoading(false);
+          return;
+        }
       }
+
       const fetchedCalendars = await fetchCalendars();
       const processedCalendars = fetchedCalendars.map((calendar) => ({
         ...calendar,
@@ -58,7 +100,7 @@ export const CalendarFeatLocalStorageProvider: React.FC<{ children: React.ReactN
       // eslint-disable-next-line no-console
       console.error(error);
     }
-  }, [user]);
+  }, [user, reset]);
 
   React.useEffect(() => {
     if (user) {
@@ -75,10 +117,20 @@ export const CalendarFeatLocalStorageProvider: React.FC<{ children: React.ReactN
     initCalendarsFeatLocalStorage();
   }, [user, initCalendarsFeatLocalStorage]); // 依存関係にcalendarsを追加
 
+  const value = React.useMemo(
+    () => ({
+      calendars,
+      setCalendars,
+      isLoading,
+      mutateCalendar,
+      calendarConfig,
+      control,
+    }),
+    [calendars, setCalendars, isLoading, mutateCalendar, calendarConfig, control]
+  );
+
   return (
-    <CalendarFeatLocalStorageContext.Provider
-      value={{ calendars, setCalendars, isLoading, mutateCalendar }}
-    >
+    <CalendarFeatLocalStorageContext.Provider value={value}>
       {props.children}
     </CalendarFeatLocalStorageContext.Provider>
   );

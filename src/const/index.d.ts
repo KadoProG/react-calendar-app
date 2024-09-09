@@ -54,7 +54,7 @@ type CalendarEventWithCalendarId = gapi.client.calendar.Event & {
  * LocalStorageに保存するデータ
  */
 interface LocalStorageType {
-  id: string;
-  calendars: CalendarFeatLocalStorage[];
-  calendarConfig: CalendarConfig;
+  id: string?;
+  calendars: CalendarFeatLocalStorage[]?;
+  calendarConfig: CalendarConfig?;
 }
