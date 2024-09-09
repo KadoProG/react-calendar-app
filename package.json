@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "prettier": "prettier --write --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,json,css}'",
-    "check-types": "tsc --noEmit",
+    "check-types": "tsc -b",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "preview": "vite preview",

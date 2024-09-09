@@ -12,6 +12,7 @@ export const CalendarConfigContext = React.createContext<CalendarConfigContextVa
     divisionsPerHour: 4,
     heightPerHour: 40,
     weekDisplayCount: 7,
+    dateRangeStartTime: 'SunDay',
   },
   baseDate: dayjs(),
   setBaseDate: () => {},

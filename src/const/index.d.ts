@@ -29,6 +29,10 @@ interface CalendarConfig {
    * １画面の表示数
    */
   weekDisplayCount: number;
+  /**
+   * カレンダーの開始タイミング
+   */
+  dateRangeStartTime: 'SunDay' | 'MonDay' | 'None';
 }
 
 /**
