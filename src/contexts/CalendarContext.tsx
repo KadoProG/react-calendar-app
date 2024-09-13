@@ -48,23 +48,31 @@ export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = 
     calendarConfig: config,
   } = React.useContext(CalendarFeatLocalStorageContext); // カレンダー情報を取得
 
-  const initDate = convertCalendarRange(dayjs(), config);
-
-  const { control, watch } = useForm<FetchCalendarForm>({
+  const { control, watch, reset } = useForm<FetchCalendarForm>({
     defaultValues: {
-      start: initDate.start.toISOString(),
-      end: initDate.end.toISOString(),
+      start: '',
+      end: '',
       canFetch: false,
     },
   });
 
   const { start, end } = watch();
 
+  // configの値が変更された時に、startとendを更新
+  React.useEffect(() => {
+    const initDate = convertCalendarRange(start ? dayjs(start) : dayjs(), config);
+    reset({
+      start: initDate.start.toISOString(),
+      end: initDate.end.toISOString(),
+      canFetch: false,
+    });
+  }, [config, reset, start]);
+
   const {
     data,
     isLoading: isCalendarEventsLoading,
     mutate,
-  } = useSWR(calendars ? { calendars, start, end } : null, fetchCalendarEvents, {
+  } = useSWR(!isLoading ? { calendars, start, end } : null, fetchCalendarEvents, {
     // 自動fetchの無効化
     revalidateIfStale: false,
     revalidateOnFocus: false,

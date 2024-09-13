@@ -84,7 +84,7 @@ export const CalendarFeatLocalStorageProvider: React.FC<{ children: React.ReactN
           if (userConfig.calendarConfig) {
             reset(userConfig.calendarConfig);
           }
-          setIsLoading(false);
+          setTimeout(() => setIsLoading(false), 0);
           return;
         }
       }
