@@ -14,6 +14,7 @@ interface CalendarBodyMainRowProps {
   isDragging: boolean;
   splitedSelectedCalendarEvents?: ReturnType<typeof splitCalendarEvents>;
   config: CalendarConfig;
+  dragEventItem: { eventId: string; yDiff: number } | null;
 }
 
 /**
@@ -93,18 +94,20 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
           />
         ))}
 
+      {/* 既存のカレンダーイベントの表示 */}
       {calendarEventsInTimelyInDay.map((event) => {
         const startDate = dayjs(event.start!.dateTime);
         const endDate = dayjs(event.end!.dateTime);
         const startDiff = calculateIndexDifference(date, startDate, divisionsPerHour);
         const endDiff = calculateIndexDifference(startDate, endDate, divisionsPerHour);
+        const isDragItem = props.dragEventItem?.eventId === event.id;
 
         return (
           <button
             key={event.id}
-            className={styles.calendarEvent}
-            onMouseDown={(e) => e.stopPropagation()}
+            className={`${styles.calendarEvent} ${isDragItem ? styles.calendarEvent__leave : ''}`}
             onClick={(e) => handleScheduleClick(e, event.id ?? '')}
+            id={`calendarEvent__${event.id}`}
             style={{
               top: `${(startDiff * heightPerHour) / divisionsPerHour}px`,
               height: `${(endDiff * heightPerHour) / divisionsPerHour}px`,

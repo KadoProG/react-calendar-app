@@ -9,6 +9,7 @@ import { useWatch } from 'react-hook-form';
 import { KeyDownContext } from '@/contexts/KeyDownContext';
 import { CalendarMenuContext } from '@/components/domains/newCalendar/CalendarMenuContext';
 import { AuthContext } from '@/contexts/AuthContext';
+import { calculateIndexDifference } from '@/utils/convertDayjs';
 
 export const NewCalendar: React.FC = () => {
   const { openMenu } = React.useContext(CalendarMenuContext);
@@ -28,11 +29,42 @@ export const NewCalendar: React.FC = () => {
 
   const isMouseDownRef = React.useRef<'allday' | 'timely' | null>(null);
 
+  // イベントドラッグ時に格納される変数
+  const [dragEventItem, setDragEventItem] = React.useState<{
+    eventId: string;
+    yDiff: number;
+  } | null>(null);
+
   const handleMouseDown = React.useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (isMouseDownRef.current) return;
       const { xIndex, yIndex } = getMouseSelectedCalendar(e, scrollRef.current!, config, topHeight);
 
+      // イベントの上でマウスダウンした場合の処理
+      if (e.target instanceof HTMLElement && e.target.id.includes('calendarEvent__')) {
+        const eventId = e.target.id.replace('calendarEvent__', '');
+        const event = calendarEvents.find((event) => event.id === eventId);
+        if (!event) return;
+
+        setSelectedStartDay(dayjs(event.start?.dateTime ?? event.start?.date));
+        setSelectedEndDay(dayjs(event.end?.dateTime ?? event.end?.date));
+        isMouseDownRef.current = event.start?.date ? 'allday' : 'timely';
+
+        const yDiff =
+          isMouseDownRef.current === 'allday'
+            ? 0
+            : yIndex -
+              calculateIndexDifference(
+                dayjs(event.start?.dateTime).startOf('day'),
+                dayjs(event.start?.dateTime ?? event.start?.date),
+                config.divisionsPerHour
+              );
+
+        setDragEventItem({ eventId, yDiff });
+        return;
+      }
+
+      // 終日イベントの上でマウスダウンした場合の処理
       if (yIndex < 0) {
         const resultDate = start.add(xIndex, 'day');
         setSelectedStartDay(resultDate);
@@ -41,13 +73,13 @@ export const NewCalendar: React.FC = () => {
         return;
       }
 
+      // 通常のイベントの上でマウスダウンした場合の処理
       const resultDate = start.add(xIndex, 'day').add(yIndex / config.divisionsPerHour, 'hour');
-
       setSelectedStartDay(resultDate);
       setSelectedEndDay(resultDate);
       isMouseDownRef.current = 'timely';
     },
-    [start, topHeight, config]
+    [start, topHeight, config, calendarEvents]
   );
 
   const handleMouseMove = React.useCallback(
@@ -146,6 +178,7 @@ export const NewCalendar: React.FC = () => {
             selectedEndDay={selectedEndDay}
             isDragging={isDragging && isMouseDownRef.current === 'timely'}
             config={config}
+            dragEventItem={dragEventItem}
           />
         </div>
       </div>

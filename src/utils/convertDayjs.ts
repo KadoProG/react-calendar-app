@@ -53,6 +53,13 @@ export const splitCalendarEvents = (events: CalendarEvent[]): SplitedCalendarEve
   return result;
 };
 
+/**
+ * インデックスから時刻を生成する関数
+ *
+ * @param {dayjs.Dayjs} day - 日付 (dayjsオブジェクト)
+ * @param {number} index - インデックス
+ * @param {number} divisionsPerHour - 1時間あたりの分割数
+ */
 export const generateTime = (day: dayjs.Dayjs, index: number, divisionsPerHour: number) => {
   const minutesPerDivision = 60 / divisionsPerHour;
   const totalMinutes = index * minutesPerDivision;
@@ -62,6 +69,15 @@ export const generateTime = (day: dayjs.Dayjs, index: number, divisionsPerHour: 
   return day.startOf('day').add(hours, 'hour').add(minutes, 'minute');
 };
 
+/**
+ * 開始時刻と終了時刻からインデックスの差分を計算する関数
+ *
+ * インデックスの差分は、開始時刻から終了時刻までの分数を1時間あたりの分割数で割った値を四捨五入したもの
+ *
+ * @param {dayjs.Dayjs} startTime - 開始時刻 (dayjsオブジェクト)
+ * @param {dayjs.Dayjs} endTime - 終了時刻 (dayjsオブジェクト)
+ * @param {number} divisionsPerHour - 1時間あたりの分割数
+ */
 export const calculateIndexDifference = (
   startTime: dayjs.Dayjs,
   endTime: dayjs.Dayjs,
