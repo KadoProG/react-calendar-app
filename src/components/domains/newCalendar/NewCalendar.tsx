@@ -31,7 +31,8 @@ export const NewCalendar: React.FC = () => {
 
   // イベントドラッグ時に格納される変数
   const [dragEventItem, setDragEventItem] = React.useState<{
-    eventId: string;
+    event: CalendarEventWithCalendarId;
+    ySizeIndex: number;
     yDiff: number;
   } | null>(null);
 
@@ -50,6 +51,10 @@ export const NewCalendar: React.FC = () => {
         setSelectedEndDay(dayjs(event.end?.dateTime ?? event.end?.date));
         isMouseDownRef.current = event.start?.date ? 'allday' : 'timely';
 
+        const ySizeIndex =
+          (dayjs(event.end?.dateTime).diff(dayjs(event.start?.dateTime), 'minute') / 60) *
+          config.divisionsPerHour;
+
         const yDiff =
           isMouseDownRef.current === 'allday'
             ? 0
@@ -60,7 +65,7 @@ export const NewCalendar: React.FC = () => {
                 config.divisionsPerHour
               );
 
-        setDragEventItem({ eventId, yDiff });
+        setDragEventItem({ event, ySizeIndex, yDiff });
         return;
       }
 
@@ -89,6 +94,21 @@ export const NewCalendar: React.FC = () => {
 
       const { xIndex, yIndex } = getMouseSelectedCalendar(e, scrollRef.current!, config, topHeight);
 
+      // イベントドラッグ中の処理
+      if (dragEventItem) {
+        const resultStart = start
+          .add(xIndex, 'day')
+          .add((yIndex - dragEventItem.yDiff) / config.divisionsPerHour, 'hour');
+        const resultEnd = resultStart.add(
+          ((dragEventItem.ySizeIndex - 1) * 60) / config.divisionsPerHour,
+          'minute'
+        );
+
+        setSelectedStartDay(resultStart);
+        setSelectedEndDay(resultEnd);
+        return;
+      }
+
       if (isMouseDownRef.current === 'allday') {
         const resultDate = start.add(xIndex, 'day');
         setSelectedEndDay(resultDate);
@@ -98,7 +118,7 @@ export const NewCalendar: React.FC = () => {
       const resultDate = start.add(xIndex, 'day').add(yIndex / config.divisionsPerHour, 'hour');
       setSelectedEndDay(resultDate);
     },
-    [start, config, topHeight]
+    [start, config, topHeight, dragEventItem]
   );
 
   const handleMouseUp = React.useCallback(
@@ -112,36 +132,49 @@ export const NewCalendar: React.FC = () => {
         selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay
       ).add(60 / config.divisionsPerHour, 'minute');
 
-      await openMenu({
-        anchorEl: e.target as HTMLElement,
-        start: resultStartDay,
-        end: resultEndDay,
-        isAllDay: isMouseDownRef.current === 'allday',
-        calendarId: user?.email ?? '',
-        eventId: '',
-        summary: '',
-      });
+      if (dragEventItem) {
+        await openMenu({
+          anchorEl: e.target as HTMLElement,
+          start: resultStartDay,
+          end: resultEndDay,
+          isAllDay: dragEventItem.event.start?.date ? true : false,
+          calendarId: dragEventItem.event.calendarId,
+          eventId: dragEventItem.event.id ?? '',
+          summary: dragEventItem.event.summary ?? '',
+        });
+      } else {
+        await openMenu({
+          anchorEl: e.target as HTMLElement,
+          start: resultStartDay,
+          end: resultEndDay,
+          isAllDay: isMouseDownRef.current === 'allday',
+          calendarId: user?.email ?? '',
+          eventId: '',
+          summary: '',
+        });
+      }
 
       isMouseDownRef.current = null;
       setIsDragging(false);
+      setDragEventItem(null);
     },
-    [selectedStartDay, selectedEndDay, isDragging, config, openMenu, user]
+    [selectedStartDay, selectedEndDay, isDragging, config, openMenu, user, dragEventItem]
   );
 
   React.useEffect(() => {
-    if (isDragging) {
-      addKeyDownEvent({
-        id: 0,
-        key: 'Escape',
-        callback: () => {
-          isMouseDownRef.current = null;
-          setIsDragging(false);
-        },
-      });
-    } else {
+    addKeyDownEvent({
+      id: 0,
+      key: 'Escape',
+      callback: () => {
+        isMouseDownRef.current = null;
+        setIsDragging(false);
+        setDragEventItem(null);
+      },
+    });
+    return () => {
       removeKeyDownEvent(0);
-    }
-  }, [addKeyDownEvent, removeKeyDownEvent, isDragging]);
+    };
+  }, [addKeyDownEvent, removeKeyDownEvent]);
 
   return (
     <div style={{ height: '100svh', display: 'flex', flexDirection: 'column' }}>

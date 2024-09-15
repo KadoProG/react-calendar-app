@@ -14,7 +14,7 @@ interface CalendarBodyMainRowProps {
   isDragging: boolean;
   splitedSelectedCalendarEvents?: ReturnType<typeof splitCalendarEvents>;
   config: CalendarConfig;
-  dragEventItem: { eventId: string; yDiff: number } | null;
+  dragEventItem: { event: CalendarEventWithCalendarId; yDiff: number } | null;
 }
 
 /**
@@ -100,13 +100,14 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
         const endDate = dayjs(event.end!.dateTime);
         const startDiff = calculateIndexDifference(date, startDate, divisionsPerHour);
         const endDiff = calculateIndexDifference(startDate, endDate, divisionsPerHour);
-        const isDragItem = props.dragEventItem?.eventId === event.id;
+        const isDragItem = props.dragEventItem?.event.id === event.id;
 
         return (
           <button
             key={event.id}
             className={`${styles.calendarEvent} ${isDragItem ? styles.calendarEvent__leave : ''}`}
             onClick={(e) => handleScheduleClick(e, event.id ?? '')}
+            // disabled={isDragItem}
             id={`calendarEvent__${event.id}`}
             style={{
               top: `${(startDiff * heightPerHour) / divisionsPerHour}px`,

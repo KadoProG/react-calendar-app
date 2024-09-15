@@ -1,7 +1,6 @@
 .dayColumn {
   flex: 1;
   width: 100%;
-  background-color: var(--background-paper);
   position: relative;
   border-left: 1px solid var(--divider);
 }
@@ -53,6 +52,7 @@
 
   &__leave {
     opacity: 0.2;
+    z-index: -1;
   }
 }
 

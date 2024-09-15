@@ -12,7 +12,7 @@ interface CalendarBodyMainProps {
   selectedEndDay: dayjs.Dayjs | null;
   isDragging: boolean;
   config: CalendarConfig;
-  dragEventItem: { eventId: string; yDiff: number } | null;
+  dragEventItem: { event: CalendarEventWithCalendarId; yDiff: number } | null;
 }
 
 export const CalendarBodyMain: React.FC<CalendarBodyMainProps> = (props) => {
