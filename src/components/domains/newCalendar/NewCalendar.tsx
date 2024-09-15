@@ -69,20 +69,20 @@ export const NewCalendar: React.FC = () => {
         return;
       }
 
-      // 終日イベントの上でマウスダウンした場合の処理
+      let resultDate: dayjs.Dayjs;
+
       if (yIndex < 0) {
-        const resultDate = start.add(xIndex, 'day');
-        setSelectedStartDay(resultDate);
-        setSelectedEndDay(resultDate);
+        // 終日イベントの上でマウスダウンした場合の処理
+        resultDate = start.add(xIndex, 'day');
         isMouseDownRef.current = 'allday';
-        return;
+      } else {
+        // 通常のイベントの上でマウスダウンした場合の処理
+        resultDate = start.add(xIndex, 'day').add(yIndex / config.divisionsPerHour, 'hour');
+        isMouseDownRef.current = 'timely';
       }
 
-      // 通常のイベントの上でマウスダウンした場合の処理
-      const resultDate = start.add(xIndex, 'day').add(yIndex / config.divisionsPerHour, 'hour');
       setSelectedStartDay(resultDate);
       setSelectedEndDay(resultDate);
-      isMouseDownRef.current = 'timely';
     },
     [start, topHeight, config, calendarEvents]
   );
@@ -109,13 +109,14 @@ export const NewCalendar: React.FC = () => {
         return;
       }
 
-      if (isMouseDownRef.current === 'allday') {
-        const resultDate = start.add(xIndex, 'day');
-        setSelectedEndDay(resultDate);
-        return;
+      // 終日イベントのデフォルト値
+      let resultDate: dayjs.Dayjs = start.add(xIndex, 'day');
+
+      if (isMouseDownRef.current === 'timely') {
+        // 通常のイベントの計算
+        resultDate = resultDate.add(yIndex / config.divisionsPerHour, 'hour');
       }
 
-      const resultDate = start.add(xIndex, 'day').add(yIndex / config.divisionsPerHour, 'hour');
       setSelectedEndDay(resultDate);
     },
     [start, config, topHeight, dragEventItem]
@@ -127,32 +128,25 @@ export const NewCalendar: React.FC = () => {
 
       if (!selectedStartDay || !selectedEndDay) return;
 
-      const resultStartDay = selectedStartDay <= selectedEndDay ? selectedStartDay : selectedEndDay;
-      const resultEndDay = (
-        selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay
-      ).add(60 / config.divisionsPerHour, 'minute');
+      const resultStart = selectedStartDay <= selectedEndDay ? selectedStartDay : selectedEndDay;
+      const resultEnd = (selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay).add(
+        60 / config.divisionsPerHour,
+        'minute'
+      );
 
-      if (dragEventItem) {
-        await openMenu({
-          anchorEl: e.target as HTMLElement,
-          start: resultStartDay,
-          end: resultEndDay,
-          isAllDay: dragEventItem.event.start?.date ? true : false,
-          calendarId: dragEventItem.event.calendarId,
-          eventId: dragEventItem.event.id ?? '',
-          summary: dragEventItem.event.summary ?? '',
-        });
-      } else {
-        await openMenu({
-          anchorEl: e.target as HTMLElement,
-          start: resultStartDay,
-          end: resultEndDay,
-          isAllDay: isMouseDownRef.current === 'allday',
-          calendarId: user?.email ?? '',
-          eventId: '',
-          summary: '',
-        });
-      }
+      const menuArgs = {
+        anchorEl: e.target as HTMLElement,
+        start: resultStart,
+        end: resultEnd,
+        isAllDay: dragEventItem
+          ? !!dragEventItem.event?.start?.date
+          : isMouseDownRef.current === 'allday',
+        calendarId: dragEventItem ? dragEventItem.event.calendarId : (user?.email ?? ''),
+        eventId: dragEventItem ? (dragEventItem.event.id ?? '') : '',
+        summary: dragEventItem ? (dragEventItem.event.summary ?? '') : '',
+      };
+
+      await openMenu(menuArgs);
 
       isMouseDownRef.current = null;
       setIsDragging(false);
