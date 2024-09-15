@@ -1,6 +1,6 @@
 import dayjs from '@/libs/dayjs';
 
-interface SplitedCalendarEvent extends CalendarEvent {
+export interface SplitedCalendarEvent extends CalendarEventWithCalendarId {
   splitStart: dayjs.Dayjs;
   splitEnd: dayjs.Dayjs;
 }
@@ -8,11 +8,14 @@ interface SplitedCalendarEvent extends CalendarEvent {
 /**
  * カレンダーイベントの配列を受け取り、日付をまたぐイベントを分割して返す
  */
-export const splitCalendarEvents = (events: CalendarEvent[]): SplitedCalendarEvent[] => {
+export const splitCalendarEvents = (
+  events: CalendarEventWithCalendarId[]
+): SplitedCalendarEvent[] => {
   const result: SplitedCalendarEvent[] = [];
 
   events.forEach((event) => {
-    const { start: tempStart, end: tempEnd } = event;
+    const tempStart = dayjs(event.start?.dateTime || event.start?.date);
+    const tempEnd = dayjs(event.end?.dateTime || event.end?.date);
 
     const start = tempStart < tempEnd ? tempStart : tempEnd;
     const end = tempStart < tempEnd ? tempEnd : tempStart;

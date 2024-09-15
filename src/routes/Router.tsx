@@ -4,7 +4,6 @@ import { APIPage } from '@/pages/APIPage';
 import { AuthContext } from '@/contexts/AuthContext';
 import { LoadingWithMessage } from '@/components/common/LoadingWithMessage';
 import { HomePage } from '@/pages/HomePage';
-import { CalendarPage } from '@/pages/CalendarPage';
 import { NewCalendarPage } from '@/pages/NewCalendarPage';
 
 export const MyRouter: React.FC = () => {
@@ -18,7 +17,6 @@ export const MyRouter: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/new-calendar" element={<NewCalendarPage />} />
         <Route path="/api" element={<APIPage />} />
       </Routes>
