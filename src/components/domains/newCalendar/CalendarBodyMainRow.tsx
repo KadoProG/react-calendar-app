@@ -2,12 +2,16 @@ import styles from '@/components/domains/newCalendar/CalendarBodyMainRow.module.
 import { CalendarBodyMainRowSelectedItem } from '@/components/domains/newCalendar/CalendarBodyMainRowSelectedItem';
 import { CalendarMenuContext } from '@/components/domains/newCalendar/CalendarMenuContext';
 import dayjs from '@/libs/dayjs';
-import { calculateIndexDifference, splitCalendarEvents } from '@/utils/convertDayjs';
+import {
+  calculateIndexDifference,
+  splitCalendarEvents,
+  SplitedCalendarEvent,
+} from '@/utils/convertDayjs';
 import React from 'react';
 
 interface CalendarBodyMainRowProps {
   start: dayjs.Dayjs;
-  calendarEventsInTimely: CalendarEventWithCalendarId[];
+  calendarEventsInTimely: SplitedCalendarEvent[];
   i: number;
   selectedStartDay: dayjs.Dayjs | null;
   selectedEndDay: dayjs.Dayjs | null;
@@ -31,13 +35,8 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
 
   // 時刻付き予定のうち、その日に該当するものを取得
   const calendarEventsInTimelyInDay = React.useMemo(
-    () =>
-      props.calendarEventsInTimely.filter(
-        (event) =>
-          dayjs(event.start!.dateTime).isSame(date, 'day') ||
-          (props.i === 0 && dayjs(event.start!.dateTime).isBefore(date, 'day'))
-      ),
-    [props.calendarEventsInTimely, date, props.i]
+    () => props.calendarEventsInTimely.filter((event) => event.splitStart.isSame(date, 'day')),
+    [props.calendarEventsInTimely, date]
   );
 
   const handleScheduleClick = React.useCallback(
@@ -96,8 +95,8 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
 
       {/* 既存のカレンダーイベントの表示 */}
       {calendarEventsInTimelyInDay.map((event) => {
-        const startDate = dayjs(event.start!.dateTime);
-        const endDate = dayjs(event.end!.dateTime);
+        const startDate = event.splitStart;
+        const endDate = event.splitEnd;
         const startDiff = calculateIndexDifference(date, startDate, divisionsPerHour);
         const endDiff = calculateIndexDifference(startDate, endDate, divisionsPerHour);
         const isDragItem = props.dragEventItem?.event.id === event.id;

@@ -17,7 +17,10 @@ interface CalendarBodyMainProps {
 
 export const CalendarBodyMain: React.FC<CalendarBodyMainProps> = (props) => {
   const calendarEventsInTimely = React.useMemo(
-    () => props.calendarEvents.filter((event) => !!event.start?.dateTime && !!event.end?.dateTime),
+    () =>
+      splitCalendarEvents(
+        props.calendarEvents.filter((event) => !!event.start?.dateTime && !!event.end?.dateTime)
+      ),
     [props.calendarEvents]
   );
 
@@ -27,10 +30,11 @@ export const CalendarBodyMain: React.FC<CalendarBodyMainProps> = (props) => {
         ? splitCalendarEvents([
             {
               id: '1',
-              title: '',
-              start: props.selectedStartDay,
-              end: props.selectedEndDay,
-              isAllDayEvent: false,
+              summary: '',
+              start: { dateTime: props.selectedStartDay?.toISOString() },
+              end: { dateTime: props.selectedEndDay?.toISOString() },
+              calendarId: '',
+              backgroundColor: '',
             },
           ])
         : undefined,
