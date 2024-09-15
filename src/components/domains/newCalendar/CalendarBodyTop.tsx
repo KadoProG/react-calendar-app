@@ -40,7 +40,7 @@ export const CalendarBodyTop: React.FC<CalendarBodyTopProps> = (props) => {
   }, [updateHeight]);
 
   return (
-    <div ref={ref} style={{ display: 'flex', minHeight: 72 }}>
+    <div ref={ref} style={{ display: 'flex' }}>
       <div style={{ minWidth: LEFT_WIDTH }}>
         <Button style={{ padding: '2px 4px' }}>
           ＋<br />

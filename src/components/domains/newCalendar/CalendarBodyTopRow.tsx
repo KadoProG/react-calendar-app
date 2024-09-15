@@ -82,24 +82,26 @@ export const CalendarBodyTopRow: React.FC<CalendarBodyTopRowProps> = (props) => 
       <p style={{ textAlign: 'center' }}>{date.date()}</p>
 
       {/* カレンダーイベント */}
-      {calendarEventsInAllDayInDay.map((event) => {
-        const startDate = dayjs(event.start!.date);
-        const endDate = dayjs(event.end!.date);
-        const scheculeDiff = endDate.diff(dayjs(date), 'day');
-        const overDiff = !(scheculeDiff + props.i < props.config.weekDisplayCount);
-        const resultDiff = overDiff ? props.config.weekDisplayCount - props.i : scheculeDiff;
-        return (
-          <button
-            key={event.id}
-            onClick={(e) => handleScheduleClick(e, event.id ?? '')}
-            id={`calendarEvent__${event.id}`}
-            className={`${styles.calendarEvent} ${startDate.isBefore(date, 'day') ? styles.start : ''} ${overDiff ? styles.end : ''}`}
-            style={{ width: `${resultDiff * 100}%`, backgroundColor: event.backgroundColor }}
-          >
-            {event.summary}
-          </button>
-        );
-      })}
+      <div style={{ minHeight: 20 }}>
+        {calendarEventsInAllDayInDay.map((event) => {
+          const startDate = dayjs(event.start!.date);
+          const endDate = dayjs(event.end!.date);
+          const scheculeDiff = endDate.diff(dayjs(date), 'day');
+          const overDiff = !(scheculeDiff + props.i < props.config.weekDisplayCount);
+          const resultDiff = overDiff ? props.config.weekDisplayCount - props.i : scheculeDiff;
+          return (
+            <button
+              key={event.id}
+              onClick={(e) => handleScheduleClick(e, event.id ?? '')}
+              id={`calendarEvent__${event.id}`}
+              className={`${styles.calendarEvent} ${startDate.isBefore(date, 'day') ? styles.start : ''} ${overDiff ? styles.end : ''}`}
+              style={{ width: `${resultDiff * 100}%`, backgroundColor: event.backgroundColor }}
+            >
+              {event.summary}
+            </button>
+          );
+        })}
+      </div>
 
       {/* 選択時のハイライト表示 */}
       <div style={{ position: 'relative' }}>
