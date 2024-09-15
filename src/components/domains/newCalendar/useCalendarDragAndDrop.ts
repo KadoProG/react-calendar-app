@@ -24,6 +24,7 @@ export const useCalendarDragAndDrop = (
 
   const [dragEventItem, setDragEventItem] = React.useState<{
     event: CalendarEventWithCalendarId;
+    xSizeIndex: number;
     ySizeIndex: number;
     yDiff: number;
   } | null>(null);
@@ -49,6 +50,8 @@ export const useCalendarDragAndDrop = (
           (dayjs(event.end?.dateTime).diff(dayjs(event.start?.dateTime), 'minute') / 60) *
           config.divisionsPerHour;
 
+        const xSizeIndex = dayjs(event.end?.date).diff(dayjs(event.start?.date), 'day');
+
         const yDiff =
           isMouseDownRef.current === 'allday'
             ? 0
@@ -59,7 +62,7 @@ export const useCalendarDragAndDrop = (
                 config.divisionsPerHour
               );
 
-        setDragEventItem({ event, ySizeIndex, yDiff });
+        setDragEventItem({ event, ySizeIndex, yDiff, xSizeIndex });
         return;
       }
 
@@ -95,7 +98,7 @@ export const useCalendarDragAndDrop = (
           const resultStart = start.add(xIndex, 'day');
 
           setSelectedStartDay(resultStart);
-          setSelectedEndDay(resultStart);
+          setSelectedEndDay(resultStart.add(dragEventItem.xSizeIndex - 1, 'day'));
           return;
         }
         const resultStart = start
