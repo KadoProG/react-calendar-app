@@ -12,6 +12,7 @@ interface CalendarBodyMainProps {
   selectedEndDay: dayjs.Dayjs | null;
   isDragging: boolean;
   config: CalendarConfig;
+  dragEventItem: { event: CalendarEventWithCalendarId; yDiff: number } | null;
 }
 
 export const CalendarBodyMain: React.FC<CalendarBodyMainProps> = (props) => {
@@ -64,6 +65,7 @@ export const CalendarBodyMain: React.FC<CalendarBodyMainProps> = (props) => {
             calendarEventsInTimely={calendarEventsInTimely}
             splitedSelectedCalendarEvents={splitedSelectedCalendarEvents}
             config={props.config}
+            dragEventItem={props.dragEventItem}
           />
         ))}
       </div>

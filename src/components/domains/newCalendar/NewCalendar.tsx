@@ -9,6 +9,7 @@ import { useWatch } from 'react-hook-form';
 import { KeyDownContext } from '@/contexts/KeyDownContext';
 import { CalendarMenuContext } from '@/components/domains/newCalendar/CalendarMenuContext';
 import { AuthContext } from '@/contexts/AuthContext';
+import { calculateIndexDifference } from '@/utils/convertDayjs';
 
 export const NewCalendar: React.FC = () => {
   const { openMenu } = React.useContext(CalendarMenuContext);
@@ -28,11 +29,47 @@ export const NewCalendar: React.FC = () => {
 
   const isMouseDownRef = React.useRef<'allday' | 'timely' | null>(null);
 
+  // イベントドラッグ時に格納される変数
+  const [dragEventItem, setDragEventItem] = React.useState<{
+    event: CalendarEventWithCalendarId;
+    ySizeIndex: number;
+    yDiff: number;
+  } | null>(null);
+
   const handleMouseDown = React.useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (isMouseDownRef.current) return;
       const { xIndex, yIndex } = getMouseSelectedCalendar(e, scrollRef.current!, config, topHeight);
 
+      // イベントの上でマウスダウンした場合の処理
+      if (e.target instanceof HTMLElement && e.target.id.includes('calendarEvent__')) {
+        const eventId = e.target.id.replace('calendarEvent__', '');
+        const event = calendarEvents.find((event) => event.id === eventId);
+        if (!event) return;
+
+        setSelectedStartDay(dayjs(event.start?.dateTime ?? event.start?.date));
+        setSelectedEndDay(dayjs(event.end?.dateTime ?? event.end?.date));
+        isMouseDownRef.current = event.start?.date ? 'allday' : 'timely';
+
+        const ySizeIndex =
+          (dayjs(event.end?.dateTime).diff(dayjs(event.start?.dateTime), 'minute') / 60) *
+          config.divisionsPerHour;
+
+        const yDiff =
+          isMouseDownRef.current === 'allday'
+            ? 0
+            : yIndex -
+              calculateIndexDifference(
+                dayjs(event.start?.dateTime).startOf('day'),
+                dayjs(event.start?.dateTime ?? event.start?.date),
+                config.divisionsPerHour
+              );
+
+        setDragEventItem({ event, ySizeIndex, yDiff });
+        return;
+      }
+
+      // 終日イベントの上でマウスダウンした場合の処理
       if (yIndex < 0) {
         const resultDate = start.add(xIndex, 'day');
         setSelectedStartDay(resultDate);
@@ -41,13 +78,13 @@ export const NewCalendar: React.FC = () => {
         return;
       }
 
+      // 通常のイベントの上でマウスダウンした場合の処理
       const resultDate = start.add(xIndex, 'day').add(yIndex / config.divisionsPerHour, 'hour');
-
       setSelectedStartDay(resultDate);
       setSelectedEndDay(resultDate);
       isMouseDownRef.current = 'timely';
     },
-    [start, topHeight, config]
+    [start, topHeight, config, calendarEvents]
   );
 
   const handleMouseMove = React.useCallback(
@@ -56,6 +93,21 @@ export const NewCalendar: React.FC = () => {
       setIsDragging(true);
 
       const { xIndex, yIndex } = getMouseSelectedCalendar(e, scrollRef.current!, config, topHeight);
+
+      // イベントドラッグ中の処理
+      if (dragEventItem) {
+        const resultStart = start
+          .add(xIndex, 'day')
+          .add((yIndex - dragEventItem.yDiff) / config.divisionsPerHour, 'hour');
+        const resultEnd = resultStart.add(
+          ((dragEventItem.ySizeIndex - 1) * 60) / config.divisionsPerHour,
+          'minute'
+        );
+
+        setSelectedStartDay(resultStart);
+        setSelectedEndDay(resultEnd);
+        return;
+      }
 
       if (isMouseDownRef.current === 'allday') {
         const resultDate = start.add(xIndex, 'day');
@@ -66,7 +118,7 @@ export const NewCalendar: React.FC = () => {
       const resultDate = start.add(xIndex, 'day').add(yIndex / config.divisionsPerHour, 'hour');
       setSelectedEndDay(resultDate);
     },
-    [start, config, topHeight]
+    [start, config, topHeight, dragEventItem]
   );
 
   const handleMouseUp = React.useCallback(
@@ -80,36 +132,49 @@ export const NewCalendar: React.FC = () => {
         selectedStartDay > selectedEndDay ? selectedStartDay : selectedEndDay
       ).add(60 / config.divisionsPerHour, 'minute');
 
-      await openMenu({
-        anchorEl: e.target as HTMLElement,
-        start: resultStartDay,
-        end: resultEndDay,
-        isAllDay: isMouseDownRef.current === 'allday',
-        calendarId: user?.email ?? '',
-        eventId: '',
-        summary: '',
-      });
+      if (dragEventItem) {
+        await openMenu({
+          anchorEl: e.target as HTMLElement,
+          start: resultStartDay,
+          end: resultEndDay,
+          isAllDay: dragEventItem.event.start?.date ? true : false,
+          calendarId: dragEventItem.event.calendarId,
+          eventId: dragEventItem.event.id ?? '',
+          summary: dragEventItem.event.summary ?? '',
+        });
+      } else {
+        await openMenu({
+          anchorEl: e.target as HTMLElement,
+          start: resultStartDay,
+          end: resultEndDay,
+          isAllDay: isMouseDownRef.current === 'allday',
+          calendarId: user?.email ?? '',
+          eventId: '',
+          summary: '',
+        });
+      }
 
       isMouseDownRef.current = null;
       setIsDragging(false);
+      setDragEventItem(null);
     },
-    [selectedStartDay, selectedEndDay, isDragging, config, openMenu, user]
+    [selectedStartDay, selectedEndDay, isDragging, config, openMenu, user, dragEventItem]
   );
 
   React.useEffect(() => {
-    if (isDragging) {
-      addKeyDownEvent({
-        id: 0,
-        key: 'Escape',
-        callback: () => {
-          isMouseDownRef.current = null;
-          setIsDragging(false);
-        },
-      });
-    } else {
+    addKeyDownEvent({
+      id: 0,
+      key: 'Escape',
+      callback: () => {
+        isMouseDownRef.current = null;
+        setIsDragging(false);
+        setDragEventItem(null);
+      },
+    });
+    return () => {
       removeKeyDownEvent(0);
-    }
-  }, [addKeyDownEvent, removeKeyDownEvent, isDragging]);
+    };
+  }, [addKeyDownEvent, removeKeyDownEvent]);
 
   return (
     <div style={{ height: '100svh', display: 'flex', flexDirection: 'column' }}>
@@ -146,6 +211,7 @@ export const NewCalendar: React.FC = () => {
             selectedEndDay={selectedEndDay}
             isDragging={isDragging && isMouseDownRef.current === 'timely'}
             config={config}
+            dragEventItem={dragEventItem}
           />
         </div>
       </div>
