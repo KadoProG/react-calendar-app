@@ -13,8 +13,8 @@ interface SettingDialogProps {
 
 export const SettingDialog: React.FC<SettingDialogProps> = (props) => (
   <DialogContainer isOpen={props.isOpen} onClose={props.onClose}>
-    <DialogContent>
-      <DialogHeader title="設定" />
+    <DialogContent style={{ maxWidth: 600 }} onClose={props.onClose}>
+      <DialogHeader title="設定" onClose={props.onClose} />
       <DialogBody>
         <SettingCalendarListValid />
         <SettingOtherFormItems />

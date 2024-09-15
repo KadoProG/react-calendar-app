@@ -59,7 +59,7 @@ export const CalendarDetailEditMenu: React.FC<CalendarDetailEditMenuProps> = (pr
       resultTop = top - 460; // 上側にスペースがあれば下を基準にして表示
     }
 
-    return { display: 'flex', top: resultTop, left: resultLeft };
+    return { display: 'block', top: resultTop, left: resultLeft };
   }, [props.anchorEl]);
 
   const handleFormSubmit = React.useCallback(

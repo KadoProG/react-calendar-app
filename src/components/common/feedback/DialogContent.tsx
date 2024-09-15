@@ -3,6 +3,7 @@ import styles from '@/components/common/feedback/Dialog.module.scss';
 interface DialogContentProps {
   children: React.ReactNode;
   onSubmit?: (e: React.FormEvent) => void;
+  onClose?: () => void;
   style?: React.CSSProperties;
 }
 
