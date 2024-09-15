@@ -46,7 +46,7 @@ export const useCalendarMenuForm = (args: {
           },
           end: {
             dateTime: !isAllDay ? dayjs(data.end).toISOString() : undefined,
-            date: isAllDay ? dayjs(data.endDate).format('YYYY-MM-DD') : undefined,
+            date: isAllDay ? dayjs(data.endDate).add(1, 'day').format('YYYY-MM-DD') : undefined,
           },
         };
 

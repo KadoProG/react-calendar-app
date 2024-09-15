@@ -90,6 +90,14 @@ export const useCalendarDragAndDrop = (
 
       // イベントドラッグ中の処理
       if (dragEventItem) {
+        // 終日イベントの場合
+        if (dragEventItem.event.start?.date) {
+          const resultStart = start.add(xIndex, 'day');
+
+          setSelectedStartDay(resultStart);
+          setSelectedEndDay(resultStart);
+          return;
+        }
         const resultStart = start
           .add(xIndex, 'day')
           .add((yIndex - dragEventItem.yDiff) / config.divisionsPerHour, 'hour');

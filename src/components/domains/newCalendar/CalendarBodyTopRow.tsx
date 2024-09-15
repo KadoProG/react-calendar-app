@@ -60,16 +60,14 @@ export const CalendarBodyTopRow: React.FC<CalendarBodyTopRowProps> = (props) => 
       const event = calendarEventsInAllDayInDay.find((event) => event.id === id);
       if (!event) return;
 
-      const isAllDay = event.start?.date;
-
       await openMenu({
         anchorEl: e.currentTarget,
-        start: dayjs(isAllDay ? event.start?.date : event.start?.dateTime),
-        end: dayjs(isAllDay ? event.end?.date : event.end?.dateTime),
+        start: dayjs(event.start?.date),
+        end: dayjs(event.end?.date).add(-1, 'day'),
         eventId: event.id ?? '',
         calendarId: event.calendarId,
         summary: event.summary ?? '',
-        isAllDay: !!isAllDay,
+        isAllDay: true,
       });
     },
     [openMenu, calendarEventsInAllDayInDay]
@@ -93,12 +91,12 @@ export const CalendarBodyTopRow: React.FC<CalendarBodyTopRowProps> = (props) => 
         return (
           <button
             key={event.id}
-            onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => handleScheduleClick(e, event.id ?? '')}
+            id={`calendarEvent__${event.id}`}
             className={`${styles.calendarEvent} ${startDate.isBefore(date, 'day') ? styles.start : ''} ${overDiff ? styles.end : ''}`}
             style={{ width: `${resultDiff * 100}%`, backgroundColor: event.backgroundColor }}
           >
-            <p>{event.summary}</p>
+            {event.summary}
           </button>
         );
       })}
