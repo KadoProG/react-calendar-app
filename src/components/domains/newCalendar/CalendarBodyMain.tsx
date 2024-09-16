@@ -50,7 +50,7 @@ export const CalendarBodyMain: React.FC<CalendarBodyMainProps> = (props) => {
             <div
               className={styles.timeLabel}
               key={i}
-              style={{ height: props.config.heightPerHour }}
+              style={{ height: props.config.heightPerHour * 1 }}
             >
               {i !== 0 && <p>{time}</p>}
             </div>
