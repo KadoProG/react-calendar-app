@@ -20,13 +20,12 @@ export const NewCalendar: React.FC = () => {
     selectedEndDay,
     isDragging,
     dragEventItem,
-    user,
     isMouseDownRef,
   } = useCalendarDragAndDrop(scrollRef, topHeight, start, calendarEvents, config);
 
   return (
     <div style={{ height: '100svh', display: 'flex', flexDirection: 'column' }}>
-      <CalendarHeader control={control} config={config} user={user} />
+      <CalendarHeader control={control} config={config} />
 
       <div
         onMouseDown={handleMouseDown}

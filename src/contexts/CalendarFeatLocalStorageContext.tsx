@@ -33,9 +33,9 @@ export const CalendarFeatLocalStorageProvider: React.FC<{ children: React.ReactN
 
   const { control, watch, reset } = useForm<CalendarConfig>({
     defaultValues: {
-      divisionsPerHour: 4,
+      divisionsPerHour: 2,
       heightPerHour: 40,
-      weekDisplayCount: 5,
+      weekDisplayCount: 7,
       dateRangeStartTime: 'SunDay',
     },
   });

@@ -12,13 +12,12 @@
 
   &__content {
     position: absolute;
+    top: 38px;
+    right: 0;
     background: var(--background-paper);
     border: 1px solid var(--divider);
     box-shadow: 0px 4px 20px 1px var(--divider);
     padding: 12px;
-    margin: 12px;
-    width: 100%;
-    max-width: 300px;
     max-height: 100%;
     z-index: 100;
     overflow: scroll;

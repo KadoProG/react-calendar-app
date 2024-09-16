@@ -9,10 +9,10 @@ import { Link } from 'react-router-dom';
 import { HEADER_HEIGHT } from '@/const/const';
 import { SettingDialog } from '@/components/domains/setting/SettingDialog';
 import { convertCalendarRange } from '@/utils/calendarUtils';
+import { CalendarHeaderUserMenuButton } from '@/components/domains/newCalendar/CalenderHeaderUserMenuButton';
 
 interface CalendarHeaderProps {
   control: Control<FetchCalendarForm>;
-  user: User | null;
   config: CalendarConfig;
 }
 
@@ -52,11 +52,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = (props) => {
 
       <div style={{ flex: 1 }} />
 
-      {props.user && (
-        <Button width={50} style={{ padding: 2 }}>
-          <img src={props.user?.imageUrl} alt="お前" width={32} height={32} />
-        </Button>
-      )}
+      <CalendarHeaderUserMenuButton />
 
       <SettingDialog isOpen={isOpenSettingDialog} onClose={() => setIsOpenSettingDialog(false)} />
     </div>
