@@ -1,4 +1,4 @@
-import { CalendarMenuProvider } from '@/components/domains/newCalendar/CalendarMenuContext';
+import { CalendarMenuProvider } from '@/components/domains/editMenu/CalendarMenuContext';
 import { NewCalendar } from '@/components/domains/newCalendar/NewCalendar';
 import { CalendarContextProvider } from '@/contexts/CalendarContext';
 import { CalendarFeatLocalStorageProvider } from '@/contexts/CalendarFeatLocalStorageContext';

@@ -1,7 +1,6 @@
 import dayjs from '@/libs/dayjs';
-import styles from '@/components/domains/newCalendar/CalendarDetailEditMenu.module.scss';
+import styles from '@/components/domains/editMenu/CalendarEditMenu.module.scss';
 import { DeleteButton } from '@/components/common/button/DeleteButton';
-import { CalendarMenuForm } from '@/components/domains/newCalendar/CalendarMenuContext';
 import React from 'react';
 import { Button } from '@/components/common/button/Button';
 import { Control, UseFormSetValue, UseFormWatch } from 'react-hook-form';
@@ -9,8 +8,9 @@ import { CheckBox } from '@/components/common/input/CheckBox';
 import { Select } from '@/components/common/input/Select';
 import { CalendarFeatLocalStorageContext } from '@/contexts/CalendarFeatLocalStorageContext';
 import { TextField } from '@/components/common/input/TextField';
+import { CalendarMenuForm } from '@/components/domains/editMenu/CalendarMenuContext';
 
-interface CalendarDetailEditMenuProps {
+interface CalendarEditMenuProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   control: Control<CalendarMenuForm, any>;
   anchorEl: HTMLElement | null;
@@ -22,7 +22,7 @@ interface CalendarDetailEditMenuProps {
   isSubmitting: boolean;
 }
 
-export const CalendarDetailEditMenu: React.FC<CalendarDetailEditMenuProps> = (props) => {
+export const CalendarEditMenu: React.FC<CalendarEditMenuProps> = (props) => {
   const { isAllDay, start, end, startDate, endDate, eventId } = React.useMemo(
     () => props.watch(),
     [props]

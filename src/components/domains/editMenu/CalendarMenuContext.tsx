@@ -1,5 +1,5 @@
-import { CalendarDetailEditMenu } from '@/components/domains/newCalendar/CalendarDetailEditMenu';
-import { useCalendarMenuForm } from '@/components/domains/newCalendar/useCalendarMenuForm';
+import { CalendarEditMenu } from '@/components/domains/editMenu/CalendarEditMenu';
+import { useCalendarMenuForm } from '@/components/domains/editMenu/useCalendarMenuForm';
 import { CalendarContext } from '@/contexts/CalendarContext';
 import dayjs from '@/libs/dayjs';
 import React from 'react';
@@ -77,7 +77,7 @@ export const CalendarMenuProvider: React.FC<{ children: React.ReactNode }> = (pr
     <CalendarMenuContext.Provider value={value}>
       <div style={{ position: 'relative' }}>
         {props.children}
-        <CalendarDetailEditMenu
+        <CalendarEditMenu
           isSubmitting={isSubmitting}
           anchorEl={anchorEl}
           control={control}

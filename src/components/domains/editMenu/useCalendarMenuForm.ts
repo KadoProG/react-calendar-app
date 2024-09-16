@@ -1,9 +1,9 @@
 import dayjs from '@/libs/dayjs';
-import { CalendarMenuForm } from '@/components/domains/newCalendar/CalendarMenuContext';
 import { KeyDownContext } from '@/contexts/KeyDownContext';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { SnackbarContext } from '@/components/common/feedback/SnackbarContext';
+import { CalendarMenuForm } from '@/components/domains/editMenu/CalendarMenuContext';
 
 export const useCalendarMenuForm = (args: {
   isOpen: boolean;

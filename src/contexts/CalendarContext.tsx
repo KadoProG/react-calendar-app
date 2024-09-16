@@ -9,7 +9,6 @@ import { convertCalendarRange } from '@/utils/calendarUtils';
 export interface FetchCalendarForm {
   start: string;
   end: string;
-  canFetch: boolean;
 }
 
 interface CalendarContextType {
@@ -33,7 +32,6 @@ export const CalendarContext = React.createContext<CalendarContextType>({
     {
       start: string;
       end: string;
-      canFetch: boolean;
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
@@ -54,7 +52,6 @@ export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = 
     defaultValues: {
       start: dayjs().toISOString(),
       end: '',
-      canFetch: false,
     },
   });
 
@@ -66,7 +63,6 @@ export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = 
     reset({
       start: initDate.start.toISOString(),
       end: initDate.end.toISOString(),
-      canFetch: false,
     });
   }, [config, reset, start]);
 

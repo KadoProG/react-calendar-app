@@ -3,8 +3,8 @@ import dayjs from '@/libs/dayjs';
 import { KeyDownContext } from '@/contexts/KeyDownContext';
 import { AuthContext } from '@/contexts/AuthContext';
 import { calculateIndexDifference } from '@/utils/convertDayjs';
-import { CalendarMenuContext } from '@/components/domains/newCalendar/CalendarMenuContext';
 import { getMouseSelectedCalendar } from '@/utils/calendarUtils';
+import { CalendarMenuContext } from '@/components/domains/editMenu/CalendarMenuContext';
 
 export const useCalendarDragAndDrop = (
   scrollRef: React.RefObject<HTMLDivElement>,
