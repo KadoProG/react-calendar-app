@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import { fetchCalendarEvents } from '@/utils/fetchCalendarEvents';
 import { Control, useForm } from 'react-hook-form';
 import { CalendarFeatLocalStorageContext } from '@/contexts/CalendarFeatLocalStorageContext';
-import { convertCalendarRange } from '@/components/domains/newCalendar/calendarUtils';
+import { convertCalendarRange } from '@/utils/calendarUtils';
 
 export interface FetchCalendarForm {
   start: string;

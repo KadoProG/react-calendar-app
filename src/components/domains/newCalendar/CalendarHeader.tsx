@@ -7,8 +7,8 @@ import { Button } from '@/components/common/button/Button';
 import { SettingButton } from '@/components/common/button/SettingButton';
 import { Link } from 'react-router-dom';
 import { HEADER_HEIGHT } from '@/const/const';
-import { SettingDialog } from '@/components/domains/apitest/SettingDialog';
-import { convertCalendarRange } from '@/components/domains/newCalendar/calendarUtils';
+import { SettingDialog } from '@/components/domains/setting/SettingDialog';
+import { convertCalendarRange } from '@/utils/calendarUtils';
 
 interface CalendarHeaderProps {
   control: Control<FetchCalendarForm>;

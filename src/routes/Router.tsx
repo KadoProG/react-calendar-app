@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { APIPage } from '@/pages/APIPage';
 import { AuthContext } from '@/contexts/AuthContext';
 import { LoadingWithMessage } from '@/components/common/LoadingWithMessage';
 import { HomePage } from '@/pages/HomePage';
@@ -18,7 +17,6 @@ export const MyRouter: React.FC = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/new-calendar" element={<NewCalendarPage />} />
-        <Route path="/api" element={<APIPage />} />
       </Routes>
     </BrowserRouter>
   );

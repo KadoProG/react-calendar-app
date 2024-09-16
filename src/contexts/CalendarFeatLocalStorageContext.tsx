@@ -1,7 +1,7 @@
 import { LOCAL_STORAGE_KEY } from '@/const/const';
 import { AuthContext } from '@/contexts/AuthContext';
-import { saveUserConfigInLocalStorage } from '@/contexts/localStorageUtils';
 import { fetchCalendars } from '@/utils/fetchCalendarEvents';
+import { saveUserConfigInLocalStorage } from '@/utils/localStorageUtils';
 import React from 'react';
 import { Control, useForm } from 'react-hook-form';
 
