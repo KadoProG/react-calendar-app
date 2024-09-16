@@ -1,20 +1,20 @@
 import React from 'react';
 import dayjs from '@/libs/dayjs';
-import { CalendarContext } from '@/contexts/CalendarContext';
 import { KeyDownContext } from '@/contexts/KeyDownContext';
 import { AuthContext } from '@/contexts/AuthContext';
 import { calculateIndexDifference } from '@/utils/convertDayjs';
 import { getMouseSelectedCalendar } from '@/components/domains/newCalendar/calendarUtils';
 import { CalendarMenuContext } from '@/components/domains/newCalendar/CalendarMenuContext';
-import { useWatch } from 'react-hook-form';
 
 export const useCalendarDragAndDrop = (
   scrollRef: React.RefObject<HTMLDivElement>,
-  topHeight: number
+  topHeight: number,
+  start: dayjs.Dayjs,
+  calendarEvents: CalendarEventWithCalendarId[],
+  config: CalendarConfig
 ) => {
   const { openMenu } = React.useContext(CalendarMenuContext);
   const { user } = React.useContext(AuthContext);
-  const { control, calendarEvents, config } = React.useContext(CalendarContext);
   const { addKeyDownEvent, removeKeyDownEvent } = React.useContext(KeyDownContext);
 
   const [selectedStartDay, setSelectedStartDay] = React.useState<dayjs.Dayjs | null>(null);
@@ -28,8 +28,6 @@ export const useCalendarDragAndDrop = (
     ySizeIndex: number;
     yDiff: number;
   } | null>(null);
-
-  const start = dayjs(useWatch({ control, name: 'start' })).startOf('day');
 
   const handleMouseDown = React.useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {

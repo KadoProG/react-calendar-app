@@ -21,6 +21,7 @@ interface CalendarContextType {
   control: Control<FetchCalendarForm, any>;
   config: CalendarConfig;
   mutate: () => void;
+  start: dayjs.Dayjs;
 }
 
 export const CalendarContext = React.createContext<CalendarContextType>({
@@ -39,6 +40,7 @@ export const CalendarContext = React.createContext<CalendarContextType>({
   >,
   config: {} as CalendarConfig,
   mutate: () => {},
+  start: dayjs(),
 });
 
 export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -50,7 +52,7 @@ export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = 
 
   const { control, watch, reset } = useForm<FetchCalendarForm>({
     defaultValues: {
-      start: '',
+      start: dayjs().toISOString(),
       end: '',
       canFetch: false,
     },
@@ -90,8 +92,9 @@ export const CalendarContextProvider: React.FC<{ children: React.ReactNode }> = 
       control,
       config,
       mutate,
+      start: dayjs(start),
     }),
-    [calendarEvents, calendars, isCalendarEventsLoading, isLoading, control, config, mutate]
+    [calendarEvents, calendars, isCalendarEventsLoading, isLoading, control, config, mutate, start]
   );
 
   return <CalendarContext.Provider value={value}>{children}</CalendarContext.Provider>;

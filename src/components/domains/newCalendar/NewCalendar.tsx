@@ -1,3 +1,4 @@
+import dayjs from '@/libs/dayjs';
 import React from 'react';
 import { CalendarHeader } from '@/components/domains/newCalendar/CalendarHeader';
 import { CalendarBodyTop } from '@/components/domains/newCalendar/CalendarBodyTop';
@@ -6,7 +7,7 @@ import { CalendarContext } from '@/contexts/CalendarContext';
 import { useCalendarDragAndDrop } from '@/components/domains/newCalendar/useCalendarDragAndDrop';
 
 export const NewCalendar: React.FC = () => {
-  const { control, calendarEvents, config } = React.useContext(CalendarContext);
+  const { control, calendarEvents, config, start } = React.useContext(CalendarContext);
 
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [topHeight, setTopHeight] = React.useState<number>(0);
@@ -21,8 +22,7 @@ export const NewCalendar: React.FC = () => {
     dragEventItem,
     user,
     isMouseDownRef,
-    start,
-  } = useCalendarDragAndDrop(scrollRef, topHeight);
+  } = useCalendarDragAndDrop(scrollRef, topHeight, start, calendarEvents, config);
 
   return (
     <div style={{ height: '100svh', display: 'flex', flexDirection: 'column' }}>
@@ -34,26 +34,33 @@ export const NewCalendar: React.FC = () => {
         onMouseUp={handleMouseUp}
         style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}
       >
-        <CalendarBodyTop
-          start={start}
-          setTopHeight={setTopHeight}
-          selectedStartDay={selectedStartDay}
-          selectedEndDay={selectedEndDay}
-          isDragging={isDragging && isMouseDownRef.current === 'allday'}
-          config={config}
-          calendarEvents={calendarEvents}
-        />
-        <div ref={scrollRef} style={{ height: '100%', overflow: 'scroll', position: 'relative' }}>
-          <CalendarBodyMain
-            start={start}
-            selectedStartDay={selectedStartDay}
-            selectedEndDay={selectedEndDay}
-            isDragging={isDragging && isMouseDownRef.current === 'timely'}
-            config={config}
-            calendarEvents={calendarEvents}
-            dragEventItem={dragEventItem}
-          />
-        </div>
+        {dayjs(start).isValid() && (
+          <>
+            <CalendarBodyTop
+              start={start}
+              setTopHeight={setTopHeight}
+              selectedStartDay={selectedStartDay}
+              selectedEndDay={selectedEndDay}
+              isDragging={isDragging && isMouseDownRef.current === 'allday'}
+              config={config}
+              calendarEvents={calendarEvents}
+            />
+            <div
+              ref={scrollRef}
+              style={{ height: '100%', overflow: 'scroll', position: 'relative' }}
+            >
+              <CalendarBodyMain
+                start={start}
+                selectedStartDay={selectedStartDay}
+                selectedEndDay={selectedEndDay}
+                isDragging={isDragging && isMouseDownRef.current === 'timely'}
+                config={config}
+                calendarEvents={calendarEvents}
+                dragEventItem={dragEventItem}
+              />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
