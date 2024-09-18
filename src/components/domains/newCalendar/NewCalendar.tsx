@@ -43,6 +43,7 @@ export const NewCalendar: React.FC = () => {
               isDragging={isDragging && isMouseDownRef.current === 'allday'}
               config={config}
               calendarEvents={calendarEvents}
+              dragEventItem={dragEventItem}
             />
             <div
               ref={scrollRef}

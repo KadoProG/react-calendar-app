@@ -106,7 +106,6 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
             key={event.id}
             className={`${styles.calendarEvent} ${isDragItem ? styles.calendarEvent__leave : ''}`}
             onClick={(e) => handleScheduleClick(e, event.id ?? '')}
-            // disabled={isDragItem}
             id={`calendarEvent__${event.id}`}
             style={{
               top: `${(startDiff * heightPerHour) / divisionsPerHour}px`,

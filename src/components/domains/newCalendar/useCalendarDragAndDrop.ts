@@ -3,7 +3,7 @@ import dayjs from '@/libs/dayjs';
 import { KeyDownContext } from '@/contexts/KeyDownContext';
 import { AuthContext } from '@/contexts/AuthContext';
 import { calculateIndexDifference } from '@/utils/convertDayjs';
-import { getMouseSelectedCalendar } from '@/utils/calendarUtils';
+import { boolMouseSelectedCalendarBottom, getMouseSelectedCalendar } from '@/utils/calendarUtils';
 import { CalendarMenuContext } from '@/components/domains/editMenu/CalendarMenuContext';
 
 export const useCalendarDragAndDrop = (
@@ -27,6 +27,7 @@ export const useCalendarDragAndDrop = (
     xSizeIndex: number;
     ySizeIndex: number;
     yDiff: number;
+    isBottom?: boolean;
   } | null>(null);
 
   const handleMouseDown = React.useCallback(
@@ -39,6 +40,8 @@ export const useCalendarDragAndDrop = (
         const eventId = e.target.id.replace('calendarEvent__', '');
         const event = calendarEvents.find((event) => event.id === eventId);
         if (!event) return;
+
+        const end = dayjs(event.end?.dateTime || event.end?.date);
 
         setSelectedStartDay(dayjs(event.start?.dateTime ?? event.start?.date));
         setSelectedEndDay(dayjs(event.end?.dateTime ?? event.end?.date));
@@ -60,7 +63,20 @@ export const useCalendarDragAndDrop = (
                 config.divisionsPerHour
               );
 
-        setDragEventItem({ event, ySizeIndex, yDiff, xSizeIndex });
+        setDragEventItem({
+          event,
+          ySizeIndex,
+          yDiff,
+          xSizeIndex,
+          isBottom: boolMouseSelectedCalendarBottom(
+            e,
+            scrollRef.current!,
+            config,
+            topHeight,
+            end,
+            start
+          ),
+        });
         return;
       }
 
@@ -91,6 +107,18 @@ export const useCalendarDragAndDrop = (
 
       // イベントドラッグ中の処理
       if (dragEventItem) {
+        if (dragEventItem.isBottom) {
+          // 終日イベントのデフォルト値
+          let resultDate: dayjs.Dayjs = start.add(xIndex, 'day');
+
+          if (isMouseDownRef.current === 'timely') {
+            // 通常のイベントの計算
+            resultDate = resultDate.add(yIndex / config.divisionsPerHour, 'hour');
+          }
+          setSelectedEndDay(resultDate);
+
+          return;
+        }
         // 終日イベントの場合
         if (dragEventItem.event.start?.date) {
           const resultStart = start.add(xIndex, 'day');
@@ -127,7 +155,13 @@ export const useCalendarDragAndDrop = (
 
   const handleMouseUp = React.useCallback(
     async (e: React.MouseEvent) => {
-      if (!isDragging) return;
+      if (!isDragging) {
+        isMouseDownRef.current = null;
+        setSelectedStartDay(null);
+        setSelectedEndDay(null);
+        setDragEventItem(null);
+        return;
+      }
 
       if (!selectedStartDay || !selectedEndDay) return;
 

@@ -12,6 +12,7 @@ interface CalendarBodyTopRowProps {
   selectedEndDay: dayjs.Dayjs | null;
   isDragging: boolean;
   config: CalendarConfig;
+  dragEventItem: { event: CalendarEventWithCalendarId; yDiff: number } | null;
 }
 
 /**
@@ -89,12 +90,16 @@ export const CalendarBodyTopRow: React.FC<CalendarBodyTopRowProps> = (props) => 
           const scheculeDiff = endDate.diff(dayjs(date), 'day');
           const overDiff = !(scheculeDiff + props.i < props.config.weekDisplayCount);
           const resultDiff = overDiff ? props.config.weekDisplayCount - props.i : scheculeDiff;
+          const isDragItem = props.dragEventItem?.event.id === event.id;
+
           return (
             <button
               key={event.id}
               onClick={(e) => handleScheduleClick(e, event.id ?? '')}
               id={`calendarEvent__${event.id}`}
-              className={`${styles.calendarEvent} ${startDate.isBefore(date, 'day') ? styles.start : ''} ${overDiff ? styles.end : ''}`}
+              className={`${styles.calendarEvent} 
+              ${startDate.isBefore(date, 'day') ? styles.start : ''} 
+              ${overDiff ? styles.end : ''}  ${isDragItem ? styles.calendarEvent__leave : ''}`}
               style={{ width: `${resultDiff * 100}%`, backgroundColor: event.backgroundColor }}
             >
               {event.summary}

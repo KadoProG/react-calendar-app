@@ -66,6 +66,13 @@
   cursor: pointer;
   border: none;
   height: 24px;
+
+  user-select: none;
+  -webkit-user-drag: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -moz-user-drag: none;
+
   &:hover {
     filter: brightness(1.1);
   }
@@ -80,6 +87,16 @@
 
   &__leave {
     opacity: 0.2;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 100%;
+    cursor: ew-resize;
   }
 }
 

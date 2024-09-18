@@ -52,3 +52,40 @@ export const convertCalendarRange = (
 
   return { start, end };
 };
+
+/**
+ * マウスで選択された場所を取得し、左から数えたインデックスを返す
+ *
+ * @returns
+ * - xIndex 左から数えたインデックス（0 ~ {weekDisplayCount - 1} の範囲）
+ * - yIndex 上から数えたインデックス（-1 ~ 23 * divisionsPerHour の範囲）
+ */
+export const boolMouseSelectedCalendarBottom = (
+  e: React.MouseEvent<HTMLElement>,
+  scrollBase: HTMLElement,
+  config: CalendarConfig,
+  topHeight: number,
+  end: dayjs.Dayjs,
+  baseDate: dayjs.Dayjs
+): boolean => {
+  const rect = e.currentTarget.getBoundingClientRect();
+
+  if (e.clientY < rect.top + topHeight) {
+    const nowLeftPosition = e.clientX - rect.left; // 現在の左位置
+
+    const endXIndex = end.diff(baseDate, 'day');
+
+    const endPosition =
+      (endXIndex * (scrollBase.clientWidth - LEFT_WIDTH)) / config.weekDisplayCount + LEFT_WIDTH;
+
+    return nowLeftPosition > endPosition - 8 && nowLeftPosition <= endPosition;
+  }
+
+  const nowTopPosition = e.clientY - rect.top - topHeight + scrollBase.scrollTop; // 現在の上位置
+
+  const endYIndex = (end.diff(dayjs(end).startOf('day'), 'minute') / 60) * config.divisionsPerHour;
+
+  const endPosition = (endYIndex * config.heightPerHour) / config.divisionsPerHour;
+
+  return nowTopPosition > endPosition - 8 && nowTopPosition <= endPosition;
+};

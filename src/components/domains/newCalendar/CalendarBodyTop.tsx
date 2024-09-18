@@ -12,6 +12,7 @@ interface CalendarBodyTopProps {
   selectedEndDay: dayjs.Dayjs | null;
   isDragging: boolean;
   config: CalendarConfig;
+  dragEventItem: { event: CalendarEventWithCalendarId; yDiff: number } | null;
 }
 
 export const CalendarBodyTop: React.FC<CalendarBodyTopProps> = (props) => {
@@ -59,6 +60,7 @@ export const CalendarBodyTop: React.FC<CalendarBodyTopProps> = (props) => {
             selectedEndDay={props.selectedEndDay}
             isDragging={props.isDragging}
             config={props.config}
+            dragEventItem={props.dragEventItem}
           />
         ))}
       </div>
