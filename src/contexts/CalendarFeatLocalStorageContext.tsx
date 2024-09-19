@@ -112,10 +112,43 @@ export const CalendarFeatLocalStorageProvider: React.FC<{ children: React.ReactN
 
   const mutateCalendar = React.useCallback(async () => {
     if (!user) return;
-    localStorage.removeItem(user?.email);
+
     setIsLoading(true);
-    initCalendarsFeatLocalStorage();
-  }, [user, initCalendarsFeatLocalStorage]); // 依存関係にcalendarsを追加
+
+    try {
+      // ローカルストレージからデータを取得
+      const item = localStorage.getItem(LOCAL_STORAGE_KEY);
+      const parsedItem = item ? JSON.parse(item) : null;
+
+      const preCalendars: CalendarFeatLocalStorage[] = []; // 現在のカレンダー情報を格納
+
+      if (parsedItem && Array.isArray(parsedItem)) {
+        const userConfig: LocalStorageType | undefined = parsedItem.find(
+          (userConfig: LocalStorageType) => userConfig.id === user.email
+        );
+
+        if (userConfig && userConfig.calendars) {
+          preCalendars.push(...userConfig.calendars);
+        }
+      }
+
+      const fetchedCalendars = await fetchCalendars();
+
+      const processedCalendars = fetchedCalendars.map((calendar) => ({
+        ...calendar,
+        hasValid: preCalendars.some(
+          (preCalendar) => preCalendar.id === calendar.id && preCalendar.hasValid
+        ),
+      }));
+
+      setCalendars(processedCalendars);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+    }
+
+    setIsLoading(false);
+  }, [user]); // 依存関係にcalendarsを追加
 
   const value = React.useMemo(
     () => ({
