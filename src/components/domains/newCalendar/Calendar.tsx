@@ -6,7 +6,7 @@ import { CalendarBodyMain } from '@/components/domains/newCalendar/CalendarBodyM
 import { CalendarContext } from '@/contexts/CalendarContext';
 import { useCalendarDragAndDrop } from '@/components/domains/newCalendar/useCalendarDragAndDrop';
 
-export const NewCalendar: React.FC = () => {
+export const Calendar: React.FC = () => {
   const { control, calendarEvents, config, start } = React.useContext(CalendarContext);
 
   const scrollRef = React.useRef<HTMLDivElement>(null);

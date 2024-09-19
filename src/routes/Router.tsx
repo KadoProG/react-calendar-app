@@ -1,9 +1,8 @@
 import React from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthContext } from '@/contexts/AuthContext';
 import { LoadingWithMessage } from '@/components/common/LoadingWithMessage';
-import { HomePage } from '@/pages/HomePage';
-import { NewCalendarPage } from '@/pages/NewCalendarPage';
+import { CalendarPage } from '@/pages/CalendarPage';
 
 export const MyRouter: React.FC = () => {
   const { status } = React.useContext(AuthContext);
@@ -15,8 +14,8 @@ export const MyRouter: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/new-calendar" element={<NewCalendarPage />} />
+        <Route path="/" element={<CalendarPage />} />
+        <Route path="/*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   );

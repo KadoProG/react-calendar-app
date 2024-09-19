@@ -1,13 +1,13 @@
 import { CalendarMenuProvider } from '@/components/domains/editMenu/CalendarMenuContext';
-import { NewCalendar } from '@/components/domains/newCalendar/NewCalendar';
+import { Calendar } from '@/components/domains/newCalendar/Calendar';
 import { CalendarContextProvider } from '@/contexts/CalendarContext';
 import { CalendarFeatLocalStorageProvider } from '@/contexts/CalendarFeatLocalStorageContext';
 
-export const NewCalendarPage: React.FC = () => (
+export const CalendarPage: React.FC = () => (
   <CalendarFeatLocalStorageProvider>
     <CalendarContextProvider>
       <CalendarMenuProvider>
-        <NewCalendar />
+        <Calendar />
       </CalendarMenuProvider>
     </CalendarContextProvider>
   </CalendarFeatLocalStorageProvider>
