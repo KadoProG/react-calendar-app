@@ -51,6 +51,3 @@ yarn dev # ready to Debug http://localhost:5173/
 - 18+56+90+103+65+142+77 = 551min(9h11min) ここで[XへPOST](https://x.com/KadoUniversity/status/1823470689833419143)
 
 - All 3543min(59時間3分)
-
-
-
