@@ -23,10 +23,12 @@ jobs:
           echo "VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID" > .env
           echo "VITE_GOOGLE_API_KEY=$VITE_GOOGLE_API_KEY" >> .env
           echo "VITE_SCOPES=$VITE_SCOPES" >> .env
+          echo "VITE_GA_TRACKING_ID=$VITE_GA_TRACKING_ID" >> .env
         env:
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
           VITE_GOOGLE_API_KEY: ${{ secrets.VITE_GOOGLE_API_KEY }}
           VITE_SCOPES: ${{ secrets.VITE_SCOPES }}
+          VITE_GA_TRACKING_ID: ${{ secrets.VITE_GA_TRACKING_ID }}
 
       - name: vite build
         run: |
