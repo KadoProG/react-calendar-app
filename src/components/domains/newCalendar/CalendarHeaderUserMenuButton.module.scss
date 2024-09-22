@@ -5,7 +5,6 @@
   z-index: 1000;
   width: 100%;
   height: 100%;
-  padding: 12px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -17,7 +16,7 @@
     background: var(--background-paper);
     border: 1px solid var(--divider);
     box-shadow: 0px 4px 20px 1px var(--divider);
-    padding: 12px;
+    padding: 8px;
     max-height: 100%;
     z-index: 100;
     overflow: scroll;
@@ -40,4 +39,22 @@
     margin-top: 20px;
     width: 100%;
   }
+}
+
+.copyright {
+  color: gray;
+  text-align: center;
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.buttonContainerRight {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
