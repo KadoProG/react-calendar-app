@@ -1,4 +1,3 @@
-import { CalendarMenuContext } from '@/components/domains/editMenu/CalendarMenuContext';
 import styles from '@/components/domains/newCalendar/CalendarBodyMainRow.module.scss';
 import { CalendarBodyMainRowSelectedItem } from '@/components/domains/newCalendar/CalendarBodyMainRowSelectedItem';
 import dayjs from '@/libs/dayjs';
@@ -25,7 +24,6 @@ interface CalendarBodyMainRowProps {
  * カレンダー時刻部分の１行を描写する
  */
 export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) => {
-  const { openMenu } = React.useContext(CalendarMenuContext);
   const { heightPerHour, divisionsPerHour } = props.config;
   // index値から日付を取得
   const date = React.useMemo(
@@ -37,25 +35,6 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
   const calendarEventsInTimelyInDay = React.useMemo(
     () => props.calendarEventsInTimely.filter((event) => event.splitStart.isSame(date, 'day')),
     [props.calendarEventsInTimely, date]
-  );
-
-  const handleScheduleClick = React.useCallback(
-    async (e: React.MouseEvent<HTMLButtonElement>, id: string) => {
-      const event = props.calendarEventsInTimely.find((event) => event.id === id);
-      if (!event) return;
-
-      const isAllDay = event.start?.date;
-
-      await openMenu({
-        anchorEl: e.currentTarget,
-        start: dayjs(isAllDay ? event.start?.date : event.start?.dateTime),
-        end: dayjs(isAllDay ? event.end?.date : event.end?.dateTime),
-        eventId: event.id ?? '',
-        calendarId: event.calendarId,
-        summary: event.summary ?? '',
-      });
-    },
-    [openMenu, props.calendarEventsInTimely]
   );
 
   // １日ずつ（Weekに対する列）の表示
@@ -105,7 +84,6 @@ export const CalendarBodyMainRow: React.FC<CalendarBodyMainRowProps> = (props) =
           <button
             key={event.id}
             className={`${styles.calendarEvent} ${isDragItem ? styles.calendarEvent__leave : ''}`}
-            onClick={(e) => handleScheduleClick(e, event.id ?? '')}
             id={`calendarEvent__${event.id}`}
             style={{
               top: `${(startDiff * heightPerHour) / divisionsPerHour}px`,

@@ -155,7 +155,7 @@ export const useCalendarDragAndDrop = (
 
   const handleMouseUp = React.useCallback(
     async (e: React.MouseEvent) => {
-      if (!isDragging) {
+      if (!isDragging && !dragEventItem) {
         isMouseDownRef.current = null;
         setSelectedStartDay(null);
         setSelectedEndDay(null);

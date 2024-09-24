@@ -1,4 +1,3 @@
-import { CalendarMenuContext } from '@/components/domains/editMenu/CalendarMenuContext';
 import styles from '@/components/domains/newCalendar/CalendarBodyTopRow.module.scss';
 import dayjs from '@/libs/dayjs';
 import { formatDateRange } from '@/utils/convertDayjs';
@@ -19,8 +18,6 @@ interface CalendarBodyTopRowProps {
  * カレンダーの上部の日付・曜日が記載された部分のヘッダの１行を描写する
  */
 export const CalendarBodyTopRow: React.FC<CalendarBodyTopRowProps> = (props) => {
-  const { openMenu } = React.useContext(CalendarMenuContext);
-
   // index値から日付を取得
   const date = React.useMemo(
     () => dayjs(props.start).startOf('day').add(props.i, 'day'),
@@ -56,24 +53,6 @@ export const CalendarBodyTopRow: React.FC<CalendarBodyTopRowProps> = (props) => 
     return props.selectedEndDay.diff(props.selectedStartDay, 'day');
   }, [props.selectedStartDay, props.selectedEndDay]);
 
-  const handleScheduleClick = React.useCallback(
-    async (e: React.MouseEvent<HTMLButtonElement>, id: string) => {
-      const event = calendarEventsInAllDayInDay.find((event) => event.id === id);
-      if (!event) return;
-
-      await openMenu({
-        anchorEl: e.currentTarget,
-        start: dayjs(event.start?.date),
-        end: dayjs(event.end?.date).add(-1, 'day'),
-        eventId: event.id ?? '',
-        calendarId: event.calendarId,
-        summary: event.summary ?? '',
-        isAllDay: true,
-      });
-    },
-    [openMenu, calendarEventsInAllDayInDay]
-  );
-
   return (
     <div
       className={styles.dayColumn}
@@ -95,7 +74,6 @@ export const CalendarBodyTopRow: React.FC<CalendarBodyTopRowProps> = (props) => 
           return (
             <button
               key={event.id}
-              onClick={(e) => handleScheduleClick(e, event.id ?? '')}
               id={`calendarEvent__${event.id}`}
               className={`${styles.calendarEvent} 
               ${startDate.isBefore(date, 'day') ? styles.start : ''} 
