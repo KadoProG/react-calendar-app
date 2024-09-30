@@ -41,11 +41,18 @@ export const useCalendarDragAndDrop = (
         const event = calendarEvents.find((event) => event.id === eventId);
         if (!event) return;
 
+        isMouseDownRef.current = event.start?.date ? 'allday' : 'timely';
+
+        const start = dayjs(event.start?.dateTime || event.start?.date);
         const end = dayjs(event.end?.dateTime || event.end?.date);
 
-        setSelectedStartDay(dayjs(event.start?.dateTime ?? event.start?.date));
-        setSelectedEndDay(dayjs(event.end?.dateTime ?? event.end?.date));
-        isMouseDownRef.current = event.start?.date ? 'allday' : 'timely';
+        const resultEnd =
+          isMouseDownRef.current === 'allday'
+            ? end.add(-1, 'day')
+            : end.add(-60 / config.divisionsPerHour, 'minute');
+
+        setSelectedStartDay(start);
+        setSelectedEndDay(resultEnd);
 
         const ySizeIndex =
           (dayjs(event.end?.dateTime).diff(dayjs(event.start?.dateTime), 'minute') / 60) *
