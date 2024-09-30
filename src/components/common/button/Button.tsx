@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 
 interface ButtonProps {
   onClick?: () => void;
+  onMouseDown?: (e: React.MouseEvent) => void;
   disabled?: boolean;
   type?: HTMLButtonElement['type'];
   children: React.ReactNode;
@@ -19,6 +20,7 @@ export const Button: React.FC<ButtonProps> = (props) =>
     </Link>
   ) : (
     <button
+      onMouseDown={props.onMouseDown}
       onClick={props.onClick}
       disabled={props.disabled}
       type={props.type}

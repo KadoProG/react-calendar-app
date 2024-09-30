@@ -3,6 +3,7 @@ import { Button } from '@/components/common/button/Button';
 import React from 'react';
 import { CalendarBodyTopRow } from '@/components/domains/newCalendar/CalendarBodyTopRow';
 import { LEFT_WIDTH } from '@/const/const';
+import { CalendarMenuContext } from '@/components/domains/editMenu/CalendarMenuContext';
 
 interface CalendarBodyTopProps {
   setTopHeight: React.Dispatch<React.SetStateAction<number>>;
@@ -16,6 +17,7 @@ interface CalendarBodyTopProps {
 }
 
 export const CalendarBodyTop: React.FC<CalendarBodyTopProps> = (props) => {
+  const { openMenu } = React.useContext(CalendarMenuContext);
   const ref = React.useRef<HTMLDivElement>(null);
   const calendarEventsInAllDay = React.useMemo(
     () => props.calendarEvents.filter((event) => !!event.start?.date && !!event.end?.date),
@@ -40,10 +42,25 @@ export const CalendarBodyTop: React.FC<CalendarBodyTopProps> = (props) => {
     updateHeight();
   }, [updateHeight]);
 
+  const handleAddEvent = React.useCallback(() => {
+    openMenu({
+      anchorEl: ref.current,
+      start: props.start.set('hour', 9),
+      end: props.start.set('hour', 10),
+      eventId: '',
+      calendarId: '',
+      summary: '',
+    });
+  }, [openMenu, props.start]);
+
   return (
     <div ref={ref} style={{ display: 'flex' }}>
       <div style={{ minWidth: LEFT_WIDTH }}>
-        <Button style={{ padding: '2px 4px' }}>
+        <Button
+          style={{ padding: '2px 4px' }}
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={handleAddEvent}
+        >
           ＋<br />
           新規
         </Button>

@@ -5,7 +5,7 @@ import dayjs from '@/libs/dayjs';
 import React from 'react';
 
 interface OpenMenuArgs {
-  anchorEl: HTMLElement;
+  anchorEl: HTMLElement | null;
   start: dayjs.Dayjs;
   end: dayjs.Dayjs;
   isAllDay?: boolean;
