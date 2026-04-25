@@ -21,7 +21,7 @@
     "react-hook-form": "^7.53.1",
     "react-router-dom": "^6.28.0",
     "swr": "^2.4.1",
-    "uuid": "^11.0.2"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",
