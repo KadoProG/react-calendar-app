@@ -5,7 +5,25 @@
 
 version: 2
 updates:
-  - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 10
+    groups:
+      # devDependenciesをまとめて1つのPRにする
+      dev-dependencies:
+        dependency-type: "development"
+      # productionの依存はpatchとminorをグループ化
+      production-minor-patch:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+  # dependabot.ymlにGitHub Actionsの自動更新も追加
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
       interval: "weekly"
