@@ -7,7 +7,7 @@ import { boolMouseSelectedCalendarBottom, getMouseSelectedCalendar } from '@/uti
 import { CalendarMenuContext } from '@/components/domains/editMenu/CalendarMenuContext';
 
 export const useCalendarDragAndDrop = (
-  scrollRef: React.RefObject<HTMLDivElement>,
+  scrollRef: React.RefObject<HTMLDivElement | null>,
   topHeight: number,
   start: dayjs.Dayjs,
   calendarEvents: CalendarEventWithCalendarId[],
