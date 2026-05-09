@@ -45,7 +45,7 @@ jobs:
           cp .htaccess.example dist/.htaccess
 
       - name: rsync deployments
-        uses: burnett01/rsync-deployments@5.1
+        uses: burnett01/rsync-deployments@5.2
         with:
           switches: -avz --delete
           path: dist/ # mixhostに送りたいファイルのあるパスを指定
