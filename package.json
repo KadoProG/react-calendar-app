@@ -14,12 +14,12 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "dayjs": "^1.11.20",
+    "dayjs": "^1.11.21",
     "gapi-script": "^1.2.0",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
-    "react-hook-form": "^7.76.0",
-    "react-router-dom": "^7.15.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-hook-form": "^7.77.0",
+    "react-router-dom": "^7.16.0",
     "swr": "^2.4.1",
     "uuid": "^14.0.0"
   },
@@ -30,7 +30,7 @@
     "@types/gapi.client": "^1.0.8",
     "@types/gapi.client.calendar": "^3.0.12",
     "@types/node": "^22.9.0",
-    "@types/react": "^19.2.14",
+    "@types/react": "^19.2.16",
     "@types/react-dom": "^19.2.3",
     "@types/uuid": "^10.0.0",
     "@vitejs/plugin-react": "^5.0.0",
