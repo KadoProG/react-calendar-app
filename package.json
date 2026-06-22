@@ -18,10 +18,10 @@
     "gapi-script": "^1.2.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-hook-form": "^7.79.0",
-    "react-router-dom": "^7.17.0",
+    "react-hook-form": "^7.80.0",
+    "react-router-dom": "^7.18.0",
     "swr": "^2.4.1",
-    "uuid": "^14.0.0"
+    "uuid": "^14.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",
