@@ -20,7 +20,7 @@
     "react-dom": "^19.2.7",
     "react-hook-form": "^7.80.0",
     "react-router-dom": "^7.18.0",
-    "swr": "^2.4.1",
+    "swr": "^2.4.2",
     "uuid": "^14.0.1"
   },
   "devDependencies": {
