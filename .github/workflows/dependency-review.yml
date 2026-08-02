@@ -7,10 +7,6 @@ on:
       - synchronize
       - reopened
       - ready_for_review
-    paths:
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/dependency-review.yml'
 
 permissions:
   contents: read
