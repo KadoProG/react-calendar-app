@@ -3,6 +3,10 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "volta": {
+    "node": "24.15.0",
+    "npm": "11.12.1"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
