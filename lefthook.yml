@@ -1,0 +1,16 @@
+pre-commit:
+  piped: true
+  jobs:
+    - name: format
+      glob: '*.{js,jsx,ts,tsx,json,css,scss}'
+      run: npx prettier --write --ignore-path .gitignore --ignore-unknown {staged_files}
+      stage_fixed: true
+
+    - name: eslint
+      glob: '*.{ts,tsx}'
+      run: npx eslint --max-warnings=0 --no-warn-ignored {staged_files}
+
+pre-push:
+  jobs:
+    - name: check-types
+      run: npx tsc -b
