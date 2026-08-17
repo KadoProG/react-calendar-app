@@ -22,9 +22,9 @@
     "gapi-script": "^1.2.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "react-hook-form": "^7.84.0",
+    "react-hook-form": "^7.85.0",
     "react-router-dom": "^7.18.2",
-    "swr": "^2.5.0",
+    "swr": "^2.5.1",
     "uuid": "^14.0.1"
   },
   "devDependencies": {
