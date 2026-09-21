@@ -22,8 +22,8 @@
     "gapi-script": "^1.2.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
-    "react-hook-form": "^7.87.0",
-    "react-router-dom": "^7.18.3",
+    "react-hook-form": "^7.88.0",
+    "react-router-dom": "^7.18.4",
     "swr": "^2.5.1",
     "uuid": "^14.0.2"
   },
